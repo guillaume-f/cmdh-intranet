@@ -1,0 +1,126 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "email": "admin@intranet.be",
+      "password": "admin123",
+      "firstName": "Sophie",
+      "lastName": "Dumont",
+      "role": "admin",
+      "avatar": null,
+      "active": true
+    },
+    {
+      "id": "u2",
+      "email": "encoder@intranet.be",
+      "password": "encoder123",
+      "firstName": "Marc",
+      "lastName": "Lefevre",
+      "role": "encoder",
+      "avatar": null,
+      "active": true
+    },
+    {
+      "id": "u3",
+      "email": "member@intranet.be",
+      "password": "member123",
+      "firstName": "Julie",
+      "lastName": "Martin",
+      "role": "member",
+      "avatar": null,
+      "active": true
+    },
+    {
+      "id": "u4",
+      "email": "candidate@intranet.be",
+      "password": "candidate123",
+      "firstName": "Thomas",
+      "lastName": "Bernard",
+      "role": "candidate",
+      "avatar": null,
+      "active": true
+    }
+  ],
+  "activities": [
+    {
+      "id": "a1",
+      "title": "Réunion de rentrée 2025",
+      "description": "Réunion annuelle pour présenter les projets de l'année et accueillir les nouveaux membres. Ordre du jour : bilan, projets, questions diverses.",
+      "date": "2025-09-15",
+      "time": "18:30",
+      "points": 5,
+      "location": "Salle polyvalente, Rue de la Paix 12, 7000 Mons",
+      "maxParticipants": 50,
+      "category": "reunion",
+      "status": "published",
+      "createdBy": "u2",
+      "createdAt": "2025-08-01T10:00:00Z"
+    },
+    {
+      "id": "a2",
+      "title": "Formation premiers secours",
+      "description": "Formation certifiante aux gestes de premiers secours. Matériel fourni. Prévoir tenue confortable. Attestation remise en fin de journée.",
+      "date": "2025-10-04",
+      "time": "09:00",
+      "points": 20,
+      "location": "Centre médical, Avenue de l'Hôpital 3, 7000 Mons",
+      "maxParticipants": 15,
+      "category": "formation",
+      "status": "published",
+      "createdBy": "u2",
+      "createdAt": "2025-08-10T14:00:00Z"
+    },
+    {
+      "id": "a3",
+      "title": "Journée team building",
+      "description": "Une journée de cohésion en plein air avec activités sportives et ludiques. Repas de midi inclus. Transport organisé au départ du siège.",
+      "date": "2025-11-22",
+      "time": "08:00",
+      "points": 15,
+      "location": "Domaine de Chevetogne, 5590 Ciney",
+      "maxParticipants": 30,
+      "category": "evenement",
+      "status": "published",
+      "createdBy": "u1",
+      "createdAt": "2025-09-01T09:00:00Z"
+    },
+    {
+      "id": "a4",
+      "title": "Atelier communication digitale",
+      "description": "Atelier pratique sur l'utilisation des réseaux sociaux et outils de communication pour les associations. Laptop conseillé.",
+      "date": "2025-12-10",
+      "time": "14:00",
+      "points": 10,
+      "location": "Espace coworking, Rue de la Station 8, 7000 Mons",
+      "maxParticipants": 20,
+      "category": "formation",
+      "status": "draft",
+      "createdBy": "u2",
+      "createdAt": "2025-09-15T11:00:00Z"
+    }
+  ],
+  "registrations": [
+    {
+      "id": "r1",
+      "activityId": "a1",
+      "userId": "u3",
+      "registeredAt": "2025-08-05T10:00:00Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r2",
+      "activityId": "a1",
+      "userId": "u2",
+      "registeredAt": "2025-08-06T11:00:00Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r3",
+      "activityId": "a2",
+      "userId": "u3",
+      "registeredAt": "2025-08-12T09:00:00Z",
+      "status": "confirmed"
+    }
+  ],
+  "passwordResets": []
+}
