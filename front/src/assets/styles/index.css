@@ -1,0 +1,5 @@
+/* Design System Index - Import all CSS files */
+@import './variables.css';
+@import './base.css';
+@import './messages.css';
+@import './components.css';

@@ -1,0 +1,45 @@
+/* Base Typography & Global Styles */
+html, body {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: 'Open Sans', sans-serif;
+}
+
+p {
+  color: var(--color-text-primary);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+/* Button */
+button {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+}

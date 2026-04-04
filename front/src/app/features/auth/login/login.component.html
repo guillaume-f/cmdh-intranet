@@ -1,0 +1,93 @@
+<div class="min-h-screen flex items-center justify-center px-4" style="background: linear-gradient(135deg, var(--color-text-primary) 0%, #1a1a1a 100%)">
+  <div class="w-full max-w-md">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="p-6 text-center text-white text-2xl font-bold" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); font-family: 'Open Sans', sans-serif;">
+          Connexion
+        </div>
+      </ng-template>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Messages -->
+        @if (messages().length > 0) {
+          @for (msg of messages(); track msg.summary) {
+            <div [ngClass]="'alert alert-' + msg.severity" role="alert" aria-live="polite">
+              <div>
+                <p class="alert-title">{{ msg.summary }}</p>
+                <p class="alert-description">{{ msg.detail }}</p>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Email field -->
+        <div class="form-input-wrapper">
+          <label for="email" class="form-label required">
+            Email
+          </label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            class="w-full"
+            placeholder="votre@email.com"
+            [attr.aria-invalid]="isFieldInvalid('email')"
+            [attr.aria-describedby]="
+              isFieldInvalid('email') ? 'email-error' : null
+            "
+          />
+          @if (isFieldInvalid('email') && isSubmitted()) {
+            <span id="email-error" class="field-error" role="alert">
+              {{ getErrorMessage('email') }}
+            </span>
+          }
+        </div>
+
+        <!-- Password field -->
+        <div class="form-input-wrapper">
+          <label for="password" class="form-label required">
+            Mot de passe
+          </label>
+          <input
+            pInputText
+            id="password"
+            type="password"
+            formControlName="password"
+            class="w-full"
+            placeholder="••••••••"
+            [attr.aria-invalid]="isFieldInvalid('password')"
+            [attr.aria-describedby]="
+              isFieldInvalid('password') ? 'password-error' : null
+            "
+          />
+          @if (isFieldInvalid('password') && isSubmitted()) {
+            <span id="password-error" class="field-error" role="alert">
+              {{ getErrorMessage('password') }}
+            </span>
+          }
+        </div>
+
+        <!-- Forgot password link -->
+        <div class="text-right">
+          <a
+            routerLink="/auth/forgot-password"
+            class="text-sm font-medium focus:outline-none focus:underline"
+          >
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <!-- Submit button -->
+        <button
+          pButton
+          type="submit"
+          label="Se connecter"
+          class="w-full p-button-primary"
+          [disabled]="isLoading() || form.invalid"
+          [loading]="isLoading()"
+        ></button>
+      </form>
+    </p-card>
+  </div>
+</div>

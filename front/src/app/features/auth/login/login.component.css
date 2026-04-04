@@ -1,0 +1,6 @@
+/* Login component styles */
+/* Most styles are defined in src/assets/styles/ */
+:host {
+  display: block;
+}
+

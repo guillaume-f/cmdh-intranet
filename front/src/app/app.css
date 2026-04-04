@@ -1,0 +1,5 @@
+/* App component styles - Most styles are now in src/assets/styles/ */
+:host {
+  display: block;
+}
+
