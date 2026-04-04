@@ -7,7 +7,6 @@ import {
   signal,
 } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -138,29 +137,7 @@ export class ResetPasswordComponent {
     });
   }
 
-  getErrorMessage(control: AbstractControl | null, fieldName?: string): string {
-    if (!control || !control.errors) {
-      return '';
-    }
 
-    if (control.errors['required']) {
-      return 'Ce champ est requis';
-    }
-
-    if (fieldName === 'newPassword' && control.errors['passwordStrength']) {
-      return 'Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial';
-    }
-
-    if (fieldName === 'confirmPassword' && control.errors['passwordMismatch']) {
-      return 'Les mots de passe ne correspondent pas';
-    }
-
-    return 'Erreur de validation';
-  }
-
-  isFieldInvalid(control: AbstractControl | null): boolean {
-    return control ? control.invalid && control.touched : false;
-  }
 
   getPasswordStrengthClass(): string {
     const score = this.passwordStrengthIndicator().score;

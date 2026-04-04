@@ -96,30 +96,5 @@ export class LoginComponent {
     });
   }
 
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
 
-    if (!field || !field.errors) {
-      return '';
-    }
-
-    if (field.errors['required']) {
-      return `${fieldName} est requis`;
-    }
-
-    if (field.errors['invalidEmail']) {
-      return 'Email invalide';
-    }
-
-    if (field.errors['minlength']) {
-      return `${fieldName} doit avoir au moins 8 caractères`;
-    }
-
-    return 'Erreur de validation';
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return !!(field && field.invalid && field.touched);
-  }
 }

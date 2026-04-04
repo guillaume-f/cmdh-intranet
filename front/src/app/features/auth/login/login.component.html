@@ -23,14 +23,16 @@
               [formControl]="form.controls.email"
               class="w-full"
               placeholder="votre@email.com"
-              [attr.aria-invalid]="isFieldInvalid(form.controls.email)"
-              [attr.aria-describedby]="
-                isFieldInvalid(form.controls.email) ? 'email-error' : null
-              "
+              [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
             />
-            @if (isFieldInvalid(form.controls.email) && isSubmitted()) {
-              <p-message id="email-error" severity="error" variant="simple" size="small">
-                {{ getErrorMessage(form.controls.email) }}
+            @if (form.controls.email?.errors?.['required'] && form.controls.email.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                Ce champ est requis
+              </p-message>
+            }
+            @if (form.controls.email?.errors?.['invalidEmail'] && form.controls.email.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                Email invalide
               </p-message>
             }
           </div>
@@ -49,14 +51,16 @@
               [formControl]="form.controls.password"
               class="w-full"
               placeholder="••••••••"
-              [attr.aria-invalid]="isFieldInvalid(form.controls.password)"
-              [attr.aria-describedby]="
-                isFieldInvalid(form.controls.password) ? 'password-error' : null
-              "
+              [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
             />
-            @if (isFieldInvalid(form.controls.password) && isSubmitted()) {
-              <p-message id="password-error" severity="error" variant="simple" size="small">
-                {{ getErrorMessage(form.controls.password) }}
+            @if (form.controls.password?.errors?.['required'] && form.controls.password.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                Ce champ est requis
+              </p-message>
+            }
+            @if (form.controls.password?.errors?.['minlength'] && form.controls.password.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                Le mot de passe doit avoir au moins 8 caractères
               </p-message>
             }
           </div>

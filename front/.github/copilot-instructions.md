@@ -36,47 +36,41 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ### Forms
 
-- **Reactive forms**: Use `[formControl]="form.controls.fieldName"` to bind controls directly in templates:
-  - Access form controls directly via `form.controls.fieldName` without creating getter methods
-  - Pass controls directly to utility methods (e.g., `isFieldInvalid(form.controls.email)`)
+- **Reactive forms**: Bind controls directly in templates without helper methods:
+  - Access form controls via `form.controls.fieldName` in templates
+  - Check errors directly with `form.controls.fieldName?.errors?.['errorType']`
+  - Check touched state with `form.controls.fieldName.touched`
   - Example:
     ```typescript
-    // Component TypeScript
+    // Component TypeScript - no helper methods needed
     readonly form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
-
-    getErrorMessage(control: AbstractControl | null): string {
-      if (!control) return '';
-      if (control.hasError('required')) return 'This field is required';
-      if (control.hasError('email')) return 'Invalid email format';
-      return '';
-    }
-
-    isFieldInvalid(control: AbstractControl | null): boolean {
-      return !!(control && control.invalid && control.touched);
-    }
     ```
     ```html
-    <!-- Template HTML -->
+    <!-- Template HTML - direct error checking -->
     <input [formControl]="form.controls.email" />
-    @if (isFieldInvalid(form.controls.email) && isSubmitted()) {
+    @if (form.controls.email?.errors?.['required'] && form.controls.email.touched) {
       <p-message severity="error" variant="simple" size="small">
-        {{ getErrorMessage(form.controls.email) }}
+        Ce champ est requis
+      </p-message>
+    }
+    @if (form.controls.email?.errors?.['invalidEmail'] && form.controls.email.touched) {
+      <p-message severity="error" variant="simple" size="small">
+        Email invalide
       </p-message>
     }
     ```
-  - **Advantages**: No boilerplate getter methods, cleaner templates, type-safe through FormGroup typing, better IDE autocomplete
-  - Utility methods accept `AbstractControl | null` for type safety
+  - **Advantages**: Clean codebase without boilerplate, direct access to errors in templates, better IDE autocomplete, minimal methods
 - **Submit buttons**: Do NOT disable submit buttons when the form is invalid. Instead:
   - Keep the button enabled so users can attempt submission
-  - Display validation errors when `isSubmitted()` is true
+  - Display validation errors when fields are touched
   - Prevent actual API calls with `if (!this.form.valid) { this.form.markAllAsTouched(); return; }` in the handler
   - This improves UX by letting users understand what fields are missing/invalid without guessing
-- Use `isSubmitted` signal to control error message visibility
 - Validate individually per field as users type for better feedback
 - Show field-level error messages inline with affected fields using PrimeNG `<p-message>` component with `severity="error"`, `variant="simple"`, and `size="small"`
+- For form-level validators (e.g., `passwordMismatch`), check via `form.errors?.['validatorName']` in the template
 
 ## State Management
 
