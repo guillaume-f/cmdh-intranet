@@ -5,24 +5,6 @@
   font-family: 'Open Sans', sans-serif;
 }
 
-/* PrimeNG Button - Primary */
-:deep(.p-button.p-button-primary) {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-  font-family: 'Open Sans', sans-serif;
-  font-weight: 600;
-}
-
-:deep(.p-button.p-button-primary:hover) {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-}
-
-:deep(.p-button.p-button-primary:focus) {
-  box-shadow: 0 0 0 0.2rem rgba(206, 170, 24, 0.5);
-}
-
 /* PrimeNG Card */
 :deep(.p-card) {
   border-color: var(--color-text-secondary);

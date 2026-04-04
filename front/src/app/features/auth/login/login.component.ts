@@ -12,18 +12,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../services/auth.service';
 import { FormValidatorsService } from '../../../services/form-validators.service';
 import { LoginRequest } from '../../../types/auth.types';
-
-interface AlertMessage {
-  severity: 'success' | 'error' | 'warning' | 'info';
-  summary: string;
-  detail: string;
-}
 
 interface LoginForm {
   email: string;
@@ -41,13 +37,16 @@ interface LoginForm {
     ButtonModule,
     InputTextModule,
     CardModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly messageService = inject(MessageService);
   private readonly formValidators = inject(FormValidatorsService);
   private readonly router = inject(Router);
 
@@ -60,7 +59,6 @@ export class LoginComponent {
   });
 
   readonly isLoading = this.authService.isLoading;
-  readonly messages = signal<AlertMessage[]>([]);
 
   readonly isSubmitted = signal(false);
 
@@ -75,25 +73,22 @@ export class LoginComponent {
 
     this.authService.login(request).subscribe({
       next: () => {
-        this.messages.set([
-          {
-            severity: 'success',
-            summary: 'Succès',
-            detail: 'Connecté avec succès',
-          },
-        ]);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Connecté avec succès',
+          life: 1500,
+        });
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
         }, 1500);
       },
       error: () => {
-        this.messages.set([
-          {
-            severity: 'error',
-            summary: 'Erreur',
-            detail: this.authService.error() || 'Erreur de connexion',
-          },
-        ]);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: this.authService.error() || 'Erreur de connexion',
+        });
       },
     });
   }

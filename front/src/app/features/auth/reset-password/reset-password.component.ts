@@ -13,18 +13,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../services/auth.service';
 import { FormValidatorsService } from '../../../services/form-validators.service';
 import { ResetPasswordRequest } from '../../../types/auth.types';
-
-interface AlertMessage {
-  severity: 'success' | 'error' | 'warning' | 'info';
-  summary: string;
-  detail: string;
-}
 
 interface ResetPasswordForm {
   tempPassword: string;
@@ -43,7 +39,9 @@ interface ResetPasswordForm {
     ButtonModule,
     InputTextModule,
     CardModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.css',
 })
@@ -53,6 +51,7 @@ export class ResetPasswordComponent {
   private readonly formValidators = inject(FormValidatorsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly messageService = inject(MessageService);
 
   readonly form: FormGroup<{
     tempPassword: any;
@@ -72,7 +71,6 @@ export class ResetPasswordComponent {
   );
 
   readonly isLoading = this.authService.isLoading;
-  readonly messages = signal<AlertMessage[]>([]);
   readonly isSubmitted = signal(false);
   readonly tempToken = signal<string>('');
 
@@ -95,13 +93,11 @@ export class ResetPasswordComponent {
     this.isSubmitted.set(true);
 
     if (!this.form.valid || !this.tempToken()) {
-      this.messages.set([
-        {
-          severity: 'error',
-          summary: 'Erreur',
-          detail: 'Formulaire invalide ou lien expiré',
-        },
-      ]);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: 'Formulaire invalide ou lien expiré',
+      });
       return;
     }
 
@@ -118,26 +114,23 @@ export class ResetPasswordComponent {
 
     this.authService.resetPassword(request).subscribe({
       next: () => {
-        this.messages.set([
-          {
-            severity: 'success',
-            summary: 'Succès',
-            detail: 'Mot de passe réinitialisé avec succès',
-          },
-        ]);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Mot de passe réinitialisé avec succès',
+          life: 3000,
+        });
 
         setTimeout(() => {
           this.router.navigate(['/auth/login']);
-        }, 1500);
+        }, 3000);
       },
       error: () => {
-        this.messages.set([
-          {
-            severity: 'error',
-            summary: 'Erreur',
-            detail: this.authService.error() || 'Erreur lors de la réinitialisation',
-          },
-        ]);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: this.authService.error() || 'Erreur lors de la réinitialisation',
+        });
       },
     });
   }
