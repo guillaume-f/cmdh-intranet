@@ -20,17 +20,17 @@
               pInputText
               id="email"
               type="email"
-              formControlName="email"
+              [formControl]="form.controls.email"
               class="w-full"
               placeholder="votre@email.com"
-              [attr.aria-invalid]="isFieldInvalid('email')"
+              [attr.aria-invalid]="isFieldInvalid(form.controls.email)"
               [attr.aria-describedby]="
-                isFieldInvalid('email') ? 'email-error' : null
+                isFieldInvalid(form.controls.email) ? 'email-error' : null
               "
             />
-            @if (isFieldInvalid('email') && isSubmitted()) {
+            @if (isFieldInvalid(form.controls.email) && isSubmitted()) {
               <p-message id="email-error" severity="error" variant="simple" size="small">
-                {{ getErrorMessage('email') }}
+                {{ getErrorMessage(form.controls.email) }}
               </p-message>
             }
           </div>
@@ -46,17 +46,17 @@
               pInputText
               id="password"
               type="password"
-              formControlName="password"
+              [formControl]="form.controls.password"
               class="w-full"
               placeholder="••••••••"
-              [attr.aria-invalid]="isFieldInvalid('password')"
+              [attr.aria-invalid]="isFieldInvalid(form.controls.password)"
               [attr.aria-describedby]="
-                isFieldInvalid('password') ? 'password-error' : null
+                isFieldInvalid(form.controls.password) ? 'password-error' : null
               "
             />
-            @if (isFieldInvalid('password') && isSubmitted()) {
+            @if (isFieldInvalid(form.controls.password) && isSubmitted()) {
               <p-message id="password-error" severity="error" variant="simple" size="small">
-                {{ getErrorMessage('password') }}
+                {{ getErrorMessage(form.controls.password) }}
               </p-message>
             }
           </div>

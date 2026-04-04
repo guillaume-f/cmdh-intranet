@@ -6,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -95,26 +96,23 @@ export class ForgotPasswordComponent {
     });
   }
 
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-
-    if (!field || !field.errors) {
+  getErrorMessage(control: AbstractControl | null): string {
+    if (!control || !control.errors) {
       return '';
     }
 
-    if (field.errors['required']) {
-      return `${fieldName} est requis`;
+    if (control.errors['required']) {
+      return 'Ce champ est requis';
     }
 
-    if (field.errors['invalidEmail']) {
+    if (control.errors['invalidEmail']) {
       return 'Email invalide';
     }
 
     return 'Erreur de validation';
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return !!(field && field.invalid && field.touched);
+  isFieldInvalid(control: AbstractControl | null): boolean {
+    return control ? control.invalid && control.touched : false;
   }
 }
