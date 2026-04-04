@@ -15,23 +15,25 @@
           <label for="email" class="form-label required">
             Email
           </label>
-          <input
-            pInputText
-            id="email"
-            type="email"
-            formControlName="email"
-            class="w-full"
-            placeholder="votre@email.com"
-            [attr.aria-invalid]="isFieldInvalid('email')"
-            [attr.aria-describedby]="
-              isFieldInvalid('email') ? 'email-error' : null
-            "
-          />
-          @if (isFieldInvalid('email') && isSubmitted()) {
-            <span id="email-error" class="field-error" role="alert">
-              {{ getErrorMessage('email') }}
-            </span>
-          }
+          <div class="flex flex-col gap-1">
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full"
+              placeholder="votre@email.com"
+              [attr.aria-invalid]="isFieldInvalid('email')"
+              [attr.aria-describedby]="
+                isFieldInvalid('email') ? 'email-error' : null
+              "
+            />
+            @if (isFieldInvalid('email') && isSubmitted()) {
+              <p-message id="email-error" severity="error" variant="simple" size="small">
+                {{ getErrorMessage('email') }}
+              </p-message>
+            }
+          </div>
         </div>
 
         <!-- Password field -->
@@ -39,23 +41,25 @@
           <label for="password" class="form-label required">
             Mot de passe
           </label>
-          <input
-            pInputText
-            id="password"
-            type="password"
-            formControlName="password"
-            class="w-full"
-            placeholder="••••••••"
-            [attr.aria-invalid]="isFieldInvalid('password')"
-            [attr.aria-describedby]="
-              isFieldInvalid('password') ? 'password-error' : null
-            "
-          />
-          @if (isFieldInvalid('password') && isSubmitted()) {
-            <span id="password-error" class="field-error" role="alert">
-              {{ getErrorMessage('password') }}
-            </span>
-          }
+          <div class="flex flex-col gap-1">
+            <input
+              pInputText
+              id="password"
+              type="password"
+              formControlName="password"
+              class="w-full"
+              placeholder="••••••••"
+              [attr.aria-invalid]="isFieldInvalid('password')"
+              [attr.aria-describedby]="
+                isFieldInvalid('password') ? 'password-error' : null
+              "
+            />
+            @if (isFieldInvalid('password') && isSubmitted()) {
+              <p-message id="password-error" severity="error" variant="simple" size="small">
+                {{ getErrorMessage('password') }}
+              </p-message>
+            }
+          </div>
         </div>
 
         <!-- Forgot password link -->
@@ -74,7 +78,7 @@
           type="submit"
           label="Se connecter"
           class="w-full"
-          [disabled]="isLoading() || form.invalid"
+          [disabled]="isLoading()"
           [loading]="isLoading()"
         ></button>
       </form>

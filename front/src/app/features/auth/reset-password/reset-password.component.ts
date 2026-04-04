@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../services/auth.service';
 import { FormValidatorsService } from '../../../services/form-validators.service';
@@ -39,6 +40,7 @@ interface ResetPasswordForm {
     ButtonModule,
     InputTextModule,
     CardModule,
+    MessageModule,
     ToastModule,
   ],
   providers: [MessageService],

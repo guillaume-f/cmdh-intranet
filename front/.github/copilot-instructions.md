@@ -34,6 +34,17 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do NOT use `ngStyle`, use `style` bindings instead
 - When using external templates/styles, use paths relative to the component TS file.
 
+### Forms
+
+- **Submit buttons**: Do NOT disable submit buttons when the form is invalid. Instead:
+  - Keep the button enabled so users can attempt submission
+  - Display validation errors when `isSubmitted()` is true
+  - Prevent actual API calls with `if (this.form.invalid) { this.form.markAllAsTouched(); return; }` in the handler
+  - This improves UX by letting users understand what fields are missing/invalid without guessing
+- Use `isSubmitted` signal to control error message visibility
+- Validate individually per field as users type for better feedback
+- Show field-level error messages inline with affected fields
+
 ## State Management
 
 - Use signals for local component state
