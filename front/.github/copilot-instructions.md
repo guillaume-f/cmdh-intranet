@@ -166,8 +166,14 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - **Component structure for forms**:
   ```typescript
+  import { DestroyRef, inject } from '@angular/core';
+  import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+  import { finalize } from 'rxjs';
+  import { LoginForm } from './models/login.model';  // Component-scoped types
+  import { LoginDtoRequest } from '../../../repositories/auth/auth.model';  // DTO types
+
   @Component({
-    selector: 'app-my-form',
+    selector: 'app-login',
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [
@@ -178,30 +184,58 @@ You are an expert in TypeScript, Angular, and scalable web application developme
       CardModule,
       MessageModule,
       ToastModule,
+      TranslatePipe
     ],
     providers: [MessageService],
-    templateUrl: './my-form.component.html',
-    styleUrl: './my-form.component.css',
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.css',
   })
-  export class MyFormComponent {
+  export class LoginComponent {
     private readonly fb = inject(FormBuilder);
     private readonly messageService = inject(MessageService);
-    private readonly formValidators = inject(FormValidatorsService);
+    private readonly authRepository = inject(AuthRepository);
+    private readonly router = inject(Router);
+    private readonly destroyRef = inject(DestroyRef);  // For observable cleanup
 
-    readonly form = this.fb.group({
-      fieldName: ['', [Validators.required, this.formValidators.email()]],
+    protected readonly form: FormGroup<LoginForm> = this.fb.group({
+      email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
 
-    readonly isLoading = someService.isLoading;
-    readonly isSubmitted = signal(false);
+    protected readonly isLoading = signal(false);
 
     onSubmit(): void {
-      this.isSubmitted.set(true);
       if (!this.form.valid) {
         this.form.markAllAsTouched();
         return;
       }
-      // Handle form submission
+
+      this.isLoading.set(true);
+      const request: LoginDtoRequest = this.form.value as LoginDtoRequest;
+
+      this.authRepository.login(request)
+        .pipe(
+          finalize(() => this.isLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef)  // Auto cleanup
+        )
+        .subscribe({
+          next: (response) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Connexion réussie',
+              life: 1500,
+            });
+            void this.router.navigate(['/dashboard']);
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erreur de connexion',
+              detail: error.message,
+              life: 3000,
+            });
+          },
+        });
     }
   }
   ```
@@ -217,6 +251,38 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Keep state transformations pure and predictable
 - Do NOT use `mutate` on signals, use `update` or `set` instead
 
+### Observable Management
+
+**CRITICAL: All observables MUST be automatically unsubscribed using `takeUntilDestroyed`**
+
+```typescript
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+export class MyComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly myRepository = inject(MyRepository);
+
+  onSubmit(): void {
+    this.myRepository.fetchData()
+      .pipe(
+        finalize(() => this.isLoading.set(false)),  // Side effects before unsubscribe
+        takeUntilDestroyed(this.destroyRef)         // Auto-unsubscribe on component destroy
+      )
+      .subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (error) => this.handleError(error),
+      });
+  }
+}
+```
+
+**Rules:**
+- Always inject `DestroyRef` when subscribing to observables
+- ALWAYS pipe `takeUntilDestroyed(this.destroyRef)` to every observable subscription
+- Place `takeUntilDestroyed` AFTER other operators like `finalize`, `map`, etc.
+- Never manually manage subscriptions with `subscription.unsubscribe()`
+
 ## Templates
 
 - Keep templates simple and avoid complex logic
@@ -224,30 +290,53 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the async pipe to handle observables
 - Do not assume globals like (`new Date()`) are available.
 
-## Services
+## Services & Repositories
+
+### Repository Pattern
+
+**Repositories are TRANSPORT LAYER ONLY - they purely handle HTTP calls and return Observables:**
+
+```typescript
+// src/app/repositories/auth/auth.model.ts - DTO types grouped by feature
+export interface LoginDtoRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginDto {
+  accessToken: string;
+  refreshToken: string;
+  user: AuthUserDto;
+}
+
+// src/app/repositories/auth/auth.repository.ts
+@Injectable({ providedIn: 'root' })
+export class AuthRepository {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = '/api/auth';
+
+  login(request: LoginDtoRequest): Observable<LoginDto> {
+    return this.http.post<LoginDto>(`${this.apiUrl}/login`, request);
+  }
+}
+```
+
+**Repository Rules:**
+- NO business logic, NO subscriptions, NO services dependencies
+- ONLY inject `HttpClient`
+- Methods ONLY return `Observable<T>` - never subscribe internally
+- All DTO types live in `[feature].model.ts` alongside the repository
+- One repository per feature to group related API calls
+
+### Services
 
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
-- Services should manage API calls, business logic, and shared state via signals
+- Services can orchestrate business logic using repositories
 - Expose signals from services for reactive state management in components
 
-### Form Validators Service
-
-Place custom validators in `src/app/services/form-validators.service.ts`:
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class FormValidatorsService {
-  /**
-   * Email validator - checks format against pattern
-   */
-  email(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) return null;
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailPattern.test(control.value) ? null : { invalidEmail: true };
-    };
+### Form Type Pattern\n\n**All form types MUST use `TypedControlsOf` to ensure type safety:**\n\n```typescript\n// src/app/features/auth/login/models/login.model.ts\nimport { TypedControlsOf } from '../../../../utilities/typed-controls';\n\nexport interface LoginFormValue {\n  email: string;\n  password: string;\n}\n\nexport type LoginForm = TypedControlsOf<LoginFormValue>;\n```\n\nThen use strongly-typed forms in components:\n\n```typescript\nprotected readonly form: FormGroup<LoginForm> = this.fb.group({\n  email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],\n  password: ['', [Validators.required, Validators.minLength(8)]],\n});\n```\n\n### Form Validators Service\n\nPlace custom validators in `src/app/services/form-validators.service.ts`:\n\n```typescript\n@Injectable({ providedIn: 'root' })\nexport class FormValidatorsService {\n  /**\n   * Email validator - checks format against pattern\n   */\n  email(): ValidatorFn {\n    return (control: AbstractControl): ValidationErrors | null => {\n      if (!control.value) return null;\n      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n      return emailPattern.test(control.value) ? null : { invalidEmail: true };\n    };
   }
 
   /**
@@ -463,22 +552,48 @@ Compiles changes without serving; useful for external dev servers.
 
 ## Project Structure & Conventions
 
+### Type Organization (Split by Responsibility)
+
+**Repository DTOs** – API request/response types grouped by feature:
+```
+src/app/repositories/
+├── auth/
+│   ├── auth.model.ts       // LoginDto, LoginDtoRequest, etc.
+│   └── auth.repository.ts  // HTTP calls only
+```
+
+**Component Models** – Feature-specific and component-scoped types:
+```
+src/app/features/auth/login/
+├── models/
+│   └── login.model.ts      // LoginForm type (TypedControlsOf<LoginFormValue>)
+├── login.component.ts
+├── login.component.html
+└── login.component.css
+```
+
+### Directory Structure
+
 - **Components**: `src/app/components/` – Reusable UI components
 - **Features**: `src/app/features/` – Feature modules with lazy-loaded routes
   - Auth feature: `src/app/features/auth/` with login, forgot-password, reset-password pages
   - Each feature has its own routes file: `auth.routes.ts`
+  - Each component has a `models/` subdirectory for component-scoped types
+- **Repositories**: `src/app/repositories/` – API transport layer, one per feature
+  - `auth/auth.repository.ts` – HTTP calls for auth
+  - `auth/auth.model.ts` – DTO types (requests/responses)
 - **Services**: `src/app/services/` – Singleton services with `providedIn: 'root'`
-  - `auth.service.ts` – Handles login, logout, password reset, token management
   - `form-validators.service.ts` – Custom form validators
-- **Types**: `src/app/types/` – Shared interfaces and type definitions
-  - `auth.types.ts` – Auth request/response types
+  - No auth.service.ts - use AuthRepository directly in components
 - **Assets**: `src/assets/styles/` – Global CSS files
   - `variables.css` – Design system CSS variables
   - `base.css` – Global typography, form elements
   - `messages.css` – Alert/message component styles
   - `components.css` – PrimeNG component overrides
   - `index.css` – Master import file
-- **Utilities**: `src/app/utils/` – Pure utility functions
+- **Utilities**: `src/app/utilities/` – Pure utility functions
+  - `typed-controls.ts` – TypedControlsOf helper for form typing
+  - `patterns.ts` – Regex patterns (EMAIL_PATTERN, etc.)
 - All new components are generated with `app` prefix (set in `angular.json`)
 
 ### Feature Routing Example (Auth)

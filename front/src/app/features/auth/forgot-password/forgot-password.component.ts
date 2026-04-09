@@ -2,9 +2,11 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormGroup,
@@ -12,21 +14,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
-import { AuthService } from '../../../services/auth.service';
-import { FormValidatorsService } from '../../../services/form-validators.service';
-import { ForgotPasswordRequest } from '../../../types/auth.types';
+import { finalize } from 'rxjs';
+import { ForgotPasswordDtoRequest } from '../../../repositories/auth/auth.model';
+import { AuthRepository } from '../../../repositories/auth/auth.repository';
 import { EMAIL_PATTERN } from '../../../utilities/patterns';
-
-interface ForgotPasswordForm {
-  email: string;
-}
+import { ForgotPasswordForm } from './models/forgot-password.model';
 
 @Component({
   selector: 'app-forgot-password',
@@ -47,56 +46,39 @@ interface ForgotPasswordForm {
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent {private readonly translateService = inject(TranslateService);
   private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
-  private readonly formValidators = inject(FormValidatorsService);
-  private readonly messageService = inject(MessageService);
+  private readonly authRepository = inject(AuthRepository);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly form: FormGroup<{
-    email: any;
-  }> = this.fb.group({
-    email: ['', [Validators.required, , Validators.pattern(EMAIL_PATTERN)]],
+  protected readonly form: FormGroup<ForgotPasswordForm> = this.fb.group({
+    email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
   });
 
-  protected readonly isLoading = this.authService.isLoading;
-  protected readonly isSubmitted = signal(false);
-  protected readonly isEmailSent = signal(false);
+   protected readonly isLoading = signal(false);
+
+   constructor() {
+    // TODO : en attente deploy https://github.com/ngx-translate/core/milestone/3 
+    this.translateService.use('fr')
+  }
 
   onSubmit(): void {
-    this.isSubmitted.set(true);
+   this.isLoading.set(true);
 
-    if (!this.form.valid) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const request: ForgotPasswordRequest = this.form.getRawValue() as ForgotPasswordRequest;
+    const request: ForgotPasswordDtoRequest = this.form.value as ForgotPasswordDtoRequest;
 
-    this.authService.forgotPassword(request).subscribe({
-      next: () => {
-        this.isEmailSent.set(true);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Succès',
-          detail: 'Un email de réinitialisation a été envoyé à votre adresse',
-          life: 3000,
-        });
-
-        setTimeout(() => {
-          this.router.navigate(['/auth/login']);
-        }, 3000);
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail:
-            this.authService.error() || 'Erreur lors de la demande',
-        });
-      },
-    });
+    this.authRepository.forgotPassword(request)
+       .pipe(
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        void this.router.navigate(['/auth/login']);
+      });
   }
-
-
 }
