@@ -12,6 +12,7 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -19,13 +20,16 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../services/auth.service';
-import { FormValidatorsService } from '../../../services/form-validators.service';
 import { LoginRequest } from '../../../types/auth.types';
+import { EMAIL_PATTERN } from '../../../utilities/patterns';
+import { TypedControlsOf } from '../../../utilities/typed-controls';
 
-interface LoginForm {
+interface LoginFormValue {
   email: string;
   password: string;
 }
+
+type LoginForm = TypedControlsOf<LoginFormValue>;
 
 @Component({
   selector: 'app-login',
@@ -40,29 +44,32 @@ interface LoginForm {
     CardModule,
     MessageModule,
     ToastModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  private readonly translateService = inject(TranslateService);
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
-  private readonly formValidators = inject(FormValidatorsService);
   private readonly router = inject(Router);
 
-  readonly form: FormGroup<{
-    email: any;
-    password: any;
-  }> = this.fb.group({
-    email: ['', [Validators.required, this.formValidators.email()]],
+  protected readonly form: FormGroup<LoginForm> = this.fb.group({
+    email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
-  readonly isLoading = this.authService.isLoading;
+  protected readonly isLoading = this.authService.isLoading;
 
-  readonly isSubmitted = signal(false);
+  protected readonly isSubmitted = signal(false);
+
+  constructor() {
+    // TODO : en attente deploy https://github.com/ngx-translate/core/milestone/3 
+    this.translateService.use('fr')
+  }
 
   onSubmit(): void {
     this.isSubmitted.set(true);
@@ -95,6 +102,4 @@ export class LoginComponent {
       },
     });
   }
-
-
 }

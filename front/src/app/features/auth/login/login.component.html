@@ -5,7 +5,7 @@
     <p-card>
       <ng-template pTemplate="header">
         <div class="p-6 text-center text-white text-2xl font-bold" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); font-family: 'Open Sans', sans-serif;">
-          Connexion
+          {{ 'AUTH.LOGIN.TITLE' | translate }}
         </div>
       </ng-template>
 
@@ -13,7 +13,7 @@
         <!-- Email field -->
         <div class="form-input-wrapper">
           <label for="email" class="form-label required">
-            Email
+            {{ 'AUTH.LOGIN.EMAIL_LABEL' | translate }}
           </label>
           <div class="flex flex-col gap-1">
             <input
@@ -22,17 +22,17 @@
               type="email"
               [formControl]="form.controls.email"
               class="w-full"
-              placeholder="votre@email.com"
+              [placeholder]="'AUTH.LOGIN.EMAIL_PLACEHOLDER' | translate"
               [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
             />
-            @if (form.controls.email?.errors?.['required'] && form.controls.email.touched) {
+            @if (form.controls.email.errors?.['required'] && form.controls.email.touched) {
               <p-message severity="error" variant="simple" size="small">
-                Ce champ est requis
+                {{ 'AUTH.ERRORS.EMAIL_REQUIRED' | translate }}
               </p-message>
             }
-            @if (form.controls.email?.errors?.['invalidEmail'] && form.controls.email.touched) {
+            @if (form.controls.email.errors?.['pattern'] && form.controls.email.touched) {
               <p-message severity="error" variant="simple" size="small">
-                Email invalide
+                {{ 'AUTH.ERRORS.EMAIL_INVALID' | translate }}
               </p-message>
             }
           </div>
@@ -41,7 +41,7 @@
         <!-- Password field -->
         <div class="form-input-wrapper">
           <label for="password" class="form-label required">
-            Mot de passe
+            {{ 'AUTH.LOGIN.PASSWORD_LABEL' | translate }}
           </label>
           <div class="flex flex-col gap-1">
             <input
@@ -50,17 +50,17 @@
               type="password"
               [formControl]="form.controls.password"
               class="w-full"
-              placeholder="••••••••"
+              [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
               [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
             />
-            @if (form.controls.password?.errors?.['required'] && form.controls.password.touched) {
+            @if (form.controls.password.errors?.['required'] && form.controls.password.touched) {
               <p-message severity="error" variant="simple" size="small">
-                Ce champ est requis
+                {{ 'AUTH.ERRORS.PASSWORD_REQUIRED' | translate }}
               </p-message>
             }
-            @if (form.controls.password?.errors?.['minlength'] && form.controls.password.touched) {
+            @if (form.controls.password.errors?.['minlength'] && form.controls.password.touched) {
               <p-message severity="error" variant="simple" size="small">
-                Le mot de passe doit avoir au moins 8 caractères
+                {{ 'AUTH.ERRORS.PASSWORD_MIN_LENGTH' | translate }}
               </p-message>
             }
           </div>
@@ -72,7 +72,7 @@
             routerLink="/auth/forgot-password"
             class="text-sm font-medium focus:outline-none focus:underline"
           >
-            Mot de passe oublié ?
+            {{ 'AUTH.LOGIN.FORGOT_PASSWORD' | translate }}
           </a>
         </div>
 

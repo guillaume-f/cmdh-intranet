@@ -12,6 +12,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -21,6 +22,7 @@ import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../services/auth.service';
 import { FormValidatorsService } from '../../../services/form-validators.service';
 import { ForgotPasswordRequest } from '../../../types/auth.types';
+import { EMAIL_PATTERN } from '../../../utilities/patterns';
 
 interface ForgotPasswordForm {
   email: string;
@@ -39,6 +41,7 @@ interface ForgotPasswordForm {
     CardModule,
     MessageModule,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './forgot-password.component.html',
@@ -51,15 +54,15 @@ export class ForgotPasswordComponent {
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
 
-  readonly form: FormGroup<{
+  protected readonly form: FormGroup<{
     email: any;
   }> = this.fb.group({
-    email: ['', [Validators.required, this.formValidators.email()]],
+    email: ['', [Validators.required, , Validators.pattern(EMAIL_PATTERN)]],
   });
 
-  readonly isLoading = this.authService.isLoading;
-  readonly isSubmitted = signal(false);
-  readonly isEmailSent = signal(false);
+  protected readonly isLoading = this.authService.isLoading;
+  protected readonly isSubmitted = signal(false);
+  protected readonly isEmailSent = signal(false);
 
   onSubmit(): void {
     this.isSubmitted.set(true);

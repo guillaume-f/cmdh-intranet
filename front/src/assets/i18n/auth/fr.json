@@ -1,0 +1,44 @@
+{ 
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Connexion",
+      "EMAIL_LABEL": "Email",
+      "EMAIL_PLACEHOLDER": "votre@email.com",
+      "PASSWORD_LABEL": "Mot de passe",
+      "PASSWORD_PLACEHOLDER": "••••••••",
+      "FORGOT_PASSWORD": "Mot de passe oublié ?",
+      "SUBMIT": "Se connecter"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Mot de passe oublié",
+      "DESCRIPTION": "Entrez votre adresse email. Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      "EMAIL_LABEL": "Email",
+      "EMAIL_PLACEHOLDER": "votre@email.com",
+      "SUBMIT": "Envoyer le lien",
+      "EMAIL_SENT_SUCCESS": "Un email de réinitialisation a été envoyé à votre adresse",
+      "BACK_TO_LOGIN": "Retour à la connexion"
+    },
+    "RESET_PASSWORD": {
+      "TITLE": "Réinitialiser le mot de passe",
+      "TEMP_PASSWORD_LABEL": "Mot de passe temporaire",
+      "TEMP_PASSWORD_PLACEHOLDER": "••••••••",
+      "NEW_PASSWORD_LABEL": "Nouveau mot de passe",
+      "NEW_PASSWORD_PLACEHOLDER": "••••••••",
+      "NEW_PASSWORD_STRENGTH": "Force:",
+      "CONFIRM_PASSWORD_LABEL": "Confirmer le mot de passe",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "••••••••",
+      "SUBMIT": "Réinitialiser"
+    },
+    "ERRORS": {
+      "EMAIL_REQUIRED": "Ce champ est requis",
+      "EMAIL_INVALID": "Email invalide",
+      "PASSWORD_REQUIRED": "Ce champ est requis",
+      "PASSWORD_MIN_LENGTH": "Le mot de passe doit avoir au moins 8 caractères",
+      "PASSWORD_STRENGTH": "Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial",
+      "PASSWORD_MISMATCH": "Les mots de passe ne correspondent pas",
+      "INVALID_FORM": "Formulaire invalide ou lien expiré",
+      "REQUEST_ERROR": "Erreur lors de la demande",
+      "GENERIC": "Une erreur s'est produite"
+    }
+  }
+}

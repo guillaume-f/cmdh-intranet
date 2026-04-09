@@ -2,13 +2,13 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
-    AuthUser,
-    ForgotPasswordRequest,
-    ForgotPasswordResponse,
-    LoginRequest,
-    LoginResponse,
-    ResetPasswordRequest,
-    ResetPasswordResponse,
+  AuthUser,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  LoginRequest,
+  LoginResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from '../types/auth.types';
 
 @Injectable({

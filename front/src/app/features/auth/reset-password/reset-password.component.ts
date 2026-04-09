@@ -13,6 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -42,6 +43,7 @@ interface ResetPasswordForm {
     CardModule,
     MessageModule,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './reset-password.component.html',
@@ -55,7 +57,7 @@ export class ResetPasswordComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly messageService = inject(MessageService);
 
-  readonly form: FormGroup<{
+  protected readonly form: FormGroup<{
     tempPassword: any;
     newPassword: any;
     confirmPassword: any;
@@ -72,11 +74,11 @@ export class ResetPasswordComponent {
     }
   );
 
-  readonly isLoading = this.authService.isLoading;
-  readonly isSubmitted = signal(false);
-  readonly tempToken = signal<string>('');
+  protected readonly isLoading = this.authService.isLoading;
+  protected readonly isSubmitted = signal(false);
+  protected readonly tempToken = signal<string>('');
 
-  readonly passwordStrengthIndicator = signal({ score: 0, text: '' });
+  protected readonly passwordStrengthIndicator = signal({ score: 0, text: '' });
 
   constructor() {
     effect(() => {
@@ -139,7 +141,7 @@ export class ResetPasswordComponent {
 
 
 
-  getPasswordStrengthClass(): string {
+  protected getPasswordStrengthClass(): string {
     const score = this.passwordStrengthIndicator().score;
 
     switch (score) {

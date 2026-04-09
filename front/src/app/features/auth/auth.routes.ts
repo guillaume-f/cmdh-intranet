@@ -1,25 +1,22 @@
 import { Routes } from '@angular/router';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-import { LoginComponent } from './login/login.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 export const authRoutes: Routes = [
   {
-    path: '',
+    path: '',    
     children: [
       {
         path: 'login',
-        component: LoginComponent,
+        loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
         data: { title: 'Connexion' },
       },
       {
         path: 'forgot-password',
-        component: ForgotPasswordComponent,
+        loadComponent: () => import('./forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
         data: { title: 'Mot de passe oublié' },
       },
       {
         path: 'reset-password',
-        component: ResetPasswordComponent,
+        loadComponent: () => import('./reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
         data: { title: 'Réinitialiser le mot de passe' },
       },
       {
