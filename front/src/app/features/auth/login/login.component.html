@@ -12,7 +12,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
         <!-- Email field -->
         <div class="form-input-wrapper">
-          <label for="email" class="form-label required">
+          <label for="email" class="form-label" [appOptionalLabel]="form.controls.email">
             {{ 'AUTH.LOGIN.EMAIL_LABEL' | translate }}
           </label>
           <div class="flex flex-col gap-1">

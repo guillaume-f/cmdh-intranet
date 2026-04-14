@@ -1,10 +1,5 @@
 {
   "COMMON": {
-    "LANGUAGE": "Français",
-    "LOADING": "Chargement...",
-    "ERROR": "Erreur",
-    "SUCCESS": "Succès",
-    "CANCEL": "Annuler",
-    "BACK": "Retour"
+    "OPTIONAL": "(Facultatif)"
   }
 }

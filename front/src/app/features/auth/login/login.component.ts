@@ -22,6 +22,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { finalize } from 'rxjs';
+import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
 import { LoginDtoRequest } from '../../../repositories/auth/auth.model';
 import { AuthRepository } from '../../../repositories/auth/auth.repository';
 import { EMAIL_PATTERN } from '../../../utilities/patterns';
@@ -40,7 +41,8 @@ import { LoginForm } from './models/login.model';
     CardModule,
     MessageModule,
     ToastModule,
-    TranslatePipe
+    TranslatePipe,
+    OptionalLabelDirective
   ],
   providers: [MessageService],
   templateUrl: './login.component.html',
