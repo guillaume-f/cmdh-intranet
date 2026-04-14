@@ -1,0 +1,1 @@
+export type UserRole = 'candidate' | 'member' | 'encoder' | 'admin'

@@ -70,7 +70,7 @@ export class LoginComponent {
   onSubmit(): void {
     this.isLoading.set(true);
 
-    if (this.form.valid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -82,7 +82,7 @@ export class LoginComponent {
       finalize(() => this.isLoading.set(false)),
       takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        void this.router.navigate(['/dashboard']);
+        void this.router.navigate(['/activities']);
       });
     }
 }

@@ -1,0 +1,10 @@
+export type Permission =
+  | 'activity:read'
+  | 'activity:create'
+  | 'activity:edit'
+  | 'activity:delete'
+  | 'activity:publish'
+  | 'registration:create'
+  | 'registration:read'
+  | 'registration:delete'
+  | 'user:manage'

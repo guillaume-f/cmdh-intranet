@@ -18,9 +18,7 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     provideTranslateService({
-      defaultLanguage: 'fr',
       fallbackLang: 'fr',
-      useDefaultLang: true,
       lang: 'fr',
       loader: provideTranslateHttpLoader({
         prefix: '/assets/i18n/',

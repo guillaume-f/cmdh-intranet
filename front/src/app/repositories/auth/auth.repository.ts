@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ForgotPasswordDto, ForgotPasswordDtoRequest, LoginDto, LoginDtoRequest, ResetPasswordDto, ResetPasswordDtoRequest } from './auth.model';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { ForgotPasswordDto, ForgotPasswordDtoRequest, LoginDto, LoginDtoRequest,
 })
 export class AuthRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   login(request: LoginDtoRequest): Observable<LoginDto> {
     return  this.http

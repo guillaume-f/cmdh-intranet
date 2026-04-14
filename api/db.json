@@ -1,4 +1,50 @@
 {
+  "roles": [
+    {
+      "id": "candidate",
+      "label": "Candidat",
+      "permissions": [
+        "activity:read"
+      ]
+    },
+    {
+      "id": "member",
+      "label": "Membre",
+      "permissions": [
+        "activity:read",
+        "registration:create",
+        "registration:delete"
+      ]
+    },
+    {
+      "id": "encoder",
+      "label": "Encodeur",
+      "permissions": [
+        "activity:read",
+        "activity:create",
+        "activity:edit",
+        "activity:publish",
+        "registration:create",
+        "registration:read",
+        "registration:delete"
+      ]
+    },
+    {
+      "id": "admin",
+      "label": "Administrateur",
+      "permissions": [
+        "activity:read",
+        "activity:create",
+        "activity:edit",
+        "activity:delete",
+        "activity:publish",
+        "registration:create",
+        "registration:read",
+        "registration:delete",
+        "user:manage"
+      ]
+    }
+  ],
   "users": [
     {
       "id": "u1",
@@ -7,6 +53,8 @@
       "firstName": "Sophie",
       "lastName": "Dumont",
       "role": "admin",
+      "extraPermissions": [],
+      "deniedPermissions": [],
       "avatar": null,
       "active": true
     },
@@ -17,6 +65,8 @@
       "firstName": "Marc",
       "lastName": "Lefevre",
       "role": "encoder",
+      "extraPermissions": [],
+      "deniedPermissions": [],
       "avatar": null,
       "active": true
     },
@@ -27,6 +77,8 @@
       "firstName": "Julie",
       "lastName": "Martin",
       "role": "member",
+      "extraPermissions": [],
+      "deniedPermissions": [],
       "avatar": null,
       "active": true
     },
@@ -37,6 +89,32 @@
       "firstName": "Thomas",
       "lastName": "Bernard",
       "role": "candidate",
+      "extraPermissions": [],
+      "deniedPermissions": [],
+      "avatar": null,
+      "active": true
+    },
+    {
+      "id": "u5",
+      "email": "julie.special@intranet.be",
+      "password": "special123",
+      "firstName": "Julie",
+      "lastName": "Spéciale",
+      "role": "member",
+      "extraPermissions": ["activity:create"],
+      "deniedPermissions": [],
+      "avatar": null,
+      "active": true
+    },
+    {
+      "id": "u6",
+      "email": "encoder.limite@intranet.be",
+      "password": "limite123",
+      "firstName": "Paul",
+      "lastName": "Limité",
+      "role": "encoder",
+      "extraPermissions": [],
+      "deniedPermissions": ["activity:delete", "activity:publish"],
       "avatar": null,
       "active": true
     }
@@ -45,7 +123,7 @@
     {
       "id": "a1",
       "title": "Réunion de rentrée 2025",
-      "description": "Réunion annuelle pour présenter les projets de l'année et accueillir les nouveaux membres. Ordre du jour : bilan, projets, questions diverses.",
+      "description": "Réunion annuelle pour présenter les projets de l'année et accueillir les nouveaux membres.",
       "date": "2025-09-15",
       "time": "18:30",
       "points": 5,
@@ -59,7 +137,7 @@
     {
       "id": "a2",
       "title": "Formation premiers secours",
-      "description": "Formation certifiante aux gestes de premiers secours. Matériel fourni. Prévoir tenue confortable. Attestation remise en fin de journée.",
+      "description": "Formation certifiante aux gestes de premiers secours. Attestation remise en fin de journée.",
       "date": "2025-10-04",
       "time": "09:00",
       "points": 20,
@@ -73,7 +151,7 @@
     {
       "id": "a3",
       "title": "Journée team building",
-      "description": "Une journée de cohésion en plein air avec activités sportives et ludiques. Repas de midi inclus. Transport organisé au départ du siège.",
+      "description": "Une journée de cohésion en plein air avec activités sportives et ludiques. Repas inclus.",
       "date": "2025-11-22",
       "time": "08:00",
       "points": 15,
@@ -87,7 +165,7 @@
     {
       "id": "a4",
       "title": "Atelier communication digitale",
-      "description": "Atelier pratique sur l'utilisation des réseaux sociaux et outils de communication pour les associations. Laptop conseillé.",
+      "description": "Atelier pratique sur l'utilisation des réseaux sociaux et outils de communication.",
       "date": "2025-12-10",
       "time": "14:00",
       "points": 10,
