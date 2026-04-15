@@ -1,19 +1,23 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { Router } from '@angular/router'
 import { Permission } from './permissions.type'
-import { User } from './user.model'
+import { UserDto } from './user.model'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly router = inject(Router)
 
-  currentUser = signal<User | null>(null)
+  currentUser = signal<UserDto | null>(null)
   isAuthenticated = computed(() => !!this.currentUser())
   userRole = computed(() => this.currentUser()?.role ?? null)
   userPermissions = computed(() => this.currentUser()?.permissions ?? [])
 
-  login(user: User): void {
+  setUser(user: UserDto): void {
     this.currentUser.set(user)
+  }
+
+  setToken(token: string): void {
+    document.cookie = `access_token=${encodeURIComponent(token)}; path=/; Secure; SameSite=Strict`;
   }
 
   logout(): void {

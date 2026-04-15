@@ -1,7 +1,7 @@
 import { Permission } from "./permissions.type"
 import { UserRole } from "./user-role.type"
 
-export interface User {
+export interface UserDto {
   id: string
   email: string
   firstName: string
@@ -9,7 +9,6 @@ export interface User {
   role: UserRole
   extraPermissions: Permission[]
   deniedPermissions: Permission[]
-  permissions: Permission[]   // ← permissions effectives calculées par l'API
-  avatar: string | null
+  permissions: Permission[]
   active: boolean
 }

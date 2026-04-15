@@ -21,10 +21,10 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
-import { finalize } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
 import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
-import { LoginDtoRequest } from '../../../repositories/auth/auth.model';
 import { AuthRepository } from '../../../repositories/auth/auth.repository';
+import { LoginDto, LoginDtoRequest } from '../../../repositories/auth/login.model';
 import { EMAIL_PATTERN } from '../../../utilities/patterns';
 import { LoginForm } from './models/login.model';
 
@@ -54,6 +54,7 @@ export class LoginComponent {
   private readonly authRepository = inject(AuthRepository);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly authService = inject(AuthService);
 
   protected readonly form: FormGroup<LoginForm> = this.fb.group({
     email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
@@ -79,10 +80,12 @@ export class LoginComponent {
 
     this.authRepository.login(request)
     .pipe(
-      finalize(() => this.isLoading.set(false)),
       takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
+      .subscribe((loginInfos: LoginDto) => {
+        this.authService.setUser(loginInfos.user);
+        this.authService.setToken(loginInfos.token);
         void this.router.navigate(['/activities']);
+        this.isLoading.set(false)
       });
     }
 }

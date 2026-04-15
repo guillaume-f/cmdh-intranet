@@ -36,41 +36,10 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ### Access Modifiers
 
-**Encapsulation rules for properties and methods:**
-
-- **`private readonly`**: Dependencies (injected services), internal state, and implementation details
-  ```typescript
-  private readonly authService = inject(AuthService);      // Injected service
-  private readonly internalCache: string[] = [];           // Internal state
-  private updatePasswordStrength(password: string): void {} // Internal method
-  ```
-
-- **`protected readonly`**: Signals and properties used in templates
-  ```typescript
-  protected readonly form = this.fb.group({ /* ... */ });           // Used in template
-  protected readonly isLoading = this.authService.isLoading;        // Used in template binding
-  protected readonly passwordStrengthIndicator = signal({ /* ... */ }); // Used in template
-  ```
-
-- **`protected`**: Methods called from templates (that are not lifecycle hooks)
-  ```typescript
-  protected getPasswordStrengthClass(): string { /* ... */ } // Called in template: [ngClass]="getPasswordStrengthClass()"
-  ```
-
-- **Public (no prefix)**: Angular lifecycle hooks and methods that act like them
-  ```typescript
-  ngOnInit(): void { /* ... */ }  // Angular lifecycle - no prefix
-  onSubmit(): void { /* ... */ } // Form submission handler - acts like lifecycle
-  ```
-
-**Summary table:**
-
-| Modifier | Where? | Example |
-|----------|--------|----------|
-| `private readonly` | Internal, not in template | Services, cache, helpers |
-| `protected readonly` | In template as property | Signals, form, loading state |
-| `protected` | In template as method call | `getPasswordStrengthClass()` |
-| public (default) | Lifecycle-like | `onSubmit()`, `ngOnInit()` |
+- `private readonly`: Dependencies (injected services), internal state, and implementation details
+- `protected readonly`: Signals and properties used in templates
+- `protected`: Methods called from templates (that are not lifecycle hooks)
+- Public (no prefix): Angular lifecycle hooks and methods that act like them
 
 ### Forms
 
@@ -80,83 +49,6 @@ You are an expert in TypeScript, Angular, and scalable web application developme
   - Check touched state with `form.controls.fieldName.touched`
   - Check invalid state with `form.controls.fieldName.invalid`
   - **Form-level errors**: Access via `form.errors?.['validatorName']`
-  
-- **Error display pattern** (simple required error):
-  ```html
-  <input [formControl]="form.controls.email" />
-  @if (form.controls.email.errors?.['required'] && form.controls.email.touched) {
-    <p-message severity="error" variant="simple" size="small">
-      Ce champ est requis
-    </p-message>
-  }
-  ```
-  
-- **Field-specific error pattern** (multiple error types):
-  ```html
-  <input [formControl]="form.controls.email" />
-  @if (form.controls.email.errors?.['required'] && form.controls.email.touched) {
-    <p-message severity="error" variant="simple" size="small">Ce champ est requis</p-message>
-  }
-  @if (form.controls.email.errors?.['invalidEmail'] && form.controls.email.touched) {
-    <p-message severity="error" variant="simple" size="small">Email invalide</p-message>
-  }
-  ```
-
-- **Accessibility attributes** (WCAG AA compliance):
-  ```html
-  <input 
-    [formControl]="form.controls.email"
-    [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
-  />
-  ```
-
-- **Form-level validator pattern** (password mismatch):
-  ```typescript
-  readonly form = this.fb.group(
-    {
-      newPassword: ['', [Validators.required, this.formValidators.passwordStrength()]],
-      confirmPassword: ['', [Validators.required]],
-    },
-    {
-      validators: [this.formValidators.passwordMatch('newPassword', 'confirmPassword')],
-    }
-  );
-  ```
-  ```html
-  @if (form.errors?.['passwordMismatch'] && form.controls.confirmPassword.touched) {
-    <p-message severity="error" variant="simple" size="small">
-      Les mots de passe ne correspondent pas
-    </p-message>
-  }
-  ```
-
-- **Dynamic indicator pattern** (password strength):
-  ```typescript
-  readonly passwordStrengthIndicator = signal({ score: 0, text: '' });
-
-  constructor() {
-    effect(() => {
-      const newPassword = this.form.get('newPassword')?.value as string;
-      this.updatePasswordStrength(newPassword);
-    });
-  }
-
-  private updatePasswordStrength(password: string): void {
-    // Calculate score and update signal
-  }
-
-  getPasswordStrengthClass(): string {
-    const score = this.passwordStrengthIndicator().score;
-    // Return class based on score
-  }
-  ```
-  ```html
-  @if (passwordStrengthIndicator().text) {
-    <div [ngClass]="getPasswordStrengthClass()">
-      Force: {{ passwordStrengthIndicator().text }}
-    </div>
-  }
-  ```
 
 - **Form submission pattern**:
   - Never disable submit buttons when form is invalid
@@ -165,84 +57,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
   - Use `MessageService` for success/error notifications with `life` property for auto-dismiss
 
 - **Component structure for forms**:
-  ```typescript
-  import { DestroyRef, inject } from '@angular/core';
-  import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-  import { finalize } from 'rxjs';
-  import { LoginForm } from './models/login.model';  // Component-scoped types
-  import { LoginDtoRequest } from '../../../repositories/auth/auth.model';  // DTO types
-
-  @Component({
-    selector: 'app-login',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [
-      CommonModule,
-      ReactiveFormsModule,
-      ButtonModule,
-      InputTextModule,
-      CardModule,
-      MessageModule,
-      ToastModule,
-      TranslatePipe
-    ],
-    providers: [MessageService],
-    templateUrl: './login.component.html',
-    styleUrl: './login.component.css',
-  })
-  export class LoginComponent {
-    private readonly fb = inject(FormBuilder);
-    private readonly messageService = inject(MessageService);
-    private readonly authRepository = inject(AuthRepository);
-    private readonly router = inject(Router);
-    private readonly destroyRef = inject(DestroyRef);  // For observable cleanup
-
-    protected readonly form: FormGroup<LoginForm> = this.fb.group({
-      email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-    });
-
-    protected readonly isLoading = signal(false);
-
-    onSubmit(): void {
-      if (!this.form.valid) {
-        this.form.markAllAsTouched();
-        return;
-      }
-
-      this.isLoading.set(true);
-      const request: LoginDtoRequest = this.form.value as LoginDtoRequest;
-
-      this.authRepository.login(request)
-        .pipe(
-          finalize(() => this.isLoading.set(false)),
-          takeUntilDestroyed(this.destroyRef)  // Auto cleanup
-        )
-        .subscribe({
-          next: (response) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Connexion réussie',
-              life: 1500,
-            });
-            void this.router.navigate(['/dashboard']);
-          },
-          error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erreur de connexion',
-              detail: error.message,
-              life: 3000,
-            });
-          },
-        });
-    }
-  }
-  ```
-
-- Show field-level error messages inline using PrimeNG `<p-message>` with `severity="error"`, `variant="simple"`, `size="small"`
-- Use signals for `isSubmitted`, `isLoading` state management
-- Create custom validators in `FormValidatorsService` and inject them: `this.formValidators.email()`, `this.formValidators.passwordStrength()`, etc.
+  - Show field-level error messages inline using PrimeNG `<p-message>` with `severity="error"`, `variant="simple"`, `size="small"`
+  - Use signals for `isSubmitted`, `isLoading` state management
+  - Create custom validators in `FormValidatorsService` and inject them: `this.formValidators.email()`, `this.formValidators.passwordStrength()`, etc.
 
 ## State Management
 
@@ -254,28 +71,6 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ### Observable Management
 
 **CRITICAL: All observables MUST be automatically unsubscribed using `takeUntilDestroyed`**
-
-```typescript
-import { DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-export class MyComponent {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly myRepository = inject(MyRepository);
-
-  onSubmit(): void {
-    this.myRepository.fetchData()
-      .pipe(
-        finalize(() => this.isLoading.set(false)),  // Side effects before unsubscribe
-        takeUntilDestroyed(this.destroyRef)         // Auto-unsubscribe on component destroy
-      )
-      .subscribe({
-        next: (data) => this.handleSuccess(data),
-        error: (error) => this.handleError(error),
-      });
-  }
-}
-```
 
 **Rules:**
 - Always inject `DestroyRef` when subscribing to observables
@@ -296,31 +91,6 @@ export class MyComponent {
 
 **Repositories are TRANSPORT LAYER ONLY - they purely handle HTTP calls and return Observables:**
 
-```typescript
-// src/app/repositories/auth/auth.model.ts - DTO types grouped by feature
-export interface LoginDtoRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginDto {
-  accessToken: string;
-  refreshToken: string;
-  user: AuthUserDto;
-}
-
-// src/app/repositories/auth/auth.repository.ts
-@Injectable({ providedIn: 'root' })
-export class AuthRepository {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/auth';
-
-  login(request: LoginDtoRequest): Observable<LoginDto> {
-    return this.http.post<LoginDto>(`${this.apiUrl}/login`, request);
-  }
-}
-```
-
 **Repository Rules:**
 - NO business logic, NO subscriptions, NO services dependencies
 - ONLY inject `HttpClient`
@@ -336,63 +106,11 @@ export class AuthRepository {
 - Services can orchestrate business logic using repositories
 - Expose signals from services for reactive state management in components
 
-### Form Type Pattern\n\n**All form types MUST use `TypedControlsOf` to ensure type safety:**\n\n```typescript\n// src/app/features/auth/login/models/login.model.ts\nimport { TypedControlsOf } from '../../../../utilities/typed-controls';\n\nexport interface LoginFormValue {\n  email: string;\n  password: string;\n}\n\nexport type LoginForm = TypedControlsOf<LoginFormValue>;\n```\n\nThen use strongly-typed forms in components:\n\n```typescript\nprotected readonly form: FormGroup<LoginForm> = this.fb.group({\n  email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],\n  password: ['', [Validators.required, Validators.minLength(8)]],\n});\n```\n\n### Form Validators Service\n\nPlace custom validators in `src/app/services/form-validators.service.ts`:\n\n```typescript\n@Injectable({ providedIn: 'root' })\nexport class FormValidatorsService {\n  /**\n   * Email validator - checks format against pattern\n   */\n  email(): ValidatorFn {\n    return (control: AbstractControl): ValidationErrors | null => {\n      if (!control.value) return null;\n      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n      return emailPattern.test(control.value) ? null : { invalidEmail: true };\n    };
-  }
-
-  /**
-   * Password strength validator - requires uppercase, lowercase, number, special char, 8+ chars
-   */
-  passwordStrength(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) return null;
-      const password = control.value;
-      const isValid =
-        password.length >= 8 &&
-        /[a-z]/.test(password) &&
-        /[A-Z]/.test(password) &&
-        /[0-9]/.test(password) &&
-        /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-      return isValid ? null : { passwordStrength: true };
-    };
-  }
-
-  /**
-   * Password match validator - checks if two fields match
-   */
-  passwordMatch(fieldName: string, confirmFieldName: string): ValidatorFn {
-    return (group: AbstractControl): ValidationErrors | null => {
-      const field = group.get(fieldName);
-      const confirmField = group.get(confirmFieldName);
-      if (!field || !confirmField) return null;
-      return field.value === confirmField.value ? null : { passwordMismatch: true };
-    };
-  }
-}
-```
-
-- Use custom validators in form groups: `this.formValidators.email()`, `this.formValidators.passwordStrength()`
-- For form-level validators, pass them in the second argument to `fb.group()`
-
 ## PrimeNG Component Guidelines
 
 - Import only required modules (e.g., `ButtonModule`, `CardModule`) rather than wildcard imports
 - For forms: Always import `MessageModule` for error display and `ToastModule` for notifications
-- For notifications: Use PrimeNG Toast via `MessageService.add()` instead of custom alerts
-  ```typescript
-  // In component providers
-  providers: [MessageService]
-  
-  // In template
-  <p-toast position="top-right"></p-toast>
-  
-  // In component logic
-  this.messageService.add({
-    severity: 'success',          // success | info | warning | error
-    summary: 'Succès',
-    detail: 'Message details',
-    life: 1500,                  // auto-dismiss in milliseconds (optional)
-  });
-  ```
+- For notifications: Use PrimeNG Toast via `MessageService.add()`
 - Use PrimeNG components with Tailwind utilities for consistent styling
 - All PrimeNG components must maintain WCAG AA compliance; verify focus management and keyboard navigation
 - **Customize PrimeNG theme**: Use custom preset (see `src/app/theme.config.ts`) instead of inline theme options
@@ -810,58 +528,15 @@ When creating a new lazy-loaded feature, follow these steps:
 
 1. **Create the feature module** in `src/app/features/<feature-name>/`
 
-2. **Update routing** in `src/app/app.routes.ts`:
-   ```typescript
-   {
-     path: 'feature-name',
-     loadChildren: () => import('./features/feature-name/feature-name.routes').then((m) => m.featureRoutes),
-     providers: [
-       provideTranslateService({
-         extend: true,
-         loader: provideTranslateHttpLoader({
-           prefix: '/assets/i18n/feature-name/',
-           suffix: '.json'
-         })
-       })
-     ]
-   }
-   ```
+2. **Create translation file** at `src/assets/i18n/feature-name/fr.json`:
 
-3. **Create translation file** at `src/assets/i18n/feature-name/fr.json`:
-   ```json
-   {
-     "FEATURE_NAME": {
-       "PAGE_TITLE": "Your Page",
-       "FIELD_LABEL": "Label",
-       "BUTTON_TEXT": "Click me",
-       "ERRORS": {
-         "GENERIC": "An error occurred"
-       }
-     }
-   }
-   ```
-
-4. **Namespace convention**: Group all translations under feature name in UPPER_SNAKE_CASE:
+3. **Namespace convention**: Group all translations under feature name in UPPER_SNAKE_CASE:
    - Global features use `COMMON.*`
-   - Auth features use `AUTH.*`
-   - New features use `FEATURE_NAME.*`
+   - features use `FEATURE_NAME.*`
 
-5. **Error translations**: Always place error messages in a nested `ERRORS` object for consistency:
-   ```json
-   {
-     "FEATURE_NAME": {
-       "ERRORS": {
-         "REQUIRED": "This field is required",
-         "INVALID": "This value is invalid"
-       }
-     }
-   }
-   ```
+4. **Error translations**: Always place error messages in a nested `ERRORS` object for consistency:
 
-6. **Import TranslatePipe** in all new components that use translations:
-   ```typescript
-   import { TranslatePipe } from '@ngx-translate/core';
-   ```
+5. **Import TranslatePipe** in all new components that use translations:
 
 ## Debugging & Common Issues
 

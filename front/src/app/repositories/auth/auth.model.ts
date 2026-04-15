@@ -1,14 +1,3 @@
-export interface LoginDtoRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginDto {
-  accessToken: string;
-  refreshToken: string;
-  user: AuthUserDto;
-}
-
 export interface ForgotPasswordDtoRequest {
   email: string;
 }

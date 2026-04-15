@@ -1,4 +1,8 @@
 /* Design System Index - Import all CSS files */
-@import './variables.css';
+/* @import './variables.css';
 @import './base.css';
-@import './components.css';
+@import './components.css'; */
+
+@theme {
+  --font-sans: 'Open Sans', sans-serif;
+}
