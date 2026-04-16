@@ -98,7 +98,9 @@
       "firstName": "Julie",
       "lastName": "Spéciale",
       "role": "member",
-      "extraPermissions": ["activity:create"],
+      "extraPermissions": [
+        "activity:create"
+      ],
       "deniedPermissions": [],
       "active": true
     },
@@ -110,7 +112,10 @@
       "lastName": "Limité",
       "role": "encoder",
       "extraPermissions": [],
-      "deniedPermissions": ["activity:delete", "activity:publish"],
+      "deniedPermissions": [
+        "activity:delete",
+        "activity:publish"
+      ],
       "active": true
     }
   ],
@@ -126,7 +131,9 @@
       "category": "reunion",
       "status": "published",
       "createdBy": "u2",
-      "createdAt": "2025-08-01T10:00:00Z"
+      "createdAt": "2025-08-01T10:00:00Z",
+      "isRegistered": false,
+      "registeredAt": null
     },
     {
       "id": "a2",
@@ -139,7 +146,9 @@
       "category": "formation",
       "status": "published",
       "createdBy": "u2",
-      "createdAt": "2025-08-10T14:00:00Z"
+      "createdAt": "2025-08-10T14:00:00Z",
+      "isRegistered": true,
+      "registeredAt": "2025-08-05T10:00:00Z"
     },
     {
       "id": "a3",
@@ -152,7 +161,9 @@
       "category": "evenement",
       "status": "published",
       "createdBy": "u1",
-      "createdAt": "2025-09-01T09:00:00Z"
+      "createdAt": "2025-09-01T09:00:00Z",
+      "isRegistered": false,
+      "registeredAt": null
     },
     {
       "id": "a4",
@@ -165,7 +176,9 @@
       "category": "formation",
       "status": "draft",
       "createdBy": "u2",
-      "createdAt": "2025-09-15T11:00:00Z"
+      "createdAt": "2025-09-15T11:00:00Z",
+      "isRegistered": true,
+      "registeredAt": "2025-08-05T10:00:00Z"
     }
   ],
   "registrations": [

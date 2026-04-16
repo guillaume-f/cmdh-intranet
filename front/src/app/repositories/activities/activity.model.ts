@@ -10,4 +10,6 @@ export interface ActivityDto {
   status: string;
   createdBy: string;
   createdAt: Date;
+  isRegistered: boolean;
+  registeredAt?: Date;
 }

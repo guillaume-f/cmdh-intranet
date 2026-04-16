@@ -5,6 +5,17 @@
 <div class="p-4">
   @if (activity(); as currentActivity) {
     <p>{{ currentActivity.title }}</p>
+
+    @if (currentActivity.isRegistered) {
+      <p>Inscrit le: {{ currentActivity.registeredAt || '-' }}</p>
+      <button type="button" (click)="onUnregister()" [disabled]="isSubmitting()">
+        Se désinscrire
+      </button>
+    } @else {
+      <button type="button" (click)="onRegister()" [disabled]="isSubmitting()">
+        S'inscrire
+      </button>
+    }
   } @else {
     <p>Chargement de l'activité...</p>
   }
