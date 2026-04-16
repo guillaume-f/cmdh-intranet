@@ -117,126 +117,18 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Apply PrimeNG severity levels consistently: `success`, `info`, `warning`, `error` mapped to brand semantic colors
 - Error messages: Always use `<p-message severity="error" variant="simple" size="small">` for inline validation errors
 
-## Design System & Brand Guidelines
-
-### Color Palette
-
-Define these CSS variables in the root stylesheet for consistent theming:
-
-```css
-:root {
-  /* Primary & Accent Colors */
-  --color-primary: #ceaa18;        /* Gold accent - use for primary actions, highlights */
-  --color-primary-dark: #a88914;   /* Darker gold for hover states */
-  --color-primary-light: #e0bb2a;  /* Lighter gold for backgrounds */
-  
-  /* Neutral Colors */
-  --color-text-primary: #222222;   /* Dark gray - main text */
-  --color-text-secondary: #666666; /* Medium gray - secondary text, borders */
-  --color-background: #ffffff;
-  --color-background-light: #eeeeee; /* Light gray - subtle backgrounds */
-  
-  /* Semantic Colors */
-  --color-danger: #dc3232;         /* Red - errors, warnings */
-  --color-success: #4caf50;
-  --color-info: #2196f3;
-  --color-warning: #ff9800;
-}
-```
-
-### Typography
-
-- **Font Family**: Open Sans (fallback: sans-serif)
-- Apply Open Sans globally in root styles and all components
-- Use standard font weights: 400 (regular), 600 (semibold), 700 (bold)
-- Headings: h1–h6 should use 700 weight with appropriate sizing
-- Body text: Use 400 weight at 14–16px
-
-### Color Usage Guidelines
-
-- **Primary Actions**: Use `--color-primary` (#ceaa18) for buttons, links, active states
-- **Text**: Use `--color-text-primary` (#222222) for main text; `--color-text-secondary` (#666666) for secondary/disabled text
-- **Error States**: Use `--color-danger` (#dc3232) for validation errors, alerts
-- **Backgrounds**: Use `--color-background-light` (#eee) for subtle section backgrounds, hover states
-- **Never hardcode colors**: Always reference CSS variables via `var(--color-*)` in styles
-- Verify all color combinations meet WCAG AA contrast ratios (4.5:1 for text, 3:1 for graphics)
-
 ### PrimeNG Theme Customization
 
 Override PrimeNG Nora theme defaults to match brand colors:
 
-```typescript
-// Configure PrimeNG preset colors in app.config.ts or component styles
-import { providePrimeng } from 'primeng/config';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    providePrimeng({
-      theme: {
-        preset: 'nora',
-        options: {
-          primary: '#ceaa18',        // Brand gold
-          surface: '#ffffff',
-          darkSurface: '#222222',    // Brand dark
-          gray: '#666666',           // Brand gray
-          danger: '#dc3232',         // Brand danger
-          focusRing: '0 0 0 0.2rem rgba(206, 170, 24, 0.5)', // Gold focus ring
-        }
-      }
-    })
-  ]
-};
-```
-
 ## Styling & Tailwind Integration
 
 - Use Tailwind utilities as the primary styling mechanism
-- Define custom CSS only when Tailwind cannot express the design (e.g., CSS Grid layouts, complex animations)
+- Define custom CSS only when Tailwind cannot express the design
 - Place component-scoped styles in the component's `.css` file; use CSS variables for theming
-- **Always use CSS variables** (`var(--color-primary)`) instead of hardcoded colors to maintain design consistency
+- **Always use CSS variables** instead of hardcoded colors to maintain design consistency
 
 ### CSS Architecture
-
-Structure global styles in `src/assets/styles/`:
-
-```
-src/assets/styles/
-├── index.css           # Master import file
-├── variables.css       # Design system CSS variables
-├── base.css            # Global typography, form elements, base styles
-└── components.css      # PrimeNG component customization overrides
-```
-
-**variables.css** - Define brand colors as CSS variables:
-```css
-:root {
-  --color-primary: #ceaa18;
-  --color-primary-dark: #a88914;
-  --color-primary-light: #e0bb2a;
-  --color-text-primary: #222222;
-  --color-text-secondary: #666666;
-  --color-danger: #dc3232;
-  --color-success: #4caf50;
-  /* ... other variables */
-}
-```
-
-**base.css** - Global form and typography styles:
-```css
-* {
-  font-family: 'Open Sans', sans-serif;
-}
-
-.form-label {
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.form-label.required::after {
-  content: ' *';
-  color: var(--color-danger);
-}
-```
 
 - Import all CSS files in `src/styles.css` or component-level files
 - Component-specific styles override global styles when needed
@@ -268,119 +160,20 @@ npm run watch
 ```
 Compiles changes without serving; useful for external dev servers.
 
-## Project Structure & Conventions
-
-### Type Organization (Split by Responsibility)
-
-**Repository DTOs** – API request/response types grouped by feature:
-```
-src/app/repositories/
-├── auth/
-│   ├── auth.model.ts       // LoginDto, LoginDtoRequest, etc.
-│   └── auth.repository.ts  // HTTP calls only
-```
-
-**Component Models** – Feature-specific and component-scoped types:
-```
-src/app/features/auth/login/
-├── models/
-│   └── login.model.ts      // LoginForm type (TypedControlsOf<LoginFormValue>)
-├── login.component.ts
-├── login.component.html
-└── login.component.css
-```
-
 ### Directory Structure
 
-- **Components**: `src/app/components/` – Reusable UI components
 - **Features**: `src/app/features/` – Feature modules with lazy-loaded routes
-  - Auth feature: `src/app/features/auth/` with login, forgot-password, reset-password pages
-  - Each feature has its own routes file: `auth.routes.ts`
+  - Each feature has its own routes file
   - Each component has a `models/` subdirectory for component-scoped types
 - **Repositories**: `src/app/repositories/` – API transport layer, one per feature
-  - `auth/auth.repository.ts` – HTTP calls for auth
-  - `auth/auth.model.ts` – DTO types (requests/responses)
-- **Services**: `src/app/services/` – Singleton services with `providedIn: 'root'`
-  - `form-validators.service.ts` – Custom form validators
-  - No auth.service.ts - use AuthRepository directly in components
+  - Each repository has its own model file
 - **Assets**: `src/assets/styles/` – Global CSS files
-  - `variables.css` – Design system CSS variables
-  - `base.css` – Global typography, form elements
-  - `messages.css` – Alert/message component styles
-  - `components.css` – PrimeNG component overrides
-  - `index.css` – Master import file
 - **Utilities**: `src/app/utilities/` – Pure utility functions
-  - `typed-controls.ts` – TypedControlsOf helper for form typing
-  - `patterns.ts` – Regex patterns (EMAIL_PATTERN, etc.)
 - All new components are generated with `app` prefix (set in `angular.json`)
-
-### Feature Routing Example (Auth)
-
-```typescript
-// src/app/features/auth/auth.routes.ts
-export const AUTH_ROUTES: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'forgot-password',
-    component: ForgotPasswordComponent,
-  },
-  {
-    path: 'reset-password',
-    component: ResetPasswordComponent,
-  },
-];
-```
-
-```typescript
-// src/app/app.routes.ts - Main routing with lazy loading
-export const routes: Routes = [
-  {
-    path: 'auth',
-    loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES),
-  },
-  // Other routes...
-];
-```
 
 ### Theme Configuration
 
-Use custom PrimeNG preset in `src/app/theme.config.ts`:
-
-```typescript
-import { definePreset } from '@primeuix/themes';
-import { Nora } from '@primeuix/themes/nora';
-
-export const CMDHPreset = definePreset(Nora, {
-  semantic: {
-    primary: {
-      50: '#fef9f0',
-      // ... color palette 50-950
-      950: '#4a3a0a',
-    },
-  },
-});
-```
-
-Apply in `src/app/app.config.ts`:
-
-```typescript
-import { providePrimeng } from 'primeng/config';
-import { CMDHPreset } from './theme.config';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    providePrimeng({
-      theme: {
-        preset: CMDHPreset,
-      },
-    }),
-    // Other providers...
-  ],
-};
-```
+Use custom PrimeNG preset in `src/app/theme.config.ts` and apply it in  `src/app/app.config.ts`
 
 ## Code Generation
 
@@ -413,114 +206,15 @@ Generated code follows the established patterns above automatically.
 
 All user-visible text must be translatable using ngx-translate. The project uses lazy-loaded feature modules with scoped translation files.
 
-### Project Structure
-
-```
-src/assets/i18n/
-├── fr.json                 # Global translations (loaded at app startup)
-└── auth/                   # Feature module: Auth
-    ├── fr.json            # Auth-specific translations (lazy-loaded)
-    └── ... (other feature modules)
-```
-
-### Configuration
-
-**In `app.config.ts`** - Global loader (root translations):
-```typescript
-providePrimeNG({
-  // ...
-}),
-provideTranslateService({
-  defaultLanguage: 'fr',
-  fallbackLang: 'fr',
-  useDefaultLang: true,
-  lang: 'fr',
-  loader: provideTranslateHttpLoader({
-    prefix: '/assets/i18n/',
-    suffix: '.json'
-  })
-})
-```
-
-**In `app.routes.ts`** - Feature-scoped loader (lazy loading):
-Each lazy-loaded route adds its feature's translations with `extend: true` to merge with global translations:
-```typescript
-{
-  path: 'auth',
-  loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes),
-  providers: [
-    provideTranslateService({
-      extend: true,                  // Merge with global translations
-      loader: provideTranslateHttpLoader({
-        prefix: '/assets/i18n/auth/',
-        suffix: '.json'
-      })
-    })
-  ],
-}
-```
-
 ### Translation Structure
 
 **Global translations** (`src/assets/i18n/fr.json`):
-```json
-{
-  "COMMON": {
-    "LANGUAGE": "Français",
-    "LOADING": "Chargement...",
-    "ERROR": "Erreur",
-    "SUCCESS": "Succès"
-  }
-}
-```
-
-**Feature translations** (`src/assets/i18n/auth/fr.json`):
-```json
-{
-  "AUTH": {
-    "LOGIN": {
-      "TITLE": "Connexion",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_PLACEHOLDER": "votre@email.com"
-    },
-    "ERRORS": {
-      "EMAIL_REQUIRED": "Ce champ est requis",
-      "EMAIL_INVALID": "Email invalide"
-    }
-  }
-}
-```
+**Feature translations** (`src/assets/i18n/feature/fr.json`):
 
 ### Usage in Templates
 
-Always import `TranslatePipe` in component imports:
-```typescript
-import { TranslatePipe } from '@ngx-translate/core';
-
-@Component({
-  //...
-  imports: [CommonModule, TranslatePipe, /* ... other imports ... */]
-})
-```
-
+Always import `TranslatePipe` in component imports
 Then use in templates with the pipe:
-```html
-<!-- Simple text -->
-<h1>{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
-
-<!-- Input placeholders -->
-<input [placeholder]="'AUTH.LOGIN.EMAIL_PLACEHOLDER' | translate" />
-
-<!-- Error messages -->
-@if (form.controls.email.errors?.['required'] && form.controls.email.touched) {
-  <p-message severity="error" variant="simple" size="small">
-    {{ 'AUTH.ERRORS.EMAIL_REQUIRED' | translate }}
-  </p-message>
-}
-
-<!-- Button labels -->
-<button [label]="'AUTH.LOGIN.SUBMIT' | translate"></button>
-```
 
 ### Adding a New Feature
 
@@ -528,15 +222,15 @@ When creating a new lazy-loaded feature, follow these steps:
 
 1. **Create the feature module** in `src/app/features/<feature-name>/`
 
-2. **Create translation file** at `src/assets/i18n/feature-name/fr.json`:
+2. **Create translation file** at `src/assets/i18n/feature-name/fr.json`
 
 3. **Namespace convention**: Group all translations under feature name in UPPER_SNAKE_CASE:
    - Global features use `COMMON.*`
    - features use `FEATURE_NAME.*`
 
-4. **Error translations**: Always place error messages in a nested `ERRORS` object for consistency:
+4. **Error translations**: Always place error messages in a nested `ERRORS` object for consistency
 
-5. **Import TranslatePipe** in all new components that use translations:
+5. **Import TranslatePipe** in all new components that use translations
 
 ## Debugging & Common Issues
 
