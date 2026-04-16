@@ -1,7 +1,7 @@
 import { DestroyRef, inject } from "@angular/core"
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop"
 import { CanActivateFn, Router } from "@angular/router"
-import { map, tap } from "rxjs"
+import { catchError, map, of, tap } from "rxjs"
 import { AuthRepository } from "../../repositories/auth/auth.repository"
 import { AuthService } from "./auth.service"
 
@@ -18,6 +18,10 @@ export const authGuard: CanActivateFn = () => {
       
       router.navigate(['/auth/login'])
       return false
+    }),
+    catchError(() => {
+      router.navigate(['/auth/login'])
+      return of(false)
     }),
     takeUntilDestroyed(destroyRef),
   )

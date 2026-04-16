@@ -2,3 +2,17 @@
 <div class="p-4 bg-primary-500 color-gray-900">
     <h1 class="text-3xl font-semibold">Activités</h1>
 </div>
+
+<div class="p-4">
+    @if (activities()?.length === 0) {
+        <p>Aucune activité à afficher.</p>
+    } @else {
+        <ul>
+            @for (activity of activities(); track activity.id) {
+                <li>
+                    <a [routerLink]="[activity.id]">{{ activity.title }}</a>
+                </li>
+            }
+        </ul>
+    }
+</div>

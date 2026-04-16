@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { UserDto } from '../../core/auth/user.model';
+import { ActivityDto } from './activity.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +11,14 @@ export class ActivitiesRepository {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/api/activities`;
 
-  getAllActivities(): Observable<UserDto> {
+  getAllActivities(): Observable<ActivityDto[]> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(
       'Authorization',
       `Bearer ${token}`
     );
     return  this.http
-            .get<UserDto>(`${this.apiUrl}`, {headers}) 
+            .get<ActivityDto[]>(`${this.apiUrl}`, {headers}) 
   }
 
   getCookie(name: string): string | undefined {
