@@ -3,5 +3,9 @@
 </div>
 
 <div class="p-4">
-  <p>ID activité: {{ activityId }}</p>
+  @if (activity(); as currentActivity) {
+    <p>{{ currentActivity.title }}</p>
+  } @else {
+    <p>Chargement de l'activité...</p>
+  }
 </div>

@@ -21,6 +21,16 @@ export class ActivitiesRepository {
             .get<ActivityDto[]>(`${this.apiUrl}`, {headers}) 
   }
 
+  getActivityById(activityId: string): Observable<ActivityDto> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    return this.http.get<ActivityDto>(`${this.apiUrl}/${activityId}`, { headers });
+  }
+
   getCookie(name: string): string | undefined {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
