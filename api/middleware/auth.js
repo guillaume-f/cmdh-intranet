@@ -55,12 +55,21 @@ function checkRoutePermission(req, res) {
   const path = req.path  // ex: /api/activities, /api/registrations/r1
   const method = req.method
 
+  const isRegisterRoute = /^\/api\/activities\/[^/]+\/register$/.test(path)
+  const isUnregisterRoute = /^\/api\/activities\/[^/]+\/unregister$/.test(path)
+
   // --- Activités ---
   if (path.startsWith('/api/activities')) {
     if (method === 'GET' && !hasPermission(req, 'activity:read')) {
       return res.status(403).json({ message: 'Permission manquante : activity:read' })
     }
-    if (method === 'POST' && !hasPermission(req, 'activity:create')) {
+    if (isRegisterRoute && method === 'POST' && !hasPermission(req, 'registration:create')) {
+      return res.status(403).json({ message: 'Permission manquante : registration:create' })
+    }
+    if (isUnregisterRoute && method === 'POST' && !hasPermission(req, 'registration:delete')) {
+      return res.status(403).json({ message: 'Permission manquante : registration:delete' })
+    }
+    if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !hasPermission(req, 'activity:create')) {
       return res.status(403).json({ message: 'Permission manquante : activity:create' })
     }
     if (method === 'PATCH' || method === 'PUT') {
@@ -233,6 +242,90 @@ module.exports = (req, res, next) => {
   // --- Contrôle des permissions sur les routes /api/* ---
   const permError = checkRoutePermission(req, res)
   if (permError) return  // La réponse d'erreur a déjà été envoyée
+
+  // --- GET /api/activities/:id ---
+  // Renvoie l'activité avec l'état d'inscription de l'utilisateur connecté.
+  const activityDetailMatch = req.path.match(/^\/api\/activities\/([^/]+)$/)
+  if (req.method === 'GET' && activityDetailMatch) {
+    const activityId = activityDetailMatch[1]
+
+    const activity = db.get('activities').find({ id: activityId }).value()
+    if (!activity) {
+      return res.status(404).json({ message: 'Activité introuvable' })
+    }
+
+    const registration = db
+      .get('registrations')
+      .find({ activityId, userId: req.user.id })
+      .value()
+
+    return res.json({
+      ...activity,
+      isRegistered: !!registration,
+      registeredAt: registration ? registration.registeredAt : null,
+    })
+  }
+
+  // --- POST /api/activities/:id/register ---
+  const registerMatch = req.path.match(/^\/api\/activities\/([^/]+)\/register$/)
+  if (req.method === 'POST' && registerMatch) {
+    const activityId = registerMatch[1]
+
+    const activity = db.get('activities').find({ id: activityId }).value()
+    if (!activity) {
+      return res.status(404).json({ message: 'Activité introuvable' })
+    }
+
+    const existingRegistration = db
+      .get('registrations')
+      .find({ activityId, userId: req.user.id })
+      .value()
+
+    if (existingRegistration) {
+      return res.status(409).json({
+        message: 'Vous êtes déjà inscrit à cette activité',
+        registration: existingRegistration,
+      })
+    }
+
+    const registration = {
+      id: `r${Date.now()}`,
+      activityId,
+      userId: req.user.id,
+      registeredAt: new Date().toISOString(),
+      status: 'confirmed',
+    }
+
+    db.get('registrations').push(registration).write()
+
+    return res.status(201).json({
+      message: 'Inscription confirmée',
+      registration,
+    })
+  }
+
+  // --- POST /api/activities/:id/unregister ---
+  const unregisterMatch = req.path.match(/^\/api\/activities\/([^/]+)\/unregister$/)
+  if (req.method === 'POST' && unregisterMatch) {
+    const activityId = unregisterMatch[1]
+
+    const registration = db
+      .get('registrations')
+      .find({ activityId, userId: req.user.id })
+      .value()
+
+    if (!registration) {
+      return res.status(404).json({ message: 'Aucune inscription trouvée pour cette activité' })
+    }
+
+    db.get('registrations').remove({ id: registration.id }).write()
+
+    return res.json({
+      message: 'Désinscription effectuée',
+      activityId,
+      userId: req.user.id,
+    })
+  }
 
   next()
 }

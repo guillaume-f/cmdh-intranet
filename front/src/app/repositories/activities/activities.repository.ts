@@ -31,6 +31,26 @@ export class ActivitiesRepository {
     return this.http.get<ActivityDto>(`${this.apiUrl}/${activityId}`, { headers });
   }
 
+  register(activityId: string): Observable<void> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    return this.http.post<void>(`${this.apiUrl}/${activityId}/register`, null, { headers });
+  }
+
+  unregister(activityId: string): Observable<void> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    return this.http.post<void>(`${this.apiUrl}/${activityId}/unregister`, null, { headers });
+  }
+
   getCookie(name: string): string | undefined {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
