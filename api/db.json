@@ -24,6 +24,7 @@
         "activity:read",
         "activity:create",
         "activity:edit",
+        "activity:delete",
         "activity:publish",
         "registration:create",
         "registration:read",
@@ -211,6 +212,54 @@
       "points": 3,
       "location": "Collégiale Sainte-Waudru",
       "id": "c0Ci3uq"
+    },
+    {
+      "title": "Repas à l'Auberge de Jeunesse",
+      "description": "Le repas est réservé aux membres de la Compagnie montoise des Hallebardiers.\nPour celui-ci (assiette anglaise + frites + 2 boissons), n'oubliez pas de vous inscrire par mail via l'adresse inscriptions@hallebardiers.org\nLe prix est de 17,5 € à payer sur le compte de la Compagnie BE70 0882 1613 8425 avant le 28 avril. En communication nous vous invitons à mentionner vos NOM - Prénom et Repas Répétition 9 mai.\nLa répétition dans la Collégiale débutera à 14H00",
+      "datetime": "2026-05-09T11:00:00.000Z",
+      "points": 0,
+      "location": "Auberge de Jeunesse du Beffroi - Mons",
+      "id": "8ylRaSv"
+    },
+    {
+      "title": "Deuxième répétition",
+      "description": "Après le traditionnel repas à l'Auberge de Jeunesse (si vous souhaitez y participer, n'oubliez pas de vous inscrire avant le 30 avril 2026), nous vous convions à participer à la seconde répétition qui sera principalement consacrée à la Cérémonie de la Descente de la Châsse de Madame sainte Waudru.\nNous comptons sur la présence de tous. Il n'est pas nécessaire de vous inscrire par mail si vous souhaitez participer à cette activité.",
+      "datetime": "2026-05-09T13:30:00.000Z",
+      "points": 5,
+      "location": "Collégiale Sainte-Waudru",
+      "id": "3CBxUoi"
+    },
+    {
+      "title": "Procession de Soignies en hommage à saint Vincent",
+      "description": "La Compagnie Montoise des Hallebardiers est invitée à participer, le 25 mai prochain à la Procession qui clôturera le Tour Saint-Vincent à Soignies.\nUne relique de sainte Waudru sera processionnée à cette occasion. La Compagnie revêtira sa tenue de Procession noire et jaune .\nPour cette raison, seuls les Hallebardiers qui participeront le dimanche suivant à la Procession du car d'or pourront porter le costume.\nRendez-vous directement pour 9H00 au 51 de la Rue Neuve à Soignies (en face de la Cour du Jeu de Balle).\nNotez cependant que nous avons besoin de quelques volontaires pour charger notre matériel dans les voitures. Le Chef de Sainte-Waudru n'étant pas de sortie il n'y a pas de camion de prévu. Les volontaires sont attendus dès 7H30 au Foyer Sainte-Waudru\nLes inscriptions se font comme habituellement via l'adresse inscriptions@hallebardiers.org.\nDress code : Chemise de la Compagnie - Pantalon sombre ou jeans - Chaussures de ville + Matériel de procession",
+      "datetime": "2026-05-25T05:30:00.000Z",
+      "points": 3,
+      "location": "Rue Neuve 51, 7060 Soignies, Belgique",
+      "id": "HtjHp7-"
+    },
+    {
+      "title": "Troisième répétition",
+      "description": "La troisième répétition est prévue le samedi 23 mai 2026 dès 16H00. Elle se déroulera à la Collégiale Sainte-Waudru.\nAu programme :Cérémonie de Descente de la Châsse de Madame sainte Waudru et mise en place de chacun à l'occasion des différentes phases auxquelles la Compagnie participera lors de ce Doudou. - Edition 2026.\nAucune inscription par mail n'est nécessaire pour cette activité pour laquelle nous comptons sur la présence de tous.",
+      "datetime": "2026-05-23T14:00:00.000Z",
+      "points": 5,
+      "location": "Collégiale Sainte-Waudru",
+      "id": "pPQ4owx"
+    },
+    {
+      "title": "Un After framerisois - Edition 2026",
+      "description": "Jamais deux sans trois. Après deux éditions éditions plus que réussies, nos Compagnons Angie et Jérôme et leur famille ont à nouveau le plaisir d'inviter les Compagnons présents à la Procession de Frameries à l'\"After framerisois - Edition 2026\"\nAprès avoir participé à la Procession de Frameries, s'être assuré que le Chef et notre matériel avait bien repris le chemin de Mons et avoir fait acte de présence au verre de l'amitié offert par les autorités communales de Frameries, Jérôme et Angie ont le plaisir d'inviter les Compagnons et les Candidats Hallebardiers présents à un \"After-Procession\" qui s'annonce bien sympathique et convivial.\nLe rendez-vous est fixé chez Jérôme (Rue Tazerka 7 à Frameries). L'heure du rendez-vous est communiquée à titre indicatif et dépendra de celle de la fin de nos obligations mentionnées ci-dessus.\nPour que nos deux Compagnons puissent s'organiser au mieux, nous vous demandons de signaler votre présence par un \"JE PARTICIPE\" à cet évènement.\nLes membres de la petite équipe qui se chargera de re-déposer le Chef dans sa chapelle à la Collégiale puis qui s'occupera de ranger le matériel dans notre vestiaire nous rejoindrons dès la mission accomplie. N'oubliez pas de leur laisser de quoi se sustenter et de quoi s'hydrater.\nDès-à-présent, nous remercions nos deux amis organisateurs et leurs familles pour l'accueil chaleureux qu'ils ne manqueront pas de nous réserver",
+      "datetime": "2026-05-14T12:00:00.000Z",
+      "points": 0,
+      "location": "Rue du Tazerka, 7 - 7080 Frameries",
+      "id": "6C1iuyq"
+    },
+    {
+      "title": "Première séance d'essayage",
+      "description": "Si lors de la Ducasse, vous avez été désigné pour revêtir un costume (Escorte d'honneur aux reliques de Madame sainte Waudru ou Escorte aux reliques de Monseigneur saint Georges), vous devez obligatoirement participer à une des deux séances d'essayage prévues.\nLa première se déroulera le lundi 11 mai 2026 de 16H00 à 18H00 au Foyer Sainte-Waudru.\nL'inscription par mail n'est pas nécessaire pour cette activité",
+      "datetime": "2026-05-11T14:00:00.000Z",
+      "points": 0,
+      "location": "Foyer Sainte-Waudru - Mons",
+      "id": "OZAcxp5"
     }
   ],
   "registrations": [
@@ -236,17 +285,73 @@
       "status": "confirmed"
     },
     {
-      "id": "r1778225976266",
-      "activityId": "a1",
-      "userId": "u1",
-      "registeredAt": "2026-05-08T07:39:36.266Z",
-      "status": "confirmed"
-    },
-    {
       "id": "r1778240809396",
       "activityId": "a4",
       "userId": "u1",
       "registeredAt": "2026-05-08T11:46:49.396Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252460485",
+      "activityId": "CSMwV4R",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:00.485Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252470036",
+      "activityId": "3CBxUoi",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:10.036Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252476165",
+      "activityId": "OZAcxp5",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:16.165Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252479135",
+      "activityId": "pyCDv1O",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:19.135Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252481727",
+      "activityId": "6C1iuyq",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:21.727Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252484547",
+      "activityId": "pPQ4owx",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:24.547Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252487310",
+      "activityId": "HtjHp7-",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:27.310Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252509122",
+      "activityId": "c0Ci3uq",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:49.122Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778252516744",
+      "activityId": "DEvLzyE",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T15:01:56.744Z",
       "status": "confirmed"
     }
   ],
