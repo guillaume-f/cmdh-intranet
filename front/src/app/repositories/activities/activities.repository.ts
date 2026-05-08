@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ActivityDto } from './activity.model';
+import { ActivityDto, ActivityDtoRequest } from './activity.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +31,7 @@ export class ActivitiesRepository {
     return this.http.get<ActivityDto>(`${this.apiUrl}/${activityId}`, { headers });
   }
 
-  addActivity(activity: Omit<ActivityDto, 'id'>): Observable<ActivityDto> {
+  addActivity(activity: ActivityDtoRequest): Observable<ActivityDto> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(
       'Authorization',

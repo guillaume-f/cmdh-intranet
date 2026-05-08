@@ -1,14 +1,19 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
+import { finalize } from 'rxjs';
 import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
-import { ActivityForm } from './models/activity-form.model';
+import { ActivityDto } from '../../../repositories/activities/activity.model';
+import { toActivityDtoRequest } from './activity-form.converter';
+import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
 
 @Component({
   selector: 'app-activity-form',
@@ -28,6 +33,10 @@ import { ActivityForm } from './models/activity-form.model';
 export class ActivityFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesRepository = inject(ActivitiesRepository);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+
+  private isLoading = signal(false);
 
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
     titre: ['', [Validators.required, Validators.maxLength(200)]],
@@ -42,8 +51,17 @@ export class ActivityFormComponent {
       this.form.markAllAsTouched();
       return;
     }
-    this.activitiesRepository.addActivity(this.form.value).subscribe(() => {
-      
+
+    this.isLoading.set(true);
+
+    const formValue = this.form.getRawValue() as ActivityFormValue;
+    const request = toActivityDtoRequest(formValue);
+
+    this.activitiesRepository.addActivity(request).pipe(
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((activiy: ActivityDto) => {
+        this.router.navigate(['/activities', activiy.id])
     });
   }
 }

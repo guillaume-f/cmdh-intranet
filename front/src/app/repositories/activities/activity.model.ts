@@ -6,10 +6,18 @@ export interface ActivityDto {
   time: string;
   points: number;
   location: string;
-  category: string;
   status: string;
   createdBy: string;
   createdAt: Date;
   isRegistered: boolean;
   registeredAt?: Date;
+}
+
+export interface ActivityDtoRequest {
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  points: number;
+  location: string;
 }
