@@ -5,7 +5,8 @@
   "ACTIVITIES": {
     "BREADCRUMB": {
       "LIST": "Activités",
-      "NEW": "Nouvelle activité"
+      "NEW": "Nouvelle activité",
+      "EDIT": "Modifier l'activité"
     },
     "FORM": {
       "TITRE_LABEL": "Titre",
@@ -18,7 +19,8 @@
       "ADRESSE_PLACEHOLDER": "Adresse de l'activité",
       "POINTS_LABEL": "Points",
       "POINTS_PLACEHOLDER": "Sélectionner les points",
-      "SUBMIT": "Enregistrer"
+      "SUBMIT": "Enregistrer",
+      "UPDATE": "Mettre à jour"
     },
     "ERRORS": {
       "TITRE_REQUIRED": "Le titre est obligatoire",

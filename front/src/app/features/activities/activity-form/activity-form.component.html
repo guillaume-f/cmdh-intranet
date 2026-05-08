@@ -1,5 +1,5 @@
 <div class="p-4 bg-primary-500 color-gray-900">
-  <h1 class="text-3xl font-semibold">{{ 'ACTIVITIES.BREADCRUMB.NEW' | translate }}</h1>
+  <h1 class="text-3xl font-semibold">{{ pageTitleKey() | translate }}</h1>
 </div>
 
 <p-breadcrumb [model]="breadcrumbItems" />
@@ -114,7 +114,7 @@
     <div class="flex justify-end">
       <p-button
         type="submit"
-        [label]="'ACTIVITIES.FORM.SUBMIT' | translate"
+        [label]="submitLabelKey() | translate"
         [disabled]="isLoading()"
       />
     </div>

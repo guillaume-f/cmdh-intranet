@@ -54,12 +54,23 @@ export class ActivityDetailComponent {
 
   protected canRegister = signal(this.authService.can('registration:create'));
   protected canDelete = signal(this.authService.can('activity:delete'));
+  protected canEdit = signal(this.authService.can('activity:edit'));
 
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
     return new Date(activity.datetime) >= new Date();
   });
+
+  protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());
+
+  protected onEdit(): void {
+    if (!this.activityId()) {
+      return;
+    }
+
+    void this.router.navigate(['/activities', this.activityId(), 'edit']);
+  }
 
   protected onRegister(): void {
     if (!this.activityId() || this.isSubmitting()) {

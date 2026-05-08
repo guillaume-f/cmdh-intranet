@@ -20,6 +20,14 @@ export const  activitiesRoutes: Routes = [
     loadComponent: () => import('./activity-form/activity-form.component').then(m => m.ActivityFormComponent),
   },
   {
+    path: ':activityId/edit',
+    canActivate: [permissionsGuard],
+    data: {
+      permissions: ['activity:edit']
+    },
+    loadComponent: () => import('./activity-form/activity-form.component').then(m => m.ActivityFormComponent),
+  },
+  {
     path: ':activityId',
     canActivate: [permissionsGuard],
     data: {
