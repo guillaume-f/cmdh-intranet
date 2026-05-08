@@ -40,14 +40,12 @@ export class ActivityFormComponent {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
 
-  private isLoading = signal(false);
+  protected readonly isLoading = signal(false);
 
   protected readonly breadcrumbItems: MenuItem[] = [
     { label: this.translate.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
     { label: this.translate.instant('ACTIVITIES.BREADCRUMB.NEW') },
   ];
-
-  protected readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
     titre: ['', [Validators.required, Validators.maxLength(200)]],

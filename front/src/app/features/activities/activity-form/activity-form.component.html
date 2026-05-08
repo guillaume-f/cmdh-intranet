@@ -2,99 +2,104 @@
   <h1 class="text-3xl font-semibold">{{ 'ACTIVITIES.BREADCRUMB.NEW' | translate }}</h1>
 </div>
 
-<p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" />
+<p-breadcrumb [model]="breadcrumbItems" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+<div class="w-full p-4 xl:mx-auto xl:max-w-6xl">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
 
-  <!-- Titre -->
-  <div class="form-input-wrapper">
-    <label for="titre" class="form-label required">
-      {{ 'ACTIVITIES.FORM.TITRE_LABEL' | translate }}
-    </label>
-    <div class="flex flex-col gap-1">
+    <!-- Titre -->
+    <div class="form-input-wrapper">
+      <label for="titre" class="form-label required">
+        {{ 'ACTIVITIES.FORM.TITRE_LABEL' | translate }}
+      </label>
+      <div class="flex flex-col gap-1">
+        <input
+          pInputText
+          id="titre"
+          type="text"
+          [formControl]="form.controls.titre"
+          class="w-full"
+          [placeholder]="'ACTIVITIES.FORM.TITRE_PLACEHOLDER' | translate"
+          [attr.aria-invalid]="form.controls.titre.invalid && form.controls.titre.touched"
+        />
+        @if (form.controls.titre.errors?.['required'] && form.controls.titre.touched) {
+          <p-message severity="error" variant="simple" size="small">
+            {{ 'ACTIVITIES.ERRORS.TITRE_REQUIRED' | translate }}
+          </p-message>
+        }
+        @if (form.controls.titre.errors?.['maxlength'] && form.controls.titre.touched) {
+          <p-message severity="error" variant="simple" size="small">
+            {{ 'ACTIVITIES.ERRORS.TITRE_MAX_LENGTH' | translate }}
+          </p-message>
+        }
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="form-input-wrapper">
+      <label for="description" class="form-label" [appOptionalLabel]="form.controls.description">
+        {{ 'ACTIVITIES.FORM.DESCRIPTION_LABEL' | translate }}
+      </label>
+      <textarea
+        pTextarea
+        id="description"
+        [formControl]="form.controls.description"
+        class="w-full"
+        rows="4"
+        [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
+      ></textarea>
+    </div>
+
+    <!-- Date et heure -->
+    <div class="form-input-wrapper">
+      <label for="dateHeure" class="form-label required">
+        {{ 'ACTIVITIES.FORM.DATETIME_LABEL' | translate }}
+      </label>
+      <div class="flex flex-col gap-1">
+        <p-datepicker
+          inputId="dateHeure"
+          [formControl]="form.controls.dateHeure"
+          dateFormat="dd/mm/yy"
+          [showTime]="true"
+          hourFormat="24"
+          [showIcon]="true"
+          class="w-full"
+          [placeholder]="'ACTIVITIES.FORM.DATETIME_PLACEHOLDER' | translate"
+        />
+        @if (form.controls.dateHeure.errors?.['required'] && form.controls.dateHeure.touched) {
+          <p-message severity="error" variant="simple" size="small">
+            {{ 'ACTIVITIES.ERRORS.DATETIME_REQUIRED' | translate }}
+          </p-message>
+        }
+      </div>
+    </div>
+
+    <!-- Adresse -->
+    <div class="form-input-wrapper">
+      <label for="adresse" class="form-label" [appOptionalLabel]="form.controls.adresse">
+        {{ 'ACTIVITIES.FORM.ADRESSE_LABEL' | translate }}
+      </label>
       <input
         pInputText
-        id="titre"
+        id="adresse"
         type="text"
-        [formControl]="form.controls.titre"
+        [formControl]="form.controls.adresse"
         class="w-full"
-        [placeholder]="'ACTIVITIES.FORM.TITRE_PLACEHOLDER' | translate"
-        [attr.aria-invalid]="form.controls.titre.invalid && form.controls.titre.touched"
+        [placeholder]="'ACTIVITIES.FORM.ADRESSE_PLACEHOLDER' | translate"
       />
-      @if (form.controls.titre.errors?.['required'] && form.controls.titre.touched) {
-        <p-message severity="error" variant="simple" size="small">
-          {{ 'ACTIVITIES.ERRORS.TITRE_REQUIRED' | translate }}
-        </p-message>
-      }
-      @if (form.controls.titre.errors?.['maxlength'] && form.controls.titre.touched) {
-        <p-message severity="error" variant="simple" size="small">
-          {{ 'ACTIVITIES.ERRORS.TITRE_MAX_LENGTH' | translate }}
-        </p-message>
-      }
     </div>
-  </div>
 
-  <!-- Description -->
-  <div class="form-input-wrapper">
-    <label for="description" class="form-label" [appOptionalLabel]="form.controls.description">
-      {{ 'ACTIVITIES.FORM.DESCRIPTION_LABEL' | translate }}
-    </label>
-    <textarea
-      pTextarea
-      id="description"
-      [formControl]="form.controls.description"
-      class="w-full"
-      rows="4"
-      [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
-    ></textarea>
-  </div>
-
-  <!-- Date et heure -->
-  <div class="form-input-wrapper">
-    <label for="dateHeure" class="form-label required">
-      {{ 'ACTIVITIES.FORM.DATETIME_LABEL' | translate }}
-    </label>
-    <div class="flex flex-col gap-1">
-      <p-datepicker
-        inputId="dateHeure"
-        [formControl]="form.controls.dateHeure"
-        dateFormat="dd/mm/yy"
-        [showTime]="true"
-        hourFormat="24"
-        [showIcon]="true"
-        class="w-full"
-        [placeholder]="'ACTIVITIES.FORM.DATETIME_PLACEHOLDER' | translate"
+    <!-- Submit -->
+    <div class="flex justify-end">
+      <p-button
+        type="submit"
+        [label]="'ACTIVITIES.FORM.SUBMIT' | translate"
+        [disabled]="isLoading()"
       />
-      @if (form.controls.dateHeure.errors?.['required'] && form.controls.dateHeure.touched) {
-        <p-message severity="error" variant="simple" size="small">
-          {{ 'ACTIVITIES.ERRORS.DATETIME_REQUIRED' | translate }}
-        </p-message>
-      }
     </div>
-  </div>
 
-  <!-- Adresse -->
-  <div class="form-input-wrapper">
-    <label for="adresse" class="form-label" [appOptionalLabel]="form.controls.adresse">
-      {{ 'ACTIVITIES.FORM.ADRESSE_LABEL' | translate }}
-    </label>
-    <input
-      pInputText
-      id="adresse"
-      type="text"
-      [formControl]="form.controls.adresse"
-      class="w-full"
-      [placeholder]="'ACTIVITIES.FORM.ADRESSE_PLACEHOLDER' | translate"
-    />
-  </div>
+  </form>
+</div>
 
-  <!-- Submit -->
-  <div class="flex justify-end">
-    <p-button
-      type="submit"
-      [label]="'ACTIVITIES.FORM.SUBMIT' | translate"
-      [disabled]="form.invalid"
-    />
-  </div>
 
-</form>
+

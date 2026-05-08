@@ -11,7 +11,6 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
   imports: [DatePipe, RouterLink, NgTemplateOutlet, Tabs, TabList, Tab, TabPanels, TabPanel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './activity-list.component.html',
-  styleUrl: './activity-list.component.css',
 })
 export class ActivityListComponent {
   private readonly activitiesRepository = inject(ActivitiesRepository);
