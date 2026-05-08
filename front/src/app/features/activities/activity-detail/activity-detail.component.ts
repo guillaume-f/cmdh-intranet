@@ -63,6 +63,7 @@ export class ActivityDetailComponent {
   });
 
   protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());
+  protected readonly canDeleteActivity = computed(() => this.canDelete() && this.isFutureActivity());
 
   protected onEdit(): void {
     if (!this.activityId()) {
