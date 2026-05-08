@@ -43,6 +43,7 @@
                   Inscrit le: {{ currentActivity.registeredAt ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
                 </p>
                 <button
+                  pButton
                   type="button"
                   class="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
                   (click)="onUnregister()"
@@ -52,6 +53,7 @@
                 </button>
               } @else {
                 <button
+                  pButton
                   type="button"
                   class="inline-flex w-full items-center justify-center rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
                   (click)="onRegister()"
@@ -64,8 +66,10 @@
 
             @if (canEditActivity()) {
               <button
+                pButton
                 type="button"
-                class="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                severity="secondary"
+                class=" w-full "
                 (click)="onEdit()"
               >
                 Modifier l'activite
@@ -74,8 +78,10 @@
 
             @if (canDeleteActivity()) {
               <button
+                pButton
                 type="button"
-                class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                severity="danger"
+                class=" w-full "
                 (click)="onDelete()"
                 [disabled]="isSubmitting()"
               >

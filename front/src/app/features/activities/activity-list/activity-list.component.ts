@@ -2,13 +2,14 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { ButtonDirective } from 'primeng/button';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
 
 @Component({
   selector: 'app-activity-list',
-  imports: [DatePipe, RouterLink, NgTemplateOutlet, Tabs, TabList, Tab, TabPanels, TabPanel],
+  imports: [DatePipe, RouterLink, NgTemplateOutlet, ButtonDirective, Tabs, TabList, Tab, TabPanels, TabPanel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './activity-list.component.html',
 })

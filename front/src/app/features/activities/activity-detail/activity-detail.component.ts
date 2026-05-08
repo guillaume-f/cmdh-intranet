@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BehaviorSubject, finalize, map, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -13,7 +14,7 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe],
+  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, ButtonDirective],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],
 })
