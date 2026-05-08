@@ -28,6 +28,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/activities/activities.routes').then(m => m.activitiesRoutes),
       },
       {
+        path: 'users',
+        loadChildren: () => import('./features/users/users.routes').then(m => m.usersRoutes),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'activities',
