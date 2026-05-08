@@ -25,7 +25,9 @@
     "ERRORS": {
       "TITRE_REQUIRED": "Le titre est obligatoire",
       "TITRE_MAX_LENGTH": "Le titre ne peut pas dépasser 200 caractères",
+      "DESCRIPTION_REQUIRED": "La description est obligatoire",
       "DATETIME_REQUIRED": "La date et l'heure sont obligatoires",
+      "ADRESSE_REQUIRED": "L'adresse est obligatoire",
       "POINTS_REQUIRED": "Le nombre de points est obligatoire"
     }
   },

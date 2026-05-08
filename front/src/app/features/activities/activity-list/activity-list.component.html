@@ -57,15 +57,18 @@
                                         {{ activity.datetime | date: 'dd/MM/yyyy HH:mm' }}
                                     </span>
 
-                                    <span
-                                        class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
-                                        [class.bg-emerald-100]="activity.isRegistered"
-                                        [class.text-emerald-800]="activity.isRegistered"
-                                        [class.bg-amber-100]="!activity.isRegistered"
-                                        [class.text-amber-800]="!activity.isRegistered"
-                                    >
-                                        {{ activity.isRegistered ? 'Inscrit' : 'Non inscrit' }}
-                                    </span>
+                                    @if (canRegister()) {
+                                        <span
+                                            class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+                                            [class.bg-emerald-100]="activity.isRegistered"
+                                            [class.text-emerald-800]="activity.isRegistered"
+                                            [class.bg-amber-100]="!activity.isRegistered"
+                                            [class.text-amber-800]="!activity.isRegistered"
+                                        >
+                                            {{ activity.isRegistered ? 'Inscrit' : 'Non inscrit' }}
+                                        </span>
+                                    }
+                              
                                 </div>
                             </div>
 

@@ -18,6 +18,8 @@ export class ActivityListComponent {
   private readonly activitiesRepository = inject(ActivitiesRepository);
   private readonly authService = inject(AuthService);
 
+  protected canRegister = signal(this.authService.can('registration:create'));
+  
   private readonly activities = toSignal(this.activitiesRepository.getAllActivities(), { initialValue: null });
 
   protected readonly canCreateActivity = signal(this.authService.can('activity:create'));

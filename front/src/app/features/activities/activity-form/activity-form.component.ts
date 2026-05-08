@@ -12,7 +12,6 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { finalize } from 'rxjs';
-import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
 import { ActivityDto } from '../../../repositories/activities/activity.model';
 import { toActivityDtoRequest } from './activity-form.converter';
@@ -29,7 +28,6 @@ import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
     SelectModule,
     ButtonModule,
     TranslatePipe,
-    OptionalLabelDirective,
     BreadcrumbModule,
   ],
   templateUrl: './activity-form.component.html',
@@ -56,9 +54,9 @@ export class ActivityFormComponent implements OnInit {
 
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
     titre: ['', [Validators.required, Validators.maxLength(200)]],
-    description: [''],
+    description: ['', [Validators.required]],
     dateHeure: [null as Date | null, [Validators.required]],
-    adresse: [''],
+    adresse: ['', [Validators.required]],
     points: [0, [Validators.required]],
   });
 
