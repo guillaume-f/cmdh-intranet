@@ -5,7 +5,6 @@
   "ACTIVITIES": {
     "BREADCRUMB": {
       "LIST": "Activités",
-      "DETAIL": "Détail activité",
       "NEW": "Nouvelle activité"
     },
     "FORM": {
@@ -29,8 +28,7 @@
   },
   "USERS": {
     "BREADCRUMB": {
-      "LIST": "Utilisateurs",
-      "DETAIL": "Détail utilisateur"
+      "LIST": "Utilisateurs"
     }
   }
 }

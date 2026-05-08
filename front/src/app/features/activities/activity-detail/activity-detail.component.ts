@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +13,7 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, ConfirmDialogModule, TranslatePipe],
+  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, TranslatePipe],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],
 })
@@ -43,8 +44,6 @@ export class ActivityDetailComponent {
     { label: this.translateService.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
     { label: this.activity()?.title  },
   ]);
-
-  protected readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
   protected readonly activity = toSignal(
     this.refreshData$.pipe(

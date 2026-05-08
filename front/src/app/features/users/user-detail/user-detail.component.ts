@@ -25,8 +25,6 @@ export class UserDetailComponent {
     { label: this.translateService.instant('USERS.BREADCRUMB.LIST'), routerLink: '/users' },
     { label: this.user()?.firstName  },
   ]);
-  protected readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
-
 
     protected readonly userId = toSignal(
     this.activatedRoute.paramMap.pipe(
