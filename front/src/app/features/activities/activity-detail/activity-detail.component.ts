@@ -55,6 +55,15 @@ export class ActivityDetailComponent {
   protected canRegister = signal(this.authService.can('registration:create'));
   protected canDelete = signal(this.authService.can('activity:delete'));
 
+  protected readonly isFutureActivity = computed(() => {
+    const activity = this.activity();
+    if (!activity) return false;
+    const activityDate = new Date(activity.date);
+    const [hours, minutes] = activity.time.split(':').map(Number);
+    activityDate.setHours(hours, minutes, 0, 0);
+    return activityDate > new Date();
+  });
+
   protected onRegister(): void {
     if (!this.activityId() || this.isSubmitting()) {
       return;
