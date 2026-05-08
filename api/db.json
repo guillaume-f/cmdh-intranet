@@ -122,11 +122,11 @@
   "activities": [
     {
       "id": "a1",
-      "title": "Réunion de rentrée 2025",
-      "description": "Réunion annuelle pour présenter les projets de l'année et accueillir les nouveaux membres.",
-      "datetime": "2025-09-15T18:30:00",
-      "points": 5,
-      "location": "Salle polyvalente, Rue de la Paix 12, 7000 Mons",
+      "title": "Voeux de la Procession",
+      "description": "Messieurs, chers Compagnons,\nEmmanuel Godefroy, Président de l'ASBL Procession du Car d'Or ainsi que les membres de l'Organe d'Administration ont le plaisir de vous convier ainsi que vos proches aux Vœux de la Procession qui se dérouleront le 22 janvier à 19H00 au Théâtre du Manège à Mons.\nLe port de la Chemise de la Compagnie est souhaité",
+      "datetime": "2026-01-22T18:00:00.000Z",
+      "points": 0,
+      "location": "Théâtre du Manège",
       "status": "published",
       "createdBy": "u2",
       "createdAt": "2025-08-01T10:00:00Z",
@@ -135,11 +135,11 @@
     },
     {
       "id": "a2",
-      "title": "Formation premiers secours",
-      "description": "Formation certifiante aux gestes de premiers secours. Attestation remise en fin de journée.",
-      "datetime": "2025-10-04T09:00:00",
-      "points": 20,
-      "location": "Centre médical, Avenue de l'Hôpital 3, 7000 Mons",
+      "title": "Soirée des Dragon Boys",
+      "description": "Messieurs, chers Compagnons,\nNous avons reçu une invitation bien sympathique d'un groupe de Montois dont la renommée grandit, Doudou après Doudou, Les Dragon Boys\nNous sommes conviés à leur soirée annuelle qui se tiendra le 23 janvier 2026 au Stade Tondreau, Avenue du Tir à Mons.\nBloquez cette date dans vos agendas si l'idée de passer boire une pinte ou deux (ou plus si affinité) vous titille.",
+      "datetime": "2026-01-23T18:00:00.000Z",
+      "points": 0,
+      "location": "Stade Charles-Tondreau",
       "status": "published",
       "createdBy": "u2",
       "createdAt": "2025-08-10T14:00:00Z",
@@ -148,11 +148,11 @@
     },
     {
       "id": "a3",
-      "title": "Journée team building",
-      "description": "Une journée de cohésion en plein air avec activités sportives et ludiques. Repas inclus.",
-      "datetime": "2025-11-22T08:00:00",
-      "points": 15,
-      "location": "Domaine de Chevetogne, 5590 Ciney",
+      "title": "Apéro des Acteurs",
+      "description": "Messieurs, chers Compagnons,\nCe 25 janvier 2026, à partir de 11h00, les acteurs vous invitent à un apéro, devenu traditionnel.\nCelui-ci se déroulera à la Brasserie O'Quai, Place Léopold, 9 à Mons",
+      "datetime": "2026-01-25T10:00:00.000Z",
+      "points": 0,
+      "location": "O'quai",
       "status": "published",
       "createdBy": "u1",
       "createdAt": "2025-09-01T09:00:00Z",
@@ -161,11 +161,11 @@
     },
     {
       "id": "a4",
-      "title": "Atelier communication digitale",
-      "description": "Atelier pratique sur l'utilisation des réseaux sociaux et outils de communication.",
-      "datetime": "2025-12-10T14:00:00",
-      "points": 10,
-      "location": "Espace coworking, Rue de la Station 8, 7000 Mons",
+      "title": "Assemblée générale ordinaire",
+      "description": "Messieurs,\nChers Compagnons,\nNous vous invitons à participer à le première Assemblée générale de la Compagnie de l'année 2026.\nCelle-ci se tiendra le vendredi 30 janvier dès 20H00 au Foyer Sainte-Waudru.\nL'ordre du jour complet et détaillé vous sera communiqué ultérieurement.\nEn espérant vous y voir très nombreux.",
+      "datetime": "2026-01-30T19:00:00.000Z",
+      "points": 3,
+      "location": "Foyer Sainte-Waudru - Mons",
       "status": "draft",
       "createdBy": "u2",
       "createdAt": "2025-09-15T11:00:00Z",
@@ -179,6 +179,38 @@
       "points": 3,
       "location": "Foyer Sainte-Waudru - Mons",
       "id": "pyCDv1O"
+    },
+    {
+      "title": "Messe de Pâques à la gériatrie",
+      "description": "Le 28 mars prochain se déroulera la Messe de Pâques à la gériatrie située Chemin de la Cure d'Air à Mons.\nIl est maintenant de tradition que la Compagnie vienne aider les résidents qui le souhaitent à assister à cette célébration.\nSi vous souhaitez prêter vos muscles quelques heures n'hésitez pas à vous inscrire uniquement par mail via l'adresse inscriptions@hallebardiers.org\nLe rendez-vous est fixé à 14H30 sur place.\nDress code : chemise ou polo de la Compagnie et pantalon sombre (ou jeans)",
+      "datetime": "2026-03-28T13:30:00.000Z",
+      "points": 1,
+      "location": "Chemin de la Cure d'Air, Mons, Belgique",
+      "id": "DEvLzyE"
+    },
+    {
+      "title": "Exposition \"40 ans en Jaune e Noir",
+      "description": "Le Conseil d'Administration de la Compagnie montoise des Hallebardiers a le grand plaisir de vous inviter ainsi que vos proches à l'exposition commémorative des 40 ans de la Compagnie montoise des Hallebardiers qui se tiendra à la Chapelle Saint-Calixte située dans l'enceinte castrale de l'ancien château comtal de Mons.\nNous vous invitons, dès-à-présent à cocher dans votre agenda les dates du 13, 14 et 15 mars 2026.\nDe plus amples renseignements vous seront communiqués sous peu. Restez bien attentifs !",
+      "datetime": "2026-03-13T17:00:00.000Z",
+      "points": 0,
+      "location": "Chapelle Saint-Calixte de Mons",
+      "id": "7UWFl0e"
+    },
+    {
+      "title": "Procession en hommage à saint Ursmer",
+      "description": "Comme l'an dernier, la Compagnie a été invitée à participer à la Procession en hommage à saint Ursmer à Binche.\nAprès avoir assisté à le messe qui sera célébrée dès 10H00, nous participerons, dès 11H00, à la Procession\nLe rendez-vous est prévu à 8H00 Au Foyer Sainte-Waudru.\nA Binche, notre vestiaire sera situé dans la Salle Saint-Ursmer, rue Saint-Jacques, 35 à Binche\nSi vous souhaitez participer à cette activité, nous vous invitons à vous inscrire via l'adresse mail inscriptions@hallebardiers.org",
+      "datetime": "2026-04-19T06:00:00.000Z",
+      "points": 3,
+      "location": "Foyer Sainte-Waudru - Mons",
+      "id": "CSMwV4R"
+    },
+    {
+      "title": "Fête de sainte Waudru - Hommage à la Patronne de la Cité",
+      "description": "Le 9 avril prochain, jour de la fête de sainte Waudru, les Montois pourront rendre hommage à leur Patronne, protectrice de la cité.\nA 12H00, une messe sera célébrée au pied de la châsse et à 18H00 se déroulera la cérémonie d'hommage.\nLa Compagnie participera à cet évènement. Le rendez-vous est fixé à 17H00 au Foyer Sainte-Waudru. Les Compagnons en tenue devront être en place à 17H45.\nSi vous désirez participer à cette activité, n'oubliez pas de vous inscrire par courriel à l'adresse inscriptions@hallebardiers.org",
+      "datetime": "2026-04-09T15:00:00.000Z",
+      "points": 3,
+      "location": "Collégiale Sainte-Waudru",
+      "id": "c0Ci3uq"
     }
   ],
   "registrations": [
