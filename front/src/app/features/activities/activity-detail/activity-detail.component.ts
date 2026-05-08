@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import dayjs from 'dayjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonDirective } from 'primeng/button';
@@ -60,7 +61,7 @@ export class ActivityDetailComponent {
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    return new Date(activity.datetime) >= new Date();
+    return dayjs(activity.datetime).isAfter(dayjs(), 'day') || dayjs(activity.datetime).isSame(dayjs(), 'day');
   });
 
   protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());

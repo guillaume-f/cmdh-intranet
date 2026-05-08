@@ -108,8 +108,6 @@ export class ActivityFormComponent implements OnInit {
       finalize(() => this.isLoading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((activity: ActivityDto) => {
-      const activityDate = activity.datetime ? new Date(activity.datetime) : null;
-
       this.form.patchValue({
         titre: activity.title,
         description: activity.description ?? '',

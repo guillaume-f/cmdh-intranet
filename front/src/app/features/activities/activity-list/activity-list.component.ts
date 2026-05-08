@@ -2,6 +2,7 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import dayjs from 'dayjs';
 import { ButtonDirective } from 'primeng/button';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -22,17 +23,17 @@ export class ActivityListComponent {
   protected readonly canCreateActivity = signal(this.authService.can('activity:create'));
 
   protected readonly futureActivities = computed(() => {
-    const now = new Date();
+    const now = dayjs();
     return (this.activities() ?? [])
-      .filter((a) => new Date(a.datetime) >= now)
-      .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
+      .filter((a) => dayjs(a.datetime).isAfter(now, 'day') || dayjs(a.datetime).isSame(now, 'day'))
+      .sort((a, b) => dayjs(a.datetime).valueOf() - dayjs(b.datetime).valueOf());
   });
 
   protected readonly pastActivities = computed(() => {
-    const now = new Date();
+    const now = dayjs();
     return (this.activities() ?? [])
-      .filter((a) => new Date(a.datetime) < now)
-      .sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
+      .filter((a) => dayjs(a.datetime).isBefore(now, 'day'))
+      .sort((a, b) => dayjs(b.datetime).valueOf() - dayjs(a.datetime).valueOf());
   });
 
   protected readonly isLoading = computed(() => this.activities() === null);
