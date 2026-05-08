@@ -16,3 +16,9 @@
         </ul>
     }
 </div>
+
+ @if (canCreateActivity()) {
+    <a routerLink="/activities/new" routerLinkActive="bg-slate-800 text-white" >
+        Nouvelle activité
+    </a>
+}
