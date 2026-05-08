@@ -1,1 +1,114 @@
-<p>Coucou</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
+  <!-- Titre -->
+  <div class="form-input-wrapper">
+    <label for="titre" class="form-label required">
+      {{ 'ACTIVITIES.FORM.TITRE_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <input
+        pInputText
+        id="titre"
+        type="text"
+        [formControl]="form.controls.titre"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.TITRE_PLACEHOLDER' | translate"
+        [attr.aria-invalid]="form.controls.titre.invalid && form.controls.titre.touched"
+      />
+      @if (form.controls.titre.errors?.['required'] && form.controls.titre.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.TITRE_REQUIRED' | translate }}
+        </p-message>
+      }
+      @if (form.controls.titre.errors?.['maxlength'] && form.controls.titre.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.TITRE_MAX_LENGTH' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="form-input-wrapper">
+    <label for="description" class="form-label" [appOptionalLabel]="form.controls.description">
+      {{ 'ACTIVITIES.FORM.DESCRIPTION_LABEL' | translate }}
+    </label>
+    <textarea
+      pTextarea
+      id="description"
+      [formControl]="form.controls.description"
+      class="w-full"
+      rows="4"
+      [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
+    ></textarea>
+  </div>
+
+  <!-- Date -->
+  <div class="form-input-wrapper">
+    <label for="date" class="form-label required">
+      {{ 'ACTIVITIES.FORM.DATE_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <p-datepicker
+        inputId="date"
+        [formControl]="form.controls.date"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.DATE_PLACEHOLDER' | translate"
+      />
+      @if (form.controls.date.errors?.['required'] && form.controls.date.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.DATE_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Heure -->
+  <div class="form-input-wrapper">
+    <label for="heure" class="form-label required">
+      {{ 'ACTIVITIES.FORM.HEURE_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <input
+        pInputText
+        id="heure"
+        type="time"
+        [formControl]="form.controls.heure"
+        class="w-full"
+        [attr.aria-invalid]="form.controls.heure.invalid && form.controls.heure.touched"
+      />
+      @if (form.controls.heure.errors?.['required'] && form.controls.heure.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.HEURE_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Adresse -->
+  <div class="form-input-wrapper">
+    <label for="adresse" class="form-label" [appOptionalLabel]="form.controls.adresse">
+      {{ 'ACTIVITIES.FORM.ADRESSE_LABEL' | translate }}
+    </label>
+    <input
+      pInputText
+      id="adresse"
+      type="text"
+      [formControl]="form.controls.adresse"
+      class="w-full"
+      [placeholder]="'ACTIVITIES.FORM.ADRESSE_PLACEHOLDER' | translate"
+    />
+  </div>
+
+  <!-- Submit -->
+  <div class="flex justify-end">
+    <p-button
+      type="submit"
+      [label]="'ACTIVITIES.FORM.SUBMIT' | translate"
+      [disabled]="form.invalid"
+    />
+  </div>
+
+</form>

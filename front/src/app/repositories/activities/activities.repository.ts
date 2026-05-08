@@ -31,6 +31,16 @@ export class ActivitiesRepository {
     return this.http.get<ActivityDto>(`${this.apiUrl}/${activityId}`, { headers });
   }
 
+  addActivity(activity: Omit<ActivityDto, 'id'>): Observable<ActivityDto> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    ); 
+  
+    return this.http.post<ActivityDto>(`${this.apiUrl}`, activity, { headers });
+  }
+
   register(activityId: string): Observable<void> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(

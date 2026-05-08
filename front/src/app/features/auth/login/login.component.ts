@@ -69,13 +69,13 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    this.isLoading.set(true);
-
+    
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
+    
+    this.isLoading.set(true);
     const request: LoginDtoRequest = this.form.value as LoginDtoRequest;
 
     this.authRepository.login(request)
