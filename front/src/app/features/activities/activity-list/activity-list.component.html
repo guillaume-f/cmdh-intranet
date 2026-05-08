@@ -1,24 +1,61 @@
-
 <div class="p-4 bg-primary-500 color-gray-900">
     <h1 class="text-3xl font-semibold">Activités</h1>
 </div>
 
-<div class="p-4">
-    @if (activities()?.length === 0) {
-        <p>Aucune activité à afficher.</p>
-    } @else {
-        <ul>
-            @for (activity of activities(); track activity.id) {
-                <li>
-                    <a [routerLink]="[activity.id]">{{ activity.title }}</a>
-                </li>
-            }
-        </ul>
-    }
-</div>
+<div class="w-full p-4 xl:mx-auto xl:max-w-6xl">
+    <div class="mb-6 flex items-center justify-between gap-4">
+        <p class="text-sm text-slate-600">Retrouvez toutes les activités disponibles</p>
 
- @if (canCreateActivity()) {
-    <a routerLink="/activities/new" routerLinkActive="bg-slate-800 text-white" >
-        Nouvelle activité
-    </a>
-}
+        @if (canCreateActivity()) {
+            <a
+                routerLink="/activities/new"
+                class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+            >
+                Nouvelle activité
+            </a>
+        }
+    </div>
+
+    <div class="space-y-4">
+    @if (activities()?.length === 0) {
+            <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+                Aucune activité à afficher.
+            </div>
+    } @else {
+            <ul class="space-y-4">
+                @for (activity of activities(); track activity.id) {
+                    <li class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                            <div class="space-y-3">
+                                <h2 class="text-xl font-semibold text-slate-900">{{ activity.title }}</h2>
+
+                                <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+                                    <span class="rounded-full bg-slate-100 px-3 py-1">
+                                        {{ activity.date | date: 'dd/MM/yyyy' }} à {{ activity.time }}
+                                    </span>
+
+                                    <span
+                                        class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+                                        [class.bg-emerald-100]="activity.isRegistered"
+                                        [class.text-emerald-800]="activity.isRegistered"
+                                        [class.bg-amber-100]="!activity.isRegistered"
+                                        [class.text-amber-800]="!activity.isRegistered"
+                                    >
+                                        {{ activity.isRegistered ? 'Inscrit' : 'Non inscrit' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a
+                                [routerLink]="[activity.id]"
+                                class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                            >
+                                Voir le détail
+                            </a>
+                        </div>
+                    </li>
+                }
+            </ul>
+    }
+    </div>
+</div>

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { TranslateService } from "@ngx-translate/core";
 import { MenuItem } from "primeng/api";
 import { BreadcrumbModule } from "primeng/breadcrumb";
 import { BehaviorSubject, map, switchMap, tap } from "rxjs";
@@ -10,7 +10,7 @@ import { UsersRepository } from "../../../repositories/users/users.repository";
 @Component({
   selector: 'app-user-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, TranslatePipe],
+  imports: [BreadcrumbModule],
   templateUrl: './user-detail.component.html',
 })
 export class UserDetailComponent {

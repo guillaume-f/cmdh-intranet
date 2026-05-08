@@ -1,82 +1,86 @@
 <p-breadcrumb [model]="breadcrumbItems()" />
 
-<div class="p-10">
-  @if (activity(); as currentActivity) {
-    <div class="grid gap-6 lg:grid-cols-3">
-      <section class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
-        <div class="space-y-2">
-          <h2 class="text-3xl font-semibold text-slate-900">{{ currentActivity.title }}</h2>
-        </div>
+<div class="w-full p-4 xl:mx-auto xl:max-w-6xl">
+  <div class="space-y-4">
+    @if (activity(); as currentActivity) {
+      <div class="grid gap-6 lg:grid-cols-3">
+        <section class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+          <div class="space-y-2">
+            <h2 class="text-3xl font-semibold text-slate-900">{{ currentActivity.title }}</h2>
+          </div>
 
-        <div class="space-y-2">
-          <p class="whitespace-pre-line text-base leading-7 text-slate-700">
-            {{ currentActivity.description }}
-          </p>
-        </div>
-
-        <div class="rounded-xl bg-slate-50 p-4">
-          <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Nombre de points</p>
-          <p class="mt-2 text-2xl font-semibold text-slate-900">{{ currentActivity.points }}</p>
-        </div>
-      </section>
-
-      <aside class="space-y-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
-        <div class="space-y-4">
-          <div>
-            <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Date et heure</p>
-            <p class="mt-2 text-base font-medium text-slate-900">
-              {{ currentActivity.date | date: 'dd/MM/yyyy' }} a {{ currentActivity.time }}
+          <div class="space-y-2">
+            <p class="whitespace-pre-line text-base leading-7 text-slate-700">
+              {{ currentActivity.description }}
             </p>
           </div>
 
-          <div>
-            <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Adresse</p>
-            <p class="mt-2 text-base leading-7 text-slate-900">{{ currentActivity.location }}</p>
+          <div class="rounded-xl bg-slate-50 p-4">
+            <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Nombre de points</p>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">{{ currentActivity.points }}</p>
           </div>
-        </div>
+        </section>
 
-        <div class="space-y-3 border-t border-slate-200 pt-6">
-          @if (canRegister()) {
-            @if (currentActivity.isRegistered) {
-              <p class="text-sm text-slate-600">
-                Inscrit le: {{ currentActivity.registeredAt ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+        <aside class="space-y-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Date et heure</p>
+              <p class="mt-2 text-base font-medium text-slate-900">
+                {{ currentActivity.date | date: 'dd/MM/yyyy' }} a {{ currentActivity.time }}
               </p>
+            </div>
+
+            <div>
+              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Adresse</p>
+              <p class="mt-2 text-base leading-7 text-slate-900">{{ currentActivity.location }}</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 border-t border-slate-200 pt-6">
+            @if (canRegister()) {
+              @if (currentActivity.isRegistered) {
+                <p class="text-sm text-slate-600">
+                  Inscrit le: {{ currentActivity.registeredAt ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+                </p>
+                <button
+                  type="button"
+                  class="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  (click)="onUnregister()"
+                  [disabled]="isSubmitting()"
+                >
+                  Se désinscrire
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="inline-flex w-full items-center justify-center rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  (click)="onRegister()"
+                  [disabled]="isSubmitting()"
+                >
+                  S'inscrire
+                </button>
+              }
+            }
+
+            @if (canDelete()) {
               <button
                 type="button"
-                class="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
-                (click)="onUnregister()"
+                class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                (click)="onDelete()"
                 [disabled]="isSubmitting()"
               >
-                Se désinscrire
-              </button>
-            } @else {
-              <button
-                type="button"
-                class="inline-flex w-full items-center justify-center rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-                (click)="onRegister()"
-                [disabled]="isSubmitting()"
-              >
-                S'inscrire
+                Supprimer l'activite
               </button>
             }
-          }
-
-          @if (canDelete()) {
-            <button
-              type="button"
-              class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-              (click)="onDelete()"
-              [disabled]="isSubmitting()"
-            >
-              Supprimer l'activite
-            </button>
-          }
-        </div>
-      </aside>
-    </div>
-  } @else {
-    <p>Chargement de l'activité...</p>
-  }
+          </div>
+        </aside>
+      </div>
+    } @else {
+      <p>Chargement de l'activité...</p>
+    }
+  </div>
 </div>
+
+
 
 <p-confirmdialog />
