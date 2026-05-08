@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MenuItem } from 'primeng/api';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
@@ -26,6 +28,7 @@ import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
     ButtonModule,
     TranslatePipe,
     OptionalLabelDirective,
+    BreadcrumbModule,
   ],
   templateUrl: './activity-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,8 +38,16 @@ export class ActivityFormComponent {
   private readonly activitiesRepository = inject(ActivitiesRepository);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   private isLoading = signal(false);
+
+  protected readonly breadcrumbItems: MenuItem[] = [
+    { label: this.translate.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
+    { label: this.translate.instant('ACTIVITIES.BREADCRUMB.NEW') },
+  ];
+
+  protected readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
     titre: ['', [Validators.required, Validators.maxLength(200)]],

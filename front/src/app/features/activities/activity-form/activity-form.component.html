@@ -1,3 +1,9 @@
+<div class="p-4 bg-primary-500 color-gray-900">
+  <h1 class="text-3xl font-semibold">{{ 'ACTIVITIES.BREADCRUMB.NEW' | translate }}</h1>
+</div>
+
+<p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" />
+
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
 
   <!-- Titre -->

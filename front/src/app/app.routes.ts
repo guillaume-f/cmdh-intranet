@@ -26,6 +26,11 @@ export const routes: Routes = [
       {
         path: 'activities',
         loadChildren: () => import('./features/activities/activities.routes').then(m => m.activitiesRoutes),
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'activities',
       }
     ],
   },

@@ -3,6 +3,11 @@
     "OPTIONAL": "Facultatif"
   },
   "ACTIVITIES": {
+    "BREADCRUMB": {
+      "LIST": "Activités",
+      "DETAIL": "Détail activité",
+      "NEW": "Nouvelle activité"
+    },
     "FORM": {
       "TITRE_LABEL": "Titre",
       "TITRE_PLACEHOLDER": "Titre de l'activité",

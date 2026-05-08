@@ -1,6 +1,8 @@
 <div class="p-4 bg-primary-500 color-gray-900">
-  <h1 class="text-3xl font-semibold">Détail activité</h1>
+  <h1 class="text-3xl font-semibold">{{ 'ACTIVITIES.BREADCRUMB.DETAIL' | translate }}</h1>
 </div>
+
+<p-breadcrumb [model]="breadcrumbItems()" [home]="breadcrumbHome" />
 
 <div class="p-4">
   @if (activity(); as currentActivity) {
