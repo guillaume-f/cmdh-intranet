@@ -4,11 +4,6 @@ import { RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/auth/auth.service";
 import { ActivitiesRepository } from "../../../repositories/activities/activities.repository";
 
-type ActivityListItem = {
-  id: string;
-  label: string;
-};
-
 @Component({
   selector: 'app-activity-list',
   imports: [RouterLink],

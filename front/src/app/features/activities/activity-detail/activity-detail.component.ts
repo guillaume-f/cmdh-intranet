@@ -13,14 +13,13 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BreadcrumbModule, TranslatePipe],
   templateUrl: './activity-detail.component.html',
-  styleUrl: './activity-detail.component.css'
 })
 export class ActivityDetailComponent {
-  private readonly route = inject(ActivatedRoute);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
   private readonly activitiesRepository = inject(ActivitiesRepository);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly translate = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
 
   protected readonly isSubmitting = signal(false);
 
@@ -28,7 +27,7 @@ export class ActivityDetailComponent {
   private readonly refreshData$ = this.refreshDataSource.asObservable();
   
   protected readonly activityId = toSignal(
-    this.route.paramMap.pipe(
+    this.activatedRoute.paramMap.pipe(
       map((params) => params.get('activityId')),
       map((value) => value ?? ''),
       tap(() => this.refreshDataSource.next())
@@ -37,7 +36,7 @@ export class ActivityDetailComponent {
   );
 
   protected readonly breadcrumbItems = computed<MenuItem[]>(() => [
-    { label: this.translate.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
+    { label: this.translateService.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
     { label: this.activity()?.title  },
   ]);
 

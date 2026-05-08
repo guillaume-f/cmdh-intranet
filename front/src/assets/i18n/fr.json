@@ -26,5 +26,11 @@
       "DATE_REQUIRED": "La date est obligatoire",
       "HEURE_REQUIRED": "L'heure est obligatoire"
     }
+  },
+  "USERS": {
+    "BREADCRUMB": {
+      "LIST": "Utilisateurs",
+      "DETAIL": "Détail utilisateur"
+    }
   }
 }

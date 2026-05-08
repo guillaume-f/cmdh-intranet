@@ -1,1 +1,24 @@
-<p>user-list.component works!</p>,
+
+<div class="p-4 bg-primary-500 color-gray-900">
+    <h1 class="text-3xl font-semibold">Utilisateurs</h1>
+</div>
+
+<div class="p-4">
+	@if (users() === null) {
+		<p>Chargement...</p>
+	} @else if (users()?.length === 0) {
+		<p>Aucun utilisateur a afficher.</p>
+	} @else {
+		<ul>
+			@for (user of users(); track user.id) {
+				<li>
+					<span>{{ user.firstName }} {{ user.lastName }}</span>
+					<span> - {{ user.email }}</span>
+					<span> - {{ user.role }}</span>
+					<span> - {{ user.active ? 'Actif' : 'Inactif' }}</span>
+					<a [routerLink]="[user.id]">Voir le detail</a>
+				</li>
+			}
+		</ul>
+	}
+</div>
