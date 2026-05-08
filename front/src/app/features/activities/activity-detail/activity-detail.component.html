@@ -26,7 +26,7 @@
             <div>
               <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Date et heure</p>
               <p class="mt-2 text-base font-medium text-slate-900">
-                {{ currentActivity.date | date: 'dd/MM/yyyy' }} a {{ currentActivity.time }}
+                {{ currentActivity.datetime | date: 'dd/MM/yyyy HH:mm' }}
               </p>
             </div>
 

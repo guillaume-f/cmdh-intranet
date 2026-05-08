@@ -52,8 +52,7 @@ export class ActivityFormComponent {
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
     titre: ['', [Validators.required, Validators.maxLength(200)]],
     description: [''],
-    date: [null as Date | null, [Validators.required]],
-    heure: ['', [Validators.required]],
+    dateHeure: [null as Date | null, [Validators.required]],
     adresse: [''],
   });
 

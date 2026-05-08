@@ -2,22 +2,20 @@ export interface ActivityDto {
   id: string;
   title: string;
   description: string;
-  date: Date;
-  time: string;
+  datetime: Date;
   points: number;
   location: string;
   status: string;
   createdBy: string;
   createdAt: Date;
   isRegistered: boolean;
-  registeredAt?: Date;
+  registeredAt?: Date | null;
 }
 
 export interface ActivityDtoRequest {
   title: string;
   description: string;
-  date: string;
-  time: string;
+  datetime: Date;
   points: number;
   location: string;
 }

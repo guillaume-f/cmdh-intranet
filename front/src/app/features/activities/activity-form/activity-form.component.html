@@ -49,45 +49,25 @@
     ></textarea>
   </div>
 
-  <!-- Date -->
+  <!-- Date et heure -->
   <div class="form-input-wrapper">
-    <label for="date" class="form-label required">
-      {{ 'ACTIVITIES.FORM.DATE_LABEL' | translate }}
+    <label for="dateHeure" class="form-label required">
+      {{ 'ACTIVITIES.FORM.DATETIME_LABEL' | translate }}
     </label>
     <div class="flex flex-col gap-1">
       <p-datepicker
-        inputId="date"
-        [formControl]="form.controls.date"
+        inputId="dateHeure"
+        [formControl]="form.controls.dateHeure"
         dateFormat="dd/mm/yy"
+        [showTime]="true"
+        hourFormat="24"
         [showIcon]="true"
         class="w-full"
-        [placeholder]="'ACTIVITIES.FORM.DATE_PLACEHOLDER' | translate"
+        [placeholder]="'ACTIVITIES.FORM.DATETIME_PLACEHOLDER' | translate"
       />
-      @if (form.controls.date.errors?.['required'] && form.controls.date.touched) {
+      @if (form.controls.dateHeure.errors?.['required'] && form.controls.dateHeure.touched) {
         <p-message severity="error" variant="simple" size="small">
-          {{ 'ACTIVITIES.ERRORS.DATE_REQUIRED' | translate }}
-        </p-message>
-      }
-    </div>
-  </div>
-
-  <!-- Heure -->
-  <div class="form-input-wrapper">
-    <label for="heure" class="form-label required">
-      {{ 'ACTIVITIES.FORM.HEURE_LABEL' | translate }}
-    </label>
-    <div class="flex flex-col gap-1">
-      <input
-        pInputText
-        id="heure"
-        type="time"
-        [formControl]="form.controls.heure"
-        class="w-full"
-        [attr.aria-invalid]="form.controls.heure.invalid && form.controls.heure.touched"
-      />
-      @if (form.controls.heure.errors?.['required'] && form.controls.heure.touched) {
-        <p-message severity="error" variant="simple" size="small">
-          {{ 'ACTIVITIES.ERRORS.HEURE_REQUIRED' | translate }}
+          {{ 'ACTIVITIES.ERRORS.DATETIME_REQUIRED' | translate }}
         </p-message>
       }
     </div>

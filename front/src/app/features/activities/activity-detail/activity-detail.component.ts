@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,7 +13,7 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, TranslatePipe],
+  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],
 })
@@ -58,10 +58,7 @@ export class ActivityDetailComponent {
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    const activityDate = new Date(activity.date);
-    const [hours, minutes] = activity.time.split(':').map(Number);
-    activityDate.setHours(hours, minutes, 0, 0);
-    return activityDate > new Date();
+    return new Date(activity.datetime) >= new Date();
   });
 
   protected onRegister(): void {

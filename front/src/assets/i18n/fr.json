@@ -12,9 +12,8 @@
       "TITRE_PLACEHOLDER": "Titre de l'activité",
       "DESCRIPTION_LABEL": "Description",
       "DESCRIPTION_PLACEHOLDER": "Décrivez l'activité...",
-      "DATE_LABEL": "Date",
-      "DATE_PLACEHOLDER": "jj/mm/aaaa",
-      "HEURE_LABEL": "Heure",
+      "DATETIME_LABEL": "Date et heure",
+      "DATETIME_PLACEHOLDER": "jj/mm/aaaa hh:mm",
       "ADRESSE_LABEL": "Adresse",
       "ADRESSE_PLACEHOLDER": "Adresse de l'activité",
       "SUBMIT": "Enregistrer"
@@ -22,8 +21,7 @@
     "ERRORS": {
       "TITRE_REQUIRED": "Le titre est obligatoire",
       "TITRE_MAX_LENGTH": "Le titre ne peut pas dépasser 200 caractères",
-      "DATE_REQUIRED": "La date est obligatoire",
-      "HEURE_REQUIRED": "L'heure est obligatoire"
+      "DATETIME_REQUIRED": "La date et l'heure sont obligatoires"
     }
   },
   "USERS": {

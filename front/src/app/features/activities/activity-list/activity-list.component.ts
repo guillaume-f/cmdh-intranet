@@ -23,18 +23,16 @@ export class ActivityListComponent {
 
   protected readonly futureActivities = computed(() => {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
     return (this.activities() ?? [])
-      .filter(a => new Date(a.date) >= now)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .filter((a) => new Date(a.datetime) >= now)
+      .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
   });
 
   protected readonly pastActivities = computed(() => {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
     return (this.activities() ?? [])
-      .filter(a => new Date(a.date) < now)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .filter((a) => new Date(a.datetime) < now)
+      .sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
   });
 
   protected readonly isLoading = computed(() => this.activities() === null);
