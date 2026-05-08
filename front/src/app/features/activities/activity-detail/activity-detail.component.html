@@ -8,6 +8,12 @@
   @if (activity(); as currentActivity) {
     <p>{{ currentActivity.title }}</p>
 
+    @if (canDelete()) {
+      <button type="button" (click)="onDelete()" [disabled]="isSubmitting()">
+        Supprimer l'activite
+      </button>
+    }
+
     @if (canRegister()) {
             @if (currentActivity.isRegistered) {
         <p>Inscrit le: {{ currentActivity.registeredAt || '-' }}</p>
@@ -26,3 +32,5 @@
     <p>Chargement de l'activité...</p>
   }
 </div>
+
+<p-confirmdialog />

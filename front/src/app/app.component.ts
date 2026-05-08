@@ -5,9 +5,9 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  templateUrl: './app.html',
+  templateUrl: './app.component.html',
 })
-export class App  {
+export class AppComponent  {
   private readonly translateService = inject(TranslateService);
   
   constructor() {

@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BehaviorSubject, finalize, map, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
@@ -11,14 +12,17 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, TranslatePipe],
+  imports: [BreadcrumbModule, ConfirmDialogModule, TranslatePipe],
   templateUrl: './activity-detail.component.html',
+  providers: [ConfirmationService],
 })
 export class ActivityDetailComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
   private readonly activitiesRepository = inject(ActivitiesRepository);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);
 
   protected readonly isSubmitting = signal(false);
@@ -50,6 +54,7 @@ export class ActivityDetailComponent {
   );
 
   protected canRegister = signal(this.authService.can('registration:create'));
+  protected canDelete = signal(this.authService.can('activity:delete'));
 
   protected onRegister(): void {
     if (!this.activityId() || this.isSubmitting()) {
@@ -66,6 +71,39 @@ export class ActivityDetailComponent {
       )
       .subscribe(() => {
         this.refreshDataSource.next();
+      });
+  }
+
+  protected onDelete(): void {
+    if (!this.activityId() || this.isSubmitting()) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      header: 'Confirmer la suppression',
+      message: 'Voulez-vous vraiment supprimer cette activite ?',
+      acceptLabel: 'Supprimer',
+      rejectLabel: 'Annuler',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteActivity(),
+    });
+  }
+
+  private deleteActivity(): void {
+    if (!this.activityId() || this.isSubmitting()) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    this.activitiesRepository
+      .deleteActivity(this.activityId())
+      .pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        void this.router.navigate(['/activities']);
       });
   }
 

@@ -209,6 +209,13 @@
       "userId": "u1",
       "registeredAt": "2026-05-08T07:39:36.266Z",
       "status": "confirmed"
+    },
+    {
+      "id": "r1778240809396",
+      "activityId": "a4",
+      "userId": "u1",
+      "registeredAt": "2026-05-08T11:46:49.396Z",
+      "status": "confirmed"
     }
   ],
   "passwordResets": []
