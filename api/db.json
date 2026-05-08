@@ -125,7 +125,7 @@
       "title": "Réunion de rentrée 2025",
       "description": "Réunion annuelle pour présenter les projets de l'année et accueillir les nouveaux membres.",
       "datetime": "2025-09-15T18:30:00",
-      "points": 5,
+      "points": 3,
       "location": "Salle polyvalente, Rue de la Paix 12, 7000 Mons",
       "status": "published",
       "createdBy": "u2",
@@ -138,7 +138,7 @@
       "title": "Formation premiers secours",
       "description": "Formation certifiante aux gestes de premiers secours. Attestation remise en fin de journée.",
       "datetime": "2025-10-04T09:00:00",
-      "points": 20,
+      "points": 1,
       "location": "Centre médical, Avenue de l'Hôpital 3, 7000 Mons",
       "status": "published",
       "createdBy": "u2",
@@ -151,7 +151,7 @@
       "title": "Journée team building",
       "description": "Une journée de cohésion en plein air avec activités sportives et ludiques. Repas inclus.",
       "datetime": "2025-11-22T08:00:00",
-      "points": 15,
+      "points": 5,
       "location": "Domaine de Chevetogne, 5590 Ciney",
       "status": "published",
       "createdBy": "u1",
@@ -164,7 +164,7 @@
       "title": "Atelier communication digitale",
       "description": "Atelier pratique sur l'utilisation des réseaux sociaux et outils de communication.",
       "datetime": "2025-12-10T14:00:00",
-      "points": 10,
+      "points": 1,
       "location": "Espace coworking, Rue de la Station 8, 7000 Mons",
       "status": "draft",
       "createdBy": "u2",
@@ -173,18 +173,10 @@
       "registeredAt": "2025-08-05T10:00:00Z"
     },
     {
-      "title": "daade",
-      "description": "dedazde",
-      "datetime": "2026-05-12T13:49:00.000Z",
-      "points": 0,
-      "location": "zedzedea",
-      "id": "jRVsqpN"
-    },
-    {
       "title": "Procession de Frameries",
       "description": "",
       "datetime": "2026-05-14T06:00:00.000Z",
-      "points": 0,
+      "points": 3,
       "location": "",
       "id": "pyCDv1O"
     }

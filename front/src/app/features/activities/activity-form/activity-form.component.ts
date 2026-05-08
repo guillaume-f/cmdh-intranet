@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
+import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { finalize } from 'rxjs';
 import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
@@ -25,6 +26,7 @@ import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
     TextareaModule,
     DatePickerModule,
     MessageModule,
+    SelectModule,
     ButtonModule,
     TranslatePipe,
     OptionalLabelDirective,
@@ -42,6 +44,8 @@ export class ActivityFormComponent {
 
   protected readonly isLoading = signal(false);
 
+  protected readonly pointsOptions = [0, 1, 3, 5];
+
   protected readonly breadcrumbItems: MenuItem[] = [
     { label: this.translate.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
     { label: this.translate.instant('ACTIVITIES.BREADCRUMB.NEW') },
@@ -52,6 +56,7 @@ export class ActivityFormComponent {
     description: [''],
     dateHeure: [null as Date | null, [Validators.required]],
     adresse: [''],
+    points: [0, [Validators.required]],
   });
 
   protected onSubmit(): void {

@@ -5,6 +5,7 @@ export interface ActivityFormValue {
   description: string;
   dateHeure: Date;
   adresse: string;
+  points: number;
 }
 
 export type ActivityForm = TypedControlsOf<ActivityFormValue>;

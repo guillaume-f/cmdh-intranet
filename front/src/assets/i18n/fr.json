@@ -16,12 +16,15 @@
       "DATETIME_PLACEHOLDER": "jj/mm/aaaa hh:mm",
       "ADRESSE_LABEL": "Adresse",
       "ADRESSE_PLACEHOLDER": "Adresse de l'activité",
+      "POINTS_LABEL": "Points",
+      "POINTS_PLACEHOLDER": "Sélectionner les points",
       "SUBMIT": "Enregistrer"
     },
     "ERRORS": {
       "TITRE_REQUIRED": "Le titre est obligatoire",
       "TITRE_MAX_LENGTH": "Le titre ne peut pas dépasser 200 caractères",
-      "DATETIME_REQUIRED": "La date et l'heure sont obligatoires"
+      "DATETIME_REQUIRED": "La date et l'heure sont obligatoires",
+      "POINTS_REQUIRED": "Le nombre de points est obligatoire"
     }
   },
   "USERS": {

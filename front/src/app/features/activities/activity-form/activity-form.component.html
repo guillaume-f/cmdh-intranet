@@ -89,6 +89,27 @@
       />
     </div>
 
+    <!-- Points -->
+    <div class="form-input-wrapper">
+      <label for="points" class="form-label required">
+        {{ 'ACTIVITIES.FORM.POINTS_LABEL' | translate }}
+      </label>
+      <div class="flex flex-col gap-1">
+        <p-select
+          inputId="points"
+          [formControl]="form.controls.points"
+          [options]="pointsOptions"
+          class="w-full"
+          [placeholder]="'ACTIVITIES.FORM.POINTS_PLACEHOLDER' | translate"
+        />
+        @if (form.controls.points.errors?.['required'] && form.controls.points.touched) {
+          <p-message severity="error" variant="simple" size="small">
+            {{ 'ACTIVITIES.ERRORS.POINTS_REQUIRED' | translate }}
+          </p-message>
+        }
+      </div>
+    </div>
+
     <!-- Submit -->
     <div class="flex justify-end">
       <p-button

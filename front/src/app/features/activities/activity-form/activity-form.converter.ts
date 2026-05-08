@@ -1,8 +1,6 @@
 import { ActivityDtoRequest } from '../../../repositories/activities/activity.model';
 import { ActivityFormValue } from './models/activity-form.model';
 
-const DEFAULT_ACTIVITY_POINTS = 0;
-
 export function toActivityDtoRequest(
   formValue: ActivityFormValue,
 ): ActivityDtoRequest {
@@ -10,7 +8,7 @@ export function toActivityDtoRequest(
     title: formValue.titre.trim(),
     description: formValue.description.trim(),
     datetime: formValue.dateHeure,
-    points: DEFAULT_ACTIVITY_POINTS,
+    points: formValue.points,
     location: formValue.adresse.trim(),
   };
 }
