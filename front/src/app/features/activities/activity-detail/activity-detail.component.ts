@@ -8,7 +8,7 @@ import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { BehaviorSubject, finalize, map, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, filter, finalize, map, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
 
@@ -49,27 +49,18 @@ export class ActivityDetailComponent {
 
   protected readonly activity = toSignal(
     this.refreshData$.pipe(
+      filter(() => !!this.activityId()),
       switchMap(() => {
-        const activityId = this.activityId();
-        if (!activityId) {
-          return of(null);
-        }
-
-        return this.activitiesRepository.getActivityById(activityId);
+        return this.activitiesRepository.getActivityById(this.activityId());
       })
     ),
     { initialValue: null }
   );
 
   protected readonly participants = toSignal(
-    this.refreshData$.pipe(
+    this.refreshData$.pipe(  filter(() => !!this.activityId()),
       switchMap(() => {
-        const activityId = this.activityId();
-        if (!activityId) {
-          return of([]);
-        }
-
-        return this.activitiesRepository.getActivityParticipants(activityId);
+        return this.activitiesRepository.getActivityParticipants(this.activityId());
       })
     ),
     { initialValue: [] }
