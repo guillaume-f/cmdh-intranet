@@ -385,6 +385,34 @@
       "userId": "u2",
       "registeredAt": "2026-05-15T08:55:04.428Z",
       "status": "confirmed"
+    },
+    {
+      "id": "r1778849989443-u3",
+      "activityId": "pyCDv1O",
+      "userId": "u3",
+      "registeredAt": "2026-05-15T12:59:49.443Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778851521761-u2",
+      "activityId": "pyCDv1O",
+      "userId": "u2",
+      "registeredAt": "2026-05-15T13:25:21.761Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778851521763-u5",
+      "activityId": "pyCDv1O",
+      "userId": "u5",
+      "registeredAt": "2026-05-15T13:25:21.761Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778851521800-u6",
+      "activityId": "pyCDv1O",
+      "userId": "u6",
+      "registeredAt": "2026-05-15T13:25:21.761Z",
+      "status": "confirmed"
     }
   ],
   "attendanceValidations": [
@@ -418,6 +446,38 @@
       "userId": "u1",
       "isPresent": true,
       "validatedAt": "2026-05-15T12:45:18.371Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778849989444-u3",
+      "activityId": "pyCDv1O",
+      "userId": "u3",
+      "isPresent": false,
+      "validatedAt": "2026-05-15T13:00:06.677Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778851521762-u2",
+      "activityId": "pyCDv1O",
+      "userId": "u2",
+      "isPresent": true,
+      "validatedAt": "2026-05-15T13:25:29.797Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778851521785-u5",
+      "activityId": "pyCDv1O",
+      "userId": "u5",
+      "isPresent": true,
+      "validatedAt": "2026-05-15T13:25:29.264Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778851521815-u6",
+      "activityId": "pyCDv1O",
+      "userId": "u6",
+      "isPresent": true,
+      "validatedAt": "2026-05-15T13:25:28.684Z",
       "validatedBy": "u1"
     }
   ],

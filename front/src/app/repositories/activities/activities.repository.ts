@@ -53,6 +53,16 @@ export class ActivitiesRepository {
     return this.http.post<void>(`${this.apiUrl}/${activityId}/participants/${userId}/${action}`, null, { headers });
   }
 
+  addParticipantsWithPresence(activityId: string, userIds: string[]): Observable<void> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    return this.http.post<void>(`${this.apiUrl}/${activityId}/participants/bulk-add`, { userIds }, { headers });
+  }
+
   addActivity(activity: ActivityDtoRequest): Observable<ActivityDto> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(

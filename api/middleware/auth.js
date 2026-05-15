@@ -13,6 +13,7 @@ const SECRET = 'intranet-dev-secret'
 
 const ACTIVITY_DETAIL_ROUTE_REGEX = /^\/api\/activities\/([^/]+)$/
 const ACTIVITY_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants$/
+const BULK_ADD_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/bulk-add$/
 const REGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/register$/
 const UNREGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/unregister$/
 const ATTENDANCE_VALIDATION_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/([^/]+)\/(validate|invalidate)$/
@@ -105,6 +106,7 @@ function checkRoutePermission(req, res) {
   const isRegisterRoute = /^\/api\/activities\/[^/]+\/register$/.test(path)
   const isUnregisterRoute = /^\/api\/activities\/[^/]+\/unregister$/.test(path)
   const isAttendanceValidationRoute = /^\/api\/activities\/[^/]+\/participants\/[^/]+\/(validate|invalidate)$/.test(path)
+  const isBulkAddParticipantsRoute = /^\/api\/activities\/[^/]+\/participants\/bulk-add$/.test(path)
 
   // --- Activités ---
   if (path.startsWith('/api/activities')) {
@@ -120,7 +122,7 @@ function checkRoutePermission(req, res) {
     if (isAttendanceValidationRoute && method === 'POST' && !hasPermission(req, 'attendance:validate')) {
       return permissionDenied(res, 'attendance:validate')
     }
-    if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !isAttendanceValidationRoute && !hasPermission(req, 'activity:create')) {
+    if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !isAttendanceValidationRoute && !isBulkAddParticipantsRoute && !hasPermission(req, 'activity:create')) {
       return permissionDenied(res, 'activity:create')
     }
     if (method === 'PATCH' || method === 'PUT') {
@@ -422,6 +424,71 @@ module.exports = (req, res, next) => {
     return res.status(201).json({
       message: 'Inscription confirmée',
       registration,
+    })
+  }
+
+  // --- POST /api/activities/:id/participants/bulk-add ---
+  // Inscrit des utilisateurs et les marque comme présents en une seule opération.
+  const bulkAddMatch = req.path.match(BULK_ADD_PARTICIPANTS_ROUTE_REGEX)
+  if (req.method === 'POST' && bulkAddMatch) {
+    if (!hasPermission(req, 'attendance:validate')) {
+      return permissionDenied(res, 'attendance:validate')
+    }
+
+    const activityId = bulkAddMatch[1]
+
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
+
+    const userIds = req.body?.userIds
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ message: 'userIds doit être un tableau non vide' })
+    }
+
+    const validatedAt = new Date().toISOString()
+    const results = []
+
+    for (const userId of userIds) {
+      const user = db.get('users').find({ id: userId }).value()
+      if (!user) continue
+
+      // Créer l'inscription si elle n'existe pas encore
+      const existingRegistration = db.get('registrations').find({ activityId, userId }).value()
+      if (!existingRegistration) {
+        db.get('registrations').push({
+          id: `r${Date.now()}-${userId}`,
+          activityId,
+          userId,
+          registeredAt: validatedAt,
+          status: 'confirmed',
+        }).write()
+      }
+
+      // Créer ou mettre à jour la validation de présence (présent)
+      const existingValidation = db.get('attendanceValidations').find({ activityId, userId }).value()
+      if (existingValidation) {
+        db.get('attendanceValidations').find({ id: existingValidation.id }).assign({
+          isPresent: true,
+          validatedAt,
+          validatedBy: req.user.id,
+        }).write()
+      } else {
+        db.get('attendanceValidations').push({
+          id: `av${Date.now()}-${userId}`,
+          activityId,
+          userId,
+          isPresent: true,
+          validatedAt,
+          validatedBy: req.user.id,
+        }).write()
+      }
+
+      results.push(userId)
+    }
+
+    return res.status(201).json({
+      message: `${results.length} participant(s) ajouté(s) et marqué(s) présent(s)`,
+      addedUserIds: results,
     })
   }
 

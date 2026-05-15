@@ -46,4 +46,33 @@
   } @else {
     <p>Aucun membre inscrit pour le moment.</p>
   }
+
+  @if (canValidateAttendance() && availableUsersToAdd().length > 0) {
+    <div class="mt-4 space-y-2 border-t border-slate-200 pt-4">
+      <p class="text-sm font-medium text-slate-700">Ajouter des participants non inscrits</p>
+      <div class="flex flex-wrap items-center gap-2">
+        <p-multiselect
+          [options]="availableUsersToAdd()"
+          optionLabel="firstName"
+          [formControl]="selectedUsersToAddControl"
+          [filter]="true"
+          filterBy="firstName,lastName"
+          placeholder="Sélectionner des membres..."
+        >
+          <ng-template #item let-user>
+            {{ user.firstName }} {{ user.lastName }}
+          </ng-template>
+        </p-multiselect>
+
+        <button
+          pButton
+          type="button"
+          (click)="onAddParticipantsWithPresence()"
+          [disabled]="isSubmitting()"
+        >
+          Ajouter et marquer présent(s)
+        </button>
+      </div>
+    </div>
+  }
 </div>
