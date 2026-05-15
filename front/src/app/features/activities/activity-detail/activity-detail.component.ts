@@ -11,11 +11,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BehaviorSubject, filter, finalize, map, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
+import { ActivityAttendanceComponent } from './activity-attendance/activity-attendance.component';
 
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, ButtonDirective],
+  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, ButtonDirective, ActivityAttendanceComponent],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],
 })
@@ -55,15 +56,6 @@ export class ActivityDetailComponent {
       })
     ),
     { initialValue: null }
-  );
-
-  protected readonly participants = toSignal(
-    this.refreshData$.pipe(  filter(() => !!this.activityId()),
-      switchMap(() => {
-        return this.activitiesRepository.getActivityParticipants(this.activityId());
-      })
-    ),
-    { initialValue: [] }
   );
 
   protected canRegister = signal(this.authService.can('registration:create'));
@@ -156,24 +148,6 @@ export class ActivityDetailComponent {
 
     this.activitiesRepository
       .unregister(this.activityId())
-      .pipe(
-        finalize(() => this.isSubmitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.refreshDataSource.next();
-      });
-  }
-
-  protected onValidatePresence(userId: string, isPresent: boolean): void {
-    if (!this.activityId() || this.isSubmitting()) {
-      return;
-    }
-
-    this.isSubmitting.set(true);
-
-    this.activitiesRepository
-      .validateParticipantPresence(this.activityId(), userId, isPresent)
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
         takeUntilDestroyed(this.destroyRef)
