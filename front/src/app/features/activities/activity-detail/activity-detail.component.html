@@ -15,6 +15,22 @@
             </p>
           </div>
 
+          <div class="space-y-2 rounded-xl border border-slate-200 p-4">
+            <h3 class="text-lg font-semibold text-slate-900">Membres inscrits</h3>
+
+            @if (participants().length > 0) {
+              <ul class="space-y-1">
+                @for (participant of participants(); track participant.userId) {
+                  <li>
+                    {{ participant.firstName }} {{ participant.lastName }}
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p>Aucun membre inscrit pour le moment.</p>
+            }
+          </div>
+
           @if (canRegister()) {
             <div class="rounded-xl bg-slate-50 p-4">
               <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Nombre de points</p>

@@ -266,6 +266,40 @@ module.exports = (req, res, next) => {
     })
   }
 
+  // --- GET /api/activities/:id/participants ---
+  // Renvoie la liste des membres inscrits à une activité.
+  const activityParticipantsMatch = req.path.match(/^\/api\/activities\/([^/]+)\/participants$/)
+  if (req.method === 'GET' && activityParticipantsMatch) {
+    const activityId = activityParticipantsMatch[1]
+
+    const activity = db.get('activities').find({ id: activityId }).value()
+    if (!activity) {
+      return res.status(404).json({ message: 'Activité introuvable' })
+    }
+
+    const registrations = db
+      .get('registrations')
+      .filter({ activityId })
+      .value()
+
+    const participants = registrations
+      .map((registration) => {
+        const user = db.get('users').find({ id: registration.userId }).value()
+        if (!user) {
+          return null
+        }
+
+        return {
+          userId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        }
+      })
+      .filter(Boolean)
+
+    return res.json(participants)
+  }
+
   // --- POST /api/activities/:id/register ---
   const registerMatch = req.path.match(/^\/api\/activities\/([^/]+)\/register$/)
   if (req.method === 'POST' && registerMatch) {
