@@ -60,7 +60,9 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true
-    },
+      ,
+      "niss": "12345678901"
+      },
     {
       "id": "u2",
       "email": "encoder@intranet.be",
@@ -71,7 +73,9 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true
-    },
+      ,
+      "niss": "12345678902"
+      },
     {
       "id": "u3",
       "email": "member@intranet.be",
@@ -82,7 +86,9 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true
-    },
+      ,
+      "niss": "12345678903"
+      },
     {
       "id": "u4",
       "email": "candidate@intranet.be",
@@ -93,7 +99,9 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true
-    },
+      ,
+      "niss": "12345678904"
+      },
     {
       "id": "u5",
       "email": "julie.special@intranet.be",
@@ -106,7 +114,9 @@
       ],
       "deniedPermissions": [],
       "active": true
-    },
+      ,
+      "niss": "12345678905"
+      },
     {
       "id": "u6",
       "email": "encoder.limite@intranet.be",
@@ -120,7 +130,9 @@
         "activity:publish"
       ],
       "active": true
-    }
+      ,
+      "niss": "12345678906"
+      }
   ],
   "activities": [
     {

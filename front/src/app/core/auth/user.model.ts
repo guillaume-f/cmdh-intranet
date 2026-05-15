@@ -11,4 +11,5 @@ export interface UserDto {
   deniedPermissions: Permission[]
   permissions: Permission[]
   active: boolean
+  niss: string
 }
