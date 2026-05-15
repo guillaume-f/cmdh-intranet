@@ -138,9 +138,29 @@
         />
         <span class="text-sm text-slate-600">
           @if (form.controls.requiresAttendanceValidation.value) {
-            {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_ON' | translate }}
+            {{ 'COMMON.YES' | translate }}
           } @else {
-            {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_OFF' | translate }}
+            {{ 'COMMON.NO' | translate }}
+          }
+        </span>
+      </div>
+    </div>
+
+    <!-- Inscription requise -->
+    <div class="form-input-wrapper">
+      <label for="requiresRegistration" class="form-label">
+        {{ 'ACTIVITIES.FORM.REQUIRES_REGISTRATION_LABEL' | translate }}
+      </label>
+      <div class="flex items-center gap-3">
+        <p-toggleswitch
+          inputId="requiresRegistration"
+          [formControl]="form.controls.requiresRegistration"
+        />
+        <span class="text-sm text-slate-600">
+          @if (form.controls.requiresRegistration.value) {
+            {{ 'COMMON.YES' | translate }}
+          } @else {
+            {{ 'COMMON.NO' | translate }}
           }
         </span>
       </div>

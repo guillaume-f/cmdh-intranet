@@ -89,7 +89,7 @@
           </div>
 
           <div class="space-y-3 border-t border-slate-200 pt-6">
-            @if (canRegister() && isFutureActivity()) {
+            @if (canRegister() && isFutureActivity() && currentActivity.requiresRegistration) {
               @if (currentActivity.isRegistered) {
                 <p class="text-sm text-slate-600">
                   Inscrit le: {{ currentActivity.registeredAt ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm') : '-' }}

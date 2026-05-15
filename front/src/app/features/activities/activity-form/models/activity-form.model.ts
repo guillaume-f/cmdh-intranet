@@ -6,6 +6,7 @@ export interface ActivityFormValue {
   dateHeure: Date;
   adresse: string;
   points: number;
+  requiresRegistration: boolean;
   requiresAttendanceValidation: boolean;
 }
 

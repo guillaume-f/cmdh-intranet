@@ -135,7 +135,8 @@
       "createdAt": "2025-08-01T10:00:00Z",
       "isRegistered": false,
       "registeredAt": null,
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": false
     },
     {
       "id": "a2",
@@ -149,7 +150,8 @@
       "createdAt": "2025-08-10T14:00:00Z",
       "isRegistered": true,
       "registeredAt": "2025-08-05T10:00:00Z",
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": false
     },
     {
       "id": "a3",
@@ -163,7 +165,8 @@
       "createdAt": "2025-09-01T09:00:00Z",
       "isRegistered": false,
       "registeredAt": null,
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": false
     },
     {
       "id": "a4",
@@ -177,7 +180,8 @@
       "createdAt": "2025-09-15T11:00:00Z",
       "isRegistered": true,
       "registeredAt": "2025-08-05T10:00:00Z",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": false
     },
     {
       "title": "Frameries fête sa Patronne - Procession de Frameries",
@@ -186,7 +190,8 @@
       "points": 3,
       "location": "Foyer Sainte-Waudru - Mons",
       "id": "pyCDv1O",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": true
     },
     {
       "title": "Messe de Pâques à la gériatrie",
@@ -195,7 +200,8 @@
       "points": 1,
       "location": "Chemin de la Cure d'Air, Mons, Belgique",
       "id": "DEvLzyE",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": true
     },
     {
       "title": "Exposition \"40 ans en Jaune e Noir",
@@ -204,7 +210,8 @@
       "points": 0,
       "location": "Chapelle Saint-Calixte de Mons",
       "id": "7UWFl0e",
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": true
     },
     {
       "title": "Procession en hommage à saint Ursmer",
@@ -213,7 +220,8 @@
       "points": 3,
       "location": "Foyer Sainte-Waudru - Mons",
       "id": "CSMwV4R",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": true
     },
     {
       "title": "Fête de sainte Waudru - Hommage à la Patronne de la Cité",
@@ -222,7 +230,8 @@
       "points": 3,
       "location": "Collégiale Sainte-Waudru",
       "id": "c0Ci3uq",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": true
     },
     {
       "title": "Repas à l'Auberge de Jeunesse",
@@ -231,7 +240,8 @@
       "points": 0,
       "location": "Auberge de Jeunesse du Beffroi - Mons",
       "id": "8ylRaSv",
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": true
     },
     {
       "title": "Deuxième répétition",
@@ -240,7 +250,8 @@
       "points": 5,
       "location": "Collégiale Sainte-Waudru",
       "id": "3CBxUoi",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": false
     },
     {
       "title": "Procession de Soignies en hommage à saint Vincent",
@@ -249,7 +260,8 @@
       "points": 3,
       "location": "Rue Neuve 51, 7060 Soignies, Belgique",
       "id": "HtjHp7-",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": true
     },
     {
       "title": "Troisième répétition",
@@ -258,7 +270,8 @@
       "points": 5,
       "location": "Collégiale Sainte-Waudru",
       "id": "pPQ4owx",
-      "requiresAttendanceValidation": true
+      "requiresAttendanceValidation": true,
+      "requiresRegistration": false
     },
     {
       "title": "Un After framerisois - Edition 2026",
@@ -267,7 +280,8 @@
       "points": 0,
       "location": "Rue du Tazerka, 7 - 7080 Frameries",
       "id": "6C1iuyq",
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": true
     },
     {
       "title": "Première séance d'essayage",
@@ -276,7 +290,8 @@
       "points": 0,
       "location": "Foyer Sainte-Waudru - Mons",
       "id": "OZAcxp5",
-      "requiresAttendanceValidation": false
+      "requiresAttendanceValidation": false,
+      "requiresRegistration": false
     }
   ],
   "registrations": [
@@ -394,6 +409,14 @@
       "userId": "u1",
       "isPresent": true,
       "validatedAt": "2026-05-15T11:42:22.888Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778846398017",
+      "activityId": "DEvLzyE",
+      "userId": "u1",
+      "isPresent": true,
+      "validatedAt": "2026-05-15T11:59:58.017Z",
       "validatedBy": "u1"
     }
   ],

@@ -60,6 +60,7 @@ export class ActivityFormComponent implements OnInit {
     dateHeure: [null as Date | null, [Validators.required]],
     adresse: ['', [Validators.required]],
     points: [0, [Validators.required]],
+    requiresRegistration: [true, [Validators.required]],
     requiresAttendanceValidation: [true, [Validators.required]],
   });
 
@@ -115,6 +116,7 @@ export class ActivityFormComponent implements OnInit {
         dateHeure: activity.datetime,
         adresse: activity.location ?? '',
         points: activity.points,
+        requiresRegistration: activity.requiresRegistration ?? true,
         requiresAttendanceValidation: activity.requiresAttendanceValidation ?? true,
       });
     });

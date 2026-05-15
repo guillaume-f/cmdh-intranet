@@ -253,6 +253,9 @@ module.exports = (req, res, next) => {
   if (req.method === 'POST' && req.path === '/api/activities' && req.body?.requiresAttendanceValidation === undefined) {
     req.body.requiresAttendanceValidation = true
   }
+  if (req.method === 'POST' && req.path === '/api/activities' && req.body?.requiresRegistration === undefined) {
+    req.body.requiresRegistration = true
+  }
 
   // --- Contrôle des permissions sur les routes /api/* ---
   const permError = checkRoutePermission(req, res)
@@ -276,6 +279,7 @@ module.exports = (req, res, next) => {
       const registration = registrationsByActivityId.get(activity.id)
       return {
         ...activity,
+        requiresRegistration: activity.requiresRegistration !== false,
         requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
         isRegistered: !!registration,
         registeredAt: registration ? registration.registeredAt : null,
@@ -303,6 +307,7 @@ module.exports = (req, res, next) => {
 
     return res.json({
       ...activity,
+      requiresRegistration: activity.requiresRegistration !== false,
       requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
       isRegistered: !!registration,
       registeredAt: registration ? registration.registeredAt : null,
@@ -363,6 +368,10 @@ module.exports = (req, res, next) => {
     const activity = db.get('activities').find({ id: activityId }).value()
     if (!activity) {
       return res.status(404).json({ message: 'Activité introuvable' })
+    }
+
+    if (activity.requiresRegistration === false) {
+      return res.status(400).json({ message: 'Les inscriptions ne sont pas requises pour cette activité' })
     }
 
     const existingRegistration = db
