@@ -82,7 +82,7 @@ export class ActivityDetailComponent {
   private readonly isAttendanceValidationAvailable = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    return dayjs(activity.datetime).isBefore(dayjs(), 'day');
+    return activity.requiresAttendanceValidation && dayjs(activity.datetime).isBefore(dayjs(), 'day');
   });
   protected readonly canValidateAttendanceForActivity = computed(() =>
     this.canValidateAttendance() && this.isAttendanceValidationAvailable()

@@ -250,6 +250,10 @@ module.exports = (req, res, next) => {
 
   req.user = decoded  // { id, email, role, permissions[] }
 
+  if (req.method === 'POST' && req.path === '/api/activities' && req.body?.requiresAttendanceValidation === undefined) {
+    req.body.requiresAttendanceValidation = true
+  }
+
   // --- Contrôle des permissions sur les routes /api/* ---
   const permError = checkRoutePermission(req, res)
   if (permError) return  // La réponse d'erreur a déjà été envoyée
@@ -272,6 +276,7 @@ module.exports = (req, res, next) => {
       const registration = registrationsByActivityId.get(activity.id)
       return {
         ...activity,
+        requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
         isRegistered: !!registration,
         registeredAt: registration ? registration.registeredAt : null,
       }
@@ -298,6 +303,7 @@ module.exports = (req, res, next) => {
 
     return res.json({
       ...activity,
+      requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
       isRegistered: !!registration,
       registeredAt: registration ? registration.registeredAt : null,
     })

@@ -5,6 +5,7 @@ export interface ActivityDto {
   datetime: Date;
   points: number;
   location: string;
+  requiresAttendanceValidation: boolean;
   status: string;
   createdBy: string;
   createdAt: Date;
@@ -18,4 +19,5 @@ export interface ActivityDtoRequest {
   datetime: Date;
   points: number;
   location: string;
+  requiresAttendanceValidation: boolean;
 }

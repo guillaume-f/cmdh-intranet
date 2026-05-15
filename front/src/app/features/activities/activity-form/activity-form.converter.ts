@@ -10,5 +10,6 @@ export function toActivityDtoRequest(
     datetime: formValue.dateHeure,
     points: formValue.points,
     location: formValue.adresse.trim(),
+    requiresAttendanceValidation: formValue.requiresAttendanceValidation,
   };
 }

@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
 import { ActivityDto } from '../../../repositories/activities/activity.model';
@@ -27,6 +28,7 @@ import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
     MessageModule,
     SelectModule,
     ButtonModule,
+    ToggleSwitchModule,
     TranslatePipe,
     BreadcrumbModule,
   ],
@@ -58,6 +60,7 @@ export class ActivityFormComponent implements OnInit {
     dateHeure: [null as Date | null, [Validators.required]],
     adresse: ['', [Validators.required]],
     points: [0, [Validators.required]],
+    requiresAttendanceValidation: [true, [Validators.required]],
   });
 
   protected readonly pageTitleKey = computed(() =>
@@ -112,6 +115,7 @@ export class ActivityFormComponent implements OnInit {
         dateHeure: activity.datetime,
         adresse: activity.location ?? '',
         points: activity.points,
+        requiresAttendanceValidation: activity.requiresAttendanceValidation ?? true,
       });
     });
   }

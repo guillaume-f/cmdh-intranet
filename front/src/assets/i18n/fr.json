@@ -19,6 +19,9 @@
       "ADRESSE_PLACEHOLDER": "Adresse de l'activité",
       "POINTS_LABEL": "Points",
       "POINTS_PLACEHOLDER": "Sélectionner les points",
+      "REQUIRES_ATTENDANCE_VALIDATION_LABEL": "Validation de présence requise",
+      "REQUIRES_ATTENDANCE_VALIDATION_ON": "Oui",
+      "REQUIRES_ATTENDANCE_VALIDATION_OFF": "Non",
       "SUBMIT": "Enregistrer",
       "UPDATE": "Mettre à jour"
     },

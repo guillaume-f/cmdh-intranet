@@ -126,6 +126,26 @@
       </div>
     </div>
 
+    <!-- Validation de présence requise -->
+    <div class="form-input-wrapper">
+      <label for="requiresAttendanceValidation" class="form-label">
+        {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_LABEL' | translate }}
+      </label>
+      <div class="flex items-center gap-3">
+        <p-toggleswitch
+          inputId="requiresAttendanceValidation"
+          [formControl]="form.controls.requiresAttendanceValidation"
+        />
+        <span class="text-sm text-slate-600">
+          @if (form.controls.requiresAttendanceValidation.value) {
+            {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_ON' | translate }}
+          } @else {
+            {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_OFF' | translate }}
+          }
+        </span>
+      </div>
+    </div>
+
     <!-- Submit -->
     <div class="flex justify-end">
       <p-button
