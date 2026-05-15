@@ -69,6 +69,7 @@ export class ActivityDetailComponent {
   protected canRegister = signal(this.authService.can('registration:create'));
   protected canDelete = signal(this.authService.can('activity:delete'));
   protected canEdit = signal(this.authService.can('activity:edit'));
+  protected canValidateAttendance = signal(this.authService.can('attendance:validate'));
 
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
@@ -78,6 +79,14 @@ export class ActivityDetailComponent {
 
   protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());
   protected readonly canDeleteActivity = computed(() => this.canDelete() && this.isFutureActivity());
+  private readonly isAttendanceValidationAvailable = computed(() => {
+    const activity = this.activity();
+    if (!activity) return false;
+    return dayjs(activity.datetime).isBefore(dayjs(), 'day');
+  });
+  protected readonly canValidateAttendanceForActivity = computed(() =>
+    this.canValidateAttendance() && this.isAttendanceValidationAvailable()
+  );
 
   protected onEdit(): void {
     if (!this.activityId()) {
@@ -147,6 +156,24 @@ export class ActivityDetailComponent {
 
     this.activitiesRepository
       .unregister(this.activityId())
+      .pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.refreshDataSource.next();
+      });
+  }
+
+  protected onValidatePresence(userId: string, isPresent: boolean): void {
+    if (!this.activityId() || this.isSubmitting()) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    this.activitiesRepository
+      .validateParticipantPresence(this.activityId(), userId, isPresent)
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
         takeUntilDestroyed(this.destroyRef)

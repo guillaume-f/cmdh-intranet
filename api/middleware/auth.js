@@ -33,6 +33,12 @@ function hasPermission(req, permission) {
   return Array.isArray(req.user?.permissions) && req.user.permissions.includes(permission)
 }
 
+function ensureAttendanceValidationsCollection(db) {
+  if (!Array.isArray(db.get('attendanceValidations').value())) {
+    db.set('attendanceValidations', []).write()
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Routes publiques (pas de token requis)
 // ---------------------------------------------------------------------------
@@ -57,6 +63,7 @@ function checkRoutePermission(req, res) {
 
   const isRegisterRoute = /^\/api\/activities\/[^/]+\/register$/.test(path)
   const isUnregisterRoute = /^\/api\/activities\/[^/]+\/unregister$/.test(path)
+  const isAttendanceValidationRoute = /^\/api\/activities\/[^/]+\/participants\/[^/]+\/(validate|invalidate)$/.test(path)
 
   // --- Activités ---
   if (path.startsWith('/api/activities')) {
@@ -69,7 +76,10 @@ function checkRoutePermission(req, res) {
     if (isUnregisterRoute && method === 'POST' && !hasPermission(req, 'registration:delete')) {
       return res.status(403).json({ message: 'Permission manquante : registration:delete' })
     }
-    if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !hasPermission(req, 'activity:create')) {
+    if (isAttendanceValidationRoute && method === 'POST' && !hasPermission(req, 'attendance:validate')) {
+      return res.status(403).json({ message: 'Permission manquante : attendance:validate' })
+    }
+    if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !isAttendanceValidationRoute && !hasPermission(req, 'activity:create')) {
       return res.status(403).json({ message: 'Permission manquante : activity:create' })
     }
     if (method === 'PATCH' || method === 'PUT') {
@@ -131,6 +141,7 @@ function checkRoutePermission(req, res) {
 // ---------------------------------------------------------------------------
 module.exports = (req, res, next) => {
   const db = req.app.db
+  ensureAttendanceValidationsCollection(db)
 
   // --- POST /auth/login ---
   if (req.method === 'POST' && req.path === '/auth/login') {
@@ -308,6 +319,14 @@ module.exports = (req, res, next) => {
       .filter({ activityId })
       .value()
 
+    const presenceByUserId = new Map(
+      db
+        .get('attendanceValidations')
+        .filter({ activityId })
+        .value()
+        .map((validation) => [validation.userId, validation])
+    )
+
     const participants = registrations
       .map((registration) => {
         const user = db.get('users').find({ id: registration.userId }).value()
@@ -319,6 +338,10 @@ module.exports = (req, res, next) => {
           userId: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
+          isPresent: presenceByUserId.has(user.id) ? presenceByUserId.get(user.id).isPresent : null,
+          presenceValidatedAt: presenceByUserId.has(user.id)
+            ? presenceByUserId.get(user.id).validatedAt
+            : null,
         }
       })
       .filter(Boolean)
@@ -361,6 +384,74 @@ module.exports = (req, res, next) => {
     return res.status(201).json({
       message: 'Inscription confirmée',
       registration,
+    })
+  }
+
+  // --- POST /api/activities/:id/participants/:userId/validate|invalidate ---
+  const attendanceValidationMatch = req.path.match(/^\/api\/activities\/([^/]+)\/participants\/([^/]+)\/(validate|invalidate)$/)
+  if (req.method === 'POST' && attendanceValidationMatch) {
+    const activityId = attendanceValidationMatch[1]
+    const userId = attendanceValidationMatch[2]
+    const action = attendanceValidationMatch[3]
+    const isPresent = action === 'validate'
+
+    const activity = db.get('activities').find({ id: activityId }).value()
+    if (!activity) {
+      return res.status(404).json({ message: 'Activité introuvable' })
+    }
+
+    const user = db.get('users').find({ id: userId }).value()
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' })
+    }
+
+    const registration = db
+      .get('registrations')
+      .find({ activityId, userId })
+      .value()
+
+    if (!registration) {
+      return res.status(400).json({
+        message: 'Impossible de valider la présence d\'un utilisateur non inscrit',
+      })
+    }
+
+    const validatedAt = new Date().toISOString()
+    const existingValidation = db
+      .get('attendanceValidations')
+      .find({ activityId, userId })
+      .value()
+
+    if (existingValidation) {
+      db
+        .get('attendanceValidations')
+        .find({ id: existingValidation.id })
+        .assign({
+          isPresent,
+          validatedAt,
+          validatedBy: req.user.id,
+        })
+        .write()
+    } else {
+      db
+        .get('attendanceValidations')
+        .push({
+          id: `av${Date.now()}`,
+          activityId,
+          userId,
+          isPresent,
+          validatedAt,
+          validatedBy: req.user.id,
+        })
+        .write()
+    }
+
+    return res.json({
+      message: isPresent ? 'Présence validée' : 'Absence validée',
+      activityId,
+      userId,
+      isPresent,
+      validatedAt,
     })
   }
 

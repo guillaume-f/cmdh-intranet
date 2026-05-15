@@ -28,7 +28,8 @@
         "activity:publish",
         "registration:create",
         "registration:read",
-        "registration:delete"
+        "registration:delete",
+        "attendance:validate"
       ]
     },
     {
@@ -43,6 +44,7 @@
         "registration:create",
         "registration:read",
         "registration:delete",
+        "attendance:validate",
         "user:manage"
       ]
     }
@@ -360,6 +362,16 @@
       "userId": "u2",
       "registeredAt": "2026-05-15T08:55:04.428Z",
       "status": "confirmed"
+    }
+  ],
+  "attendanceValidations": [
+    {
+      "id": "av1778843785149",
+      "activityId": "6C1iuyq",
+      "userId": "u1",
+      "isPresent": false,
+      "validatedAt": "2026-05-15T11:24:59.856Z",
+      "validatedBy": "u1"
     }
   ],
   "passwordResets": []

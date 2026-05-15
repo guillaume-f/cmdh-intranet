@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ActivityParticipantDto } from './activity-participant.model';
+import { ActivityAttendanceDto } from './activity-participant.model';
 import { ActivityDto, ActivityDtoRequest } from './activity.model';
 
 @Injectable({
@@ -32,14 +32,25 @@ export class ActivitiesRepository {
     return this.http.get<ActivityDto>(`${this.apiUrl}/${activityId}`, { headers });
   }
 
-  getActivityParticipants(activityId: string): Observable<ActivityParticipantDto[]> {
+  getActivityParticipants(activityId: string): Observable<ActivityAttendanceDto[]> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(
       'Authorization',
       `Bearer ${token}`
     );
 
-    return this.http.get<ActivityParticipantDto[]>(`${this.apiUrl}/${activityId}/participants`, { headers });
+    return this.http.get<ActivityAttendanceDto[]>(`${this.apiUrl}/${activityId}/participants`, { headers });
+  }
+
+  validateParticipantPresence(activityId: string, userId: string, isPresent: boolean): Observable<void> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    const action = isPresent ? 'validate' : 'invalidate';
+    return this.http.post<void>(`${this.apiUrl}/${activityId}/participants/${userId}/${action}`, null, { headers });
   }
 
   addActivity(activity: ActivityDtoRequest): Observable<ActivityDto> {

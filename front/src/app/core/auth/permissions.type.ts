@@ -7,4 +7,5 @@ export type Permission =
   | 'registration:create'
   | 'registration:read'
   | 'registration:delete'
+  | 'attendance:validate'
   | 'user:manage'
