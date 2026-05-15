@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UserDto } from '../../core/auth/user.model';
-import { UserUpdateRequest } from './user-update-request.model';
+import { UserDtoRequest } from './user-dto-request.model';
 import { UserValidatedActivitiesSummaryDto } from './user-validated-activity.model';
 
 @Injectable({
@@ -43,7 +43,7 @@ export class UsersRepository {
       return this.http.get<UserValidatedActivitiesSummaryDto>(`${this.apiUrl}/${userId}/validated-activities`, { headers });
     }
 
-    updateUser(userId: string, user: UserUpdateRequest): Observable<UserDto> {
+    updateUser(userId: string, user: UserDtoRequest): Observable<UserDto> {
       const token = this.getCookie('access_token');
       const headers = new HttpHeaders().set(
         'Authorization',
@@ -51,6 +51,16 @@ export class UsersRepository {
       );
 
       return this.http.patch<UserDto>(`${this.apiUrl}/${userId}`, user, { headers });
+    }
+
+    addUser(user: UserDtoRequest): Observable<UserDto> {
+      const token = this.getCookie('access_token');
+      const headers = new HttpHeaders().set(
+        'Authorization',
+        `Bearer ${token}`
+      );
+
+      return this.http.post<UserDto>(`${this.apiUrl}`, user, { headers });
     }
 
   private getCookie(name: string): string | undefined {

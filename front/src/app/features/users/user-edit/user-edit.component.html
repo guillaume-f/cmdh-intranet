@@ -1,5 +1,5 @@
 <div class="p-4 bg-primary-500 color-gray-900">
-  <h1 class="text-3xl font-semibold">Modification utilisateur</h1>
+  <h1 class="text-3xl font-semibold">{{ pageTitle() }}</h1>
 </div>
 
 <div class="w-full p-4 xl:mx-auto xl:max-w-5xl">
@@ -101,14 +101,14 @@
 
         <div class="flex justify-end gap-3">
           <a
-            [routerLink]="['/users', userId()]"
+            [routerLink]="cancelLink()"
             class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
             Annuler
           </a>
           <p-button
             type="submit"
-            label="Enregistrer"
+            [label]="submitLabel()"
             [disabled]="isSaving()"
           />
         </div>

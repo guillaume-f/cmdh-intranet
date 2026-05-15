@@ -114,6 +114,20 @@ function ensureAttendanceValidationsCollection(db) {
   }
 }
 
+function buildNextUserId(db) {
+  const users = db.get('users').value() || []
+  const maxId = users.reduce((max, user) => {
+    const match = typeof user.id === 'string' ? user.id.match(/^u(\d+)$/) : null
+    if (!match) {
+      return max
+    }
+    const value = Number(match[1])
+    return Number.isNaN(value) ? max : Math.max(max, value)
+  }, 0)
+
+  return `u${maxId + 1}`
+}
+
 // ---------------------------------------------------------------------------
 // Routes publiques (pas de token requis)
 // ---------------------------------------------------------------------------
@@ -346,6 +360,62 @@ module.exports = (req, res, next) => {
   // --- Contrôle des permissions sur les routes /api/* ---
   const permError = checkRoutePermission(req, res)
   if (permError) return  // La réponse d'erreur a déjà été envoyée
+
+  // --- POST /api/users ---
+  // Création d'un utilisateur avec valeurs par défaut.
+  if (req.method === 'POST' && req.path === '/api/users') {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Seul un administrateur peut créer un utilisateur' })
+    }
+
+    const { firstName, lastName, email, niss, role, active } = req.body || {}
+
+    if (!firstName || !lastName || !email || !niss || !role) {
+      return res.status(400).json({ message: 'Les champs firstName, lastName, email, niss et role sont obligatoires' })
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase()
+    const normalizedNiss = String(niss).trim()
+    const normalizedRole = String(role).trim()
+
+    const roleExists = !!db.get('roles').find({ id: normalizedRole }).value()
+    if (!roleExists) {
+      return res.status(400).json({ message: 'Rôle invalide' })
+    }
+
+    const emailExists = !!db.get('users').find((user) => String(user.email || '').toLowerCase() === normalizedEmail).value()
+    if (emailExists) {
+      return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà' })
+    }
+
+    const nissExists = !!db.get('users').find({ niss: normalizedNiss }).value()
+    if (nissExists) {
+      return res.status(409).json({ message: 'Un utilisateur avec ce NISS existe déjà' })
+    }
+
+    const createdUser = {
+      id: buildNextUserId(db),
+      email: normalizedEmail,
+      password: 'changeMe123!',
+      firstName: String(firstName).trim(),
+      lastName: String(lastName).trim(),
+      role: normalizedRole,
+      extraPermissions: [],
+      deniedPermissions: [],
+      active: typeof active === 'boolean' ? active : true,
+      niss: normalizedNiss,
+    }
+
+    db.get('users').push(createdUser).write()
+
+    const permissions = resolvePermissions(createdUser, db)
+    const { password: _pwd, ...userWithoutPassword } = createdUser
+
+    return res.status(201).json({
+      ...userWithoutPassword,
+      permissions,
+    })
+  }
 
   // --- GET /api/activities ---
   // Renvoie la liste des activités enrichie avec l'état d'inscription

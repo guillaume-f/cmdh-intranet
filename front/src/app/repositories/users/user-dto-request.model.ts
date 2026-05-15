@@ -1,6 +1,6 @@
 import { UserRole } from '../../core/auth/user-role.type';
 
-export interface UserUpdateRequest {
+export interface UserDtoRequest {
   firstName: string;
   lastName: string;
   email: string;

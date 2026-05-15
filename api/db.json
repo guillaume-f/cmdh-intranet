@@ -126,6 +126,18 @@
       ],
       "active": true,
       "niss": "12345678906"
+    },
+    {
+      "id": "u7",
+      "email": "jpd@gmail.com",
+      "password": "changeMe123!",
+      "firstName": "Jean Paul",
+      "lastName": "Doe",
+      "role": "member",
+      "extraPermissions": [],
+      "deniedPermissions": [],
+      "active": true,
+      "niss": "12345678910"
     }
   ],
   "activities": [
@@ -447,6 +459,13 @@
       "userId": "u6",
       "registeredAt": "2026-05-15T14:10:51.989Z",
       "status": "confirmed"
+    },
+    {
+      "id": "r1778857813120-u7",
+      "activityId": "c0Ci3uq",
+      "userId": "u7",
+      "registeredAt": "2026-05-15T15:10:13.119Z",
+      "status": "confirmed"
     }
   ],
   "attendanceValidations": [
@@ -536,6 +555,14 @@
       "userId": "u6",
       "isPresent": true,
       "validatedAt": "2026-05-15T14:10:51.989Z",
+      "validatedBy": "u1"
+    },
+    {
+      "id": "av1778857813120-u7",
+      "activityId": "c0Ci3uq",
+      "userId": "u7",
+      "isPresent": true,
+      "validatedAt": "2026-05-15T15:10:13.119Z",
       "validatedBy": "u1"
     }
   ],

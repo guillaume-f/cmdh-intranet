@@ -37,6 +37,7 @@ export class UserEditComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   protected readonly userId = signal(this.activatedRoute.snapshot.paramMap.get('userId') ?? '');
+  protected readonly isEditMode = computed(() => !!this.userId());
   protected readonly userName = signal('');
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);
@@ -50,8 +51,12 @@ export class UserEditComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<MenuItem[]>(() => [
     { label: 'Utilisateurs', routerLink: '/users' },
-    { label: this.userName() || 'Modification utilisateur' },
+    { label: this.isEditMode() ? (this.userName() || 'Modification utilisateur') : 'Nouvel utilisateur' },
   ]);
+
+  protected readonly pageTitle = computed(() => this.isEditMode() ? 'Modification utilisateur' : 'Nouvel utilisateur');
+  protected readonly submitLabel = computed(() => this.isEditMode() ? 'Enregistrer' : 'Créer');
+  protected readonly cancelLink = computed<(string | number)[]>(() => this.isEditMode() ? ['/users', this.userId()] : ['/users']);
 
   protected readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -68,7 +73,9 @@ export class UserEditComponent implements OnInit {
       return;
     }
 
-    this.loadUser();
+    if (this.isEditMode()) {
+      this.loadUser();
+    }
   }
 
   protected onSubmit(): void {
@@ -77,16 +84,16 @@ export class UserEditComponent implements OnInit {
       return;
     }
 
-    if (!this.userId()) {
-      return;
-    }
-
     this.isSaving.set(true);
 
-    this.usersRepository.updateUser(this.userId(), this.form.getRawValue()).pipe(
+    const request$ = this.isEditMode() && this.userId()
+      ? this.usersRepository.updateUser(this.userId(), this.form.getRawValue())
+      : this.usersRepository.addUser(this.form.getRawValue());
+
+    request$.pipe(
       finalize(() => this.isSaving.set(false))
-    ).subscribe((updatedUser) => {
-      void this.router.navigate(['/users', updatedUser.id]);
+    ).subscribe((savedUser) => {
+      void this.router.navigate(['/users', savedUser.id]);
     });
   }
 
