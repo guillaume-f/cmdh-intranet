@@ -243,6 +243,32 @@ module.exports = (req, res, next) => {
   const permError = checkRoutePermission(req, res)
   if (permError) return  // La réponse d'erreur a déjà été envoyée
 
+  // --- GET /api/activities ---
+  // Renvoie la liste des activités enrichie avec l'état d'inscription
+  // de l'utilisateur connecté.
+  if (req.method === 'GET' && req.path === '/api/activities') {
+    const activities = db.get('activities').value()
+    const userRegistrations = db
+      .get('registrations')
+      .filter({ userId: req.user.id })
+      .value()
+
+    const registrationsByActivityId = new Map(
+      userRegistrations.map((registration) => [registration.activityId, registration])
+    )
+
+    const enrichedActivities = activities.map((activity) => {
+      const registration = registrationsByActivityId.get(activity.id)
+      return {
+        ...activity,
+        isRegistered: !!registration,
+        registeredAt: registration ? registration.registeredAt : null,
+      }
+    })
+
+    return res.json(enrichedActivities)
+  }
+
   // --- GET /api/activities/:id ---
   // Renvoie l'activité avec l'état d'inscription de l'utilisateur connecté.
   const activityDetailMatch = req.path.match(/^\/api\/activities\/([^/]+)$/)
