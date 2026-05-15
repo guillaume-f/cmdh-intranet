@@ -51,7 +51,7 @@
                 </p>
                 <button
                   pButton
-                  type="button"
+                  type="button" class="w-full"
                   (click)="onUnregister()"
                   [disabled]="isSubmitting()"
                 >
@@ -59,7 +59,7 @@
                 </button>
               } @else {
                 <button
-                  pButton
+                  pButton  class="w-full"
                   type="button"
                   (click)="onRegister()"
                   [disabled]="isSubmitting()"
@@ -74,7 +74,7 @@
                 pButton
                 type="button"
                 severity="secondary"
-                class=" w-full "
+                class="w-full"
                 (click)="onEdit()"
               >
                 Modifier l'activite
@@ -86,7 +86,7 @@
                 pButton
                 type="button"
                 severity="danger"
-                class=" w-full "
+                class="w-full"
                 (click)="onDelete()"
                 [disabled]="isSubmitting()"
               >

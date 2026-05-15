@@ -2,9 +2,11 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { MultiSelect } from 'primeng/multiselect';
 import { BehaviorSubject, combineLatest, filter, finalize, map, switchMap } from 'rxjs';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { UserDto } from '../../../../core/auth/user.model';
 import { ActivitiesRepository } from '../../../../repositories/activities/activities.repository';
 import { ActivityAttendanceDto } from '../../../../repositories/activities/activity-participant.model';
@@ -19,10 +21,14 @@ import { UsersRepository } from '../../../../repositories/users/users.repository
 export class ActivityAttendanceComponent {
   private readonly activitiesRepository = inject(ActivitiesRepository);
   private readonly usersRepository = inject(UsersRepository);
+  private readonly authService = inject(AuthService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly activityId = input.required<string>();
   readonly canValidateAttendance = input(false);
+
+  protected canDeleteRegistration = signal(this.authService.can('registration:delete'));
 
   protected readonly isSubmitting = signal(false);
   protected readonly selectedUsersToAddControl = new FormControl<UserDto[]>([], { nonNullable: true, validators: Validators.required });
@@ -88,5 +94,32 @@ export class ActivityAttendanceComponent {
         this.selectedUsersToAddControl.setValue([]);
         this.refreshSource.next();
       });
+  }
+
+  protected onDeleteParticipantRegistration(userId: string): void {
+    if (!this.activityId() || this.isSubmitting()) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      header: 'Confirmer la suppression',
+      message: 'Voulez-vous vraiment supprimer cette inscription ?',
+      acceptLabel: 'Supprimer',
+      rejectLabel: 'Annuler',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.isSubmitting.set(true);
+
+        this.activitiesRepository
+          .deleteParticipantRegistration(this.activityId(), userId)
+          .pipe(
+            finalize(() => this.isSubmitting.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe(() => {
+            this.refreshSource.next();
+          });
+      },
+    });
   }
 }

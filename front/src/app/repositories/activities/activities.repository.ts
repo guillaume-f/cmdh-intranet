@@ -53,6 +53,16 @@ export class ActivitiesRepository {
     return this.http.post<void>(`${this.apiUrl}/${activityId}/participants/${userId}/${action}`, null, { headers });
   }
 
+  deleteParticipantRegistration(activityId: string, userId: string): Observable<void> {
+    const token = this.getCookie('access_token');
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${token}`
+    );
+
+    return this.http.delete<void>(`${this.apiUrl}/${activityId}/participants/${userId}`, { headers });
+  }
+
   addParticipantsWithPresence(activityId: string, userIds: string[]): Observable<void> {
     const token = this.getCookie('access_token');
     const headers = new HttpHeaders().set(

@@ -19,25 +19,39 @@
             }
           </p>
 
-          @if (canValidateAttendance()) {
+          @if (canValidateAttendance() || canDeleteRegistration()) {
             <div class="mt-3 flex flex-wrap gap-2">
-              <button
-                pButton
-                type="button"
-                (click)="onValidatePresence(participant.userId, true)"
-                [disabled]="isSubmitting()"
-              >
-                Valider présence
-              </button>
+              @if (canValidateAttendance()) {
+                <button
+                  pButton
+                  type="button"
+                  (click)="onValidatePresence(participant.userId, true)"
+                  [disabled]="isSubmitting()"
+                >
+                  Valider présence
+                </button>
 
-              <button
-                pButton
-                type="button"
-                (click)="onValidatePresence(participant.userId, false)"
-                [disabled]="isSubmitting()"
-              >
-                Marquer absent
-              </button>
+                <button
+                  pButton
+                  type="button"
+                  (click)="onValidatePresence(participant.userId, false)"
+                  [disabled]="isSubmitting()"
+                >
+                  Marquer absent
+                </button>
+              }
+
+              @if (canDeleteRegistration()) {
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  (click)="onDeleteParticipantRegistration(participant.userId)"
+                  [disabled]="isSubmitting()"
+                >
+                  Supprimer l'inscription
+                </button>
+              }
             </div>
           }
         </li>

@@ -13,6 +13,7 @@ const SECRET = 'intranet-dev-secret'
 
 const ACTIVITY_DETAIL_ROUTE_REGEX = /^\/api\/activities\/([^/]+)$/
 const ACTIVITY_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants$/
+const PARTICIPANT_REGISTRATION_DELETE_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/([^/]+)$/
 const BULK_ADD_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/bulk-add$/
 const REGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/register$/
 const UNREGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/unregister$/
@@ -107,6 +108,7 @@ function checkRoutePermission(req, res) {
   const isUnregisterRoute = /^\/api\/activities\/[^/]+\/unregister$/.test(path)
   const isAttendanceValidationRoute = /^\/api\/activities\/[^/]+\/participants\/[^/]+\/(validate|invalidate)$/.test(path)
   const isBulkAddParticipantsRoute = /^\/api\/activities\/[^/]+\/participants\/bulk-add$/.test(path)
+  const isParticipantRegistrationDeleteRoute = /^\/api\/activities\/[^/]+\/participants\/[^/]+$/.test(path)
 
   // --- Activités ---
   if (path.startsWith('/api/activities')) {
@@ -134,8 +136,13 @@ function checkRoutePermission(req, res) {
         return permissionDenied(res, 'activity:publish')
       }
     }
-    if (method === 'DELETE' && !hasPermission(req, 'activity:delete')) {
-      return permissionDenied(res, 'activity:delete')
+    if (method === 'DELETE') {
+      if (isParticipantRegistrationDeleteRoute && !hasPermission(req, 'registration:delete')) {
+        return permissionDenied(res, 'registration:delete')
+      }
+      if (!isParticipantRegistrationDeleteRoute && !hasPermission(req, 'activity:delete')) {
+        return permissionDenied(res, 'activity:delete')
+      }
     }
   }
 
@@ -555,6 +562,35 @@ module.exports = (req, res, next) => {
       userId,
       isPresent,
       validatedAt,
+    })
+  }
+
+  // --- DELETE /api/activities/:id/participants/:userId ---
+  // Supprime l'inscription et la participation associée.
+  const participantDeleteMatch = req.path.match(PARTICIPANT_REGISTRATION_DELETE_ROUTE_REGEX)
+  if (req.method === 'DELETE' && participantDeleteMatch) {
+    const activityId = participantDeleteMatch[1]
+    const userId = participantDeleteMatch[2]
+
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
+
+    const registration = db
+      .get('registrations')
+      .find({ activityId, userId })
+      .value()
+
+    if (!registration) {
+      return res.status(404).json({ message: 'Aucune inscription trouvée pour cet utilisateur' })
+    }
+
+    db.get('registrations').remove({ id: registration.id }).write()
+    db.get('attendanceValidations').remove({ activityId, userId }).write()
+
+    return res.json({
+      message: 'Inscription supprimée',
+      activityId,
+      userId,
     })
   }
 
