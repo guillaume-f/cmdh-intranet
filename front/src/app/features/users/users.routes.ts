@@ -12,6 +12,14 @@ export const  usersRoutes: Routes = [
     loadComponent: () => import('./user-list/user-list.component').then(m => m.UserListComponent),
   },
   {
+    path: ':userId/edit',
+    canActivate: [permissionsGuard],
+    data: {
+      permissions: ['user:manage']
+    },
+    loadComponent: () => import('./user-edit/user-edit.component').then(m => m.UserEditComponent),
+  },
+  {
     path: ':userId',
     canActivate: [permissionsGuard],
     data: {

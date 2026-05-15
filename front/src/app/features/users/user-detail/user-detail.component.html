@@ -56,7 +56,13 @@
 				<app-user-validated-activities [userId]="userId()" />
 			}
 
-			<div class="mt-8 flex justify-end">
+			<div class="mt-8 flex justify-end gap-3">
+				<a
+					[routerLink]="['/users', userId(), 'edit']"
+					class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+				>
+					Modifier
+				</a>
 				<a
 					routerLink="/users"
 					class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"

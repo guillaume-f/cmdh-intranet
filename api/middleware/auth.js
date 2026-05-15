@@ -200,6 +200,10 @@ function checkRoutePermission(req, res) {
   if (path.startsWith('/api/users')) {
     const isSelf = path === `/api/users/${req.user.id}`
 
+    if ((method === 'PATCH' || method === 'PUT') && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Seul un administrateur peut modifier un utilisateur' })
+    }
+
     if (!isSelf && !hasPermission(req, 'user:manage')) {
       return permissionDenied(res, 'user:manage')
     }
