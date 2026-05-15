@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UserDto } from '../../core/auth/user.model';
+import { UserValidatedActivitiesSummaryDto } from './user-validated-activity.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,16 @@ export class UsersRepository {
       );
   
       return this.http.get<UserDto>(`${this.apiUrl}/${userId}`, { headers });
+    }
+
+    getValidatedActivitiesByUserId(userId: string): Observable<UserValidatedActivitiesSummaryDto> {
+      const token = this.getCookie('access_token');
+      const headers = new HttpHeaders().set(
+        'Authorization',
+        `Bearer ${token}`
+      );
+
+      return this.http.get<UserValidatedActivitiesSummaryDto>(`${this.apiUrl}/${userId}/validated-activities`, { headers });
     }
 
   private getCookie(name: string): string | undefined {

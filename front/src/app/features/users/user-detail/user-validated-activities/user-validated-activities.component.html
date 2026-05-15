@@ -1,0 +1,53 @@
+<section class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+	<div class="flex flex-col gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-start md:justify-between">
+		<div class="space-y-2">
+			<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Points validés</p>
+			<h3 class="text-xl font-semibold text-slate-900">Activités validées</h3>
+		</div>
+	</div>
+
+	@if (validatedActivities() === null) {
+		<div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+			Chargement des participations validées...
+		</div>
+	} @else if (validatedActivities()!.items.length === 0) {
+		<div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+			Aucune participation validée pour cet utilisateur.
+		</div>
+	} @else {
+		<p-table
+			[value]="validatedActivities()!.items"
+			[tableStyle]="{ 'min-width': '38rem' }"
+		>
+			<ng-template pTemplate="header">
+				<tr>
+					<th class="w-1/2">Activité</th>
+					<th>Date</th>
+					<th class="text-right">Points gagnés</th>
+				</tr>
+			</ng-template>
+
+			<ng-template pTemplate="body" let-activity>
+				<tr>
+					<td>
+						<a
+							[routerLink]="['/activities', activity.activityId]"
+							class="font-semibold text-sky-700 transition hover:text-sky-900 hover:underline"
+						>
+							{{ activity.title }}
+						</a>
+					</td>
+					<td>{{ activity.datetime | date: 'dd/MM/yyyy' }}</td>
+					<td class="text-right font-medium">{{ activity.points }}</td>
+				</tr>
+			</ng-template>
+
+			<ng-template pTemplate="footer">
+				<tr>
+					<td colspan="2" class="text-right font-semibold text-slate-700">Total</td>
+					<td class="text-right font-semibold text-slate-900">{{ validatedActivities()!.totalPoints }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

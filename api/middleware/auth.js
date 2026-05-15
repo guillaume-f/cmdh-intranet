@@ -18,6 +18,7 @@ const BULK_ADD_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/particip
 const REGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/register$/
 const UNREGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/unregister$/
 const ATTENDANCE_VALIDATION_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/([^/]+)\/(validate|invalidate)$/
+const USER_VALIDATED_ACTIVITIES_ROUTE_REGEX = /^\/api\/users\/([^/]+)\/validated-activities$/
 
 function permissionDenied(res, permission) {
   return res.status(403).json({ message: `Permission manquante : ${permission}` })
@@ -42,6 +43,37 @@ function buildActivityResponse(activity, registration) {
     requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
     isRegistered: !!registration,
     registeredAt: registration ? registration.registeredAt : null,
+  }
+}
+
+function buildValidatedActivityList(db, userId) {
+  const attendanceValidations = db
+    .get('attendanceValidations')
+    .filter({ userId, isPresent: true })
+    .value()
+
+  const activities = attendanceValidations
+    .map((validation) => {
+      const activity = db.get('activities').find({ id: validation.activityId }).value()
+      if (!activity) {
+        return null
+      }
+
+      return {
+        activityId: activity.id,
+        title: activity.title,
+        datetime: activity.datetime,
+        points: Number(activity.points) || 0,
+      }
+    })
+    .filter(Boolean)
+    .sort((left, right) => new Date(right.datetime).getTime() - new Date(left.datetime).getTime())
+
+  const totalPoints = activities.reduce((sum, activity) => sum + activity.points, 0)
+
+  return {
+    items: activities,
+    totalPoints,
   }
 }
 
@@ -392,6 +424,20 @@ module.exports = (req, res, next) => {
       .filter(Boolean)
 
     return res.json(participants)
+  }
+
+  // --- GET /api/users/:id/validated-activities ---
+  // Renvoie les activités validées d'un utilisateur avec le total des points.
+  const userValidatedActivitiesMatch = req.path.match(USER_VALIDATED_ACTIVITIES_ROUTE_REGEX)
+  if (req.method === 'GET' && userValidatedActivitiesMatch) {
+    const userId = userValidatedActivitiesMatch[1]
+
+    const user = db.get('users').find({ id: userId }).value()
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' })
+    }
+
+    return res.json(buildValidatedActivityList(db, userId))
   }
 
   // --- POST /api/activities/:id/register ---

@@ -7,11 +7,13 @@ import { BreadcrumbModule } from "primeng/breadcrumb";
 import { TagModule } from "primeng/tag";
 import { BehaviorSubject, map, switchMap, tap } from "rxjs";
 import { UsersRepository } from "../../../repositories/users/users.repository";
+import { UserValidatedActivitiesComponent } from "./user-validated-activities/user-validated-activities.component";
 
 @Component({
   selector: 'app-user-detail',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, RouterLink, TagModule],
+  imports: [BreadcrumbModule, RouterLink, TagModule, UserValidatedActivitiesComponent],
   templateUrl: './user-detail.component.html',
 })
 export class UserDetailComponent {
