@@ -26,7 +26,7 @@
                   pButton
                   type="button"
                   (click)="onValidatePresence(participant.userId, true)"
-                  [disabled]="isSubmitting()"
+                  [disabled]="isSubmitting() || participant.isPresent === true"
                 >
                   Valider présence
                 </button>
@@ -35,7 +35,7 @@
                   pButton
                   type="button"
                   (click)="onValidatePresence(participant.userId, false)"
-                  [disabled]="isSubmitting()"
+                  [disabled]="isSubmitting() || participant.isPresent === false"
                 >
                   Marquer absent
                 </button>
