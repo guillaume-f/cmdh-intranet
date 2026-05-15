@@ -11,6 +11,47 @@ const jwt = require('jsonwebtoken')
 
 const SECRET = 'intranet-dev-secret'
 
+const ACTIVITY_DETAIL_ROUTE_REGEX = /^\/api\/activities\/([^/]+)$/
+const ACTIVITY_PARTICIPANTS_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants$/
+const REGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/register$/
+const UNREGISTER_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/unregister$/
+const ATTENDANCE_VALIDATION_ROUTE_REGEX = /^\/api\/activities\/([^/]+)\/participants\/([^/]+)\/(validate|invalidate)$/
+
+function permissionDenied(res, permission) {
+  return res.status(403).json({ message: `Permission manquante : ${permission}` })
+}
+
+function getBearerToken(req) {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null
+  }
+  return authHeader.split(' ')[1]
+}
+
+function verifyToken(token) {
+  return jwt.verify(token, SECRET)
+}
+
+function buildActivityResponse(activity, registration) {
+  return {
+    ...activity,
+    requiresRegistration: activity.requiresRegistration !== false,
+    requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
+    isRegistered: !!registration,
+    registeredAt: registration ? registration.registeredAt : null,
+  }
+}
+
+function findActivityOr404(db, activityId, res) {
+  const activity = db.get('activities').find({ id: activityId }).value()
+  if (!activity) {
+    res.status(404).json({ message: 'Activité introuvable' })
+    return null
+  }
+  return activity
+}
+
 // ---------------------------------------------------------------------------
 // Calcul des permissions effectives d'un utilisateur
 // ---------------------------------------------------------------------------
@@ -68,31 +109,31 @@ function checkRoutePermission(req, res) {
   // --- Activités ---
   if (path.startsWith('/api/activities')) {
     if (method === 'GET' && !hasPermission(req, 'activity:read')) {
-      return res.status(403).json({ message: 'Permission manquante : activity:read' })
+      return permissionDenied(res, 'activity:read')
     }
     if (isRegisterRoute && method === 'POST' && !hasPermission(req, 'registration:create')) {
-      return res.status(403).json({ message: 'Permission manquante : registration:create' })
+      return permissionDenied(res, 'registration:create')
     }
     if (isUnregisterRoute && method === 'POST' && !hasPermission(req, 'registration:delete')) {
-      return res.status(403).json({ message: 'Permission manquante : registration:delete' })
+      return permissionDenied(res, 'registration:delete')
     }
     if (isAttendanceValidationRoute && method === 'POST' && !hasPermission(req, 'attendance:validate')) {
-      return res.status(403).json({ message: 'Permission manquante : attendance:validate' })
+      return permissionDenied(res, 'attendance:validate')
     }
     if (method === 'POST' && !isRegisterRoute && !isUnregisterRoute && !isAttendanceValidationRoute && !hasPermission(req, 'activity:create')) {
-      return res.status(403).json({ message: 'Permission manquante : activity:create' })
+      return permissionDenied(res, 'activity:create')
     }
     if (method === 'PATCH' || method === 'PUT') {
       if (!hasPermission(req, 'activity:edit')) {
-        return res.status(403).json({ message: 'Permission manquante : activity:edit' })
+        return permissionDenied(res, 'activity:edit')
       }
       // Publication : changer status vers "published" nécessite activity:publish
       if (req.body?.status === 'published' && !hasPermission(req, 'activity:publish')) {
-        return res.status(403).json({ message: 'Permission manquante : activity:publish' })
+        return permissionDenied(res, 'activity:publish')
       }
     }
     if (method === 'DELETE' && !hasPermission(req, 'activity:delete')) {
-      return res.status(403).json({ message: 'Permission manquante : activity:delete' })
+      return permissionDenied(res, 'activity:delete')
     }
   }
 
@@ -103,14 +144,14 @@ function checkRoutePermission(req, res) {
       // (filtré par ?userId= dans la query)
       const isOwnQuery = req.query.userId === req.user.id
       if (!isOwnQuery) {
-        return res.status(403).json({ message: 'Permission manquante : registration:read' })
+        return permissionDenied(res, 'registration:read')
       }
     }
     if (method === 'POST' && !hasPermission(req, 'registration:create')) {
-      return res.status(403).json({ message: 'Permission manquante : registration:create' })
+      return permissionDenied(res, 'registration:create')
     }
     if (method === 'DELETE' && !hasPermission(req, 'registration:delete')) {
-      return res.status(403).json({ message: 'Permission manquante : registration:delete' })
+      return permissionDenied(res, 'registration:delete')
     }
   }
 
@@ -119,7 +160,7 @@ function checkRoutePermission(req, res) {
     const isSelf = path === `/api/users/${req.user.id}`
 
     if (!isSelf && !hasPermission(req, 'user:manage')) {
-      return res.status(403).json({ message: 'Permission manquante : user:manage' })
+      return permissionDenied(res, 'user:manage')
     }
     // Même soi-même ne peut pas changer son propre rôle ou ses permissions
     if (isSelf && (method === 'PATCH' || method === 'PUT')) {
@@ -215,12 +256,12 @@ module.exports = (req, res, next) => {
 
   // --- GET /auth/me — recharge les permissions depuis la DB (utile si modifiées) ---
   if (req.method === 'GET' && req.path === '/auth/me') {
-    const authHeader = req.headers.authorization
-    if (!authHeader?.startsWith('Bearer ')) {
+    const token = getBearerToken(req)
+    if (!token) {
       return res.status(401).json({ message: 'Token manquant' })
     }
     try {
-      const decoded = jwt.verify(authHeader.split(' ')[1], SECRET)
+      const decoded = verifyToken(token)
       const user = db.get('users').find({ id: decoded.id, active: true }).value()
       if (!user) return res.status(401).json({ message: 'Utilisateur introuvable' })
 
@@ -236,14 +277,14 @@ module.exports = (req, res, next) => {
   if (isPublicRoute(req.method, req.path)) return next()
 
   // --- Vérification JWT pour toutes les autres routes ---
-  const authHeader = req.headers.authorization
-  if (!authHeader?.startsWith('Bearer ')) {
+  const token = getBearerToken(req)
+  if (!token) {
     return res.status(401).json({ message: 'Token manquant' })
   }
 
   let decoded
   try {
-    decoded = jwt.verify(authHeader.split(' ')[1], SECRET)
+    decoded = verifyToken(token)
   } catch {
     return res.status(401).json({ message: 'Token invalide ou expiré' })
   }
@@ -277,13 +318,7 @@ module.exports = (req, res, next) => {
 
     const enrichedActivities = activities.map((activity) => {
       const registration = registrationsByActivityId.get(activity.id)
-      return {
-        ...activity,
-        requiresRegistration: activity.requiresRegistration !== false,
-        requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
-        isRegistered: !!registration,
-        registeredAt: registration ? registration.registeredAt : null,
-      }
+      return buildActivityResponse(activity, registration)
     })
 
     return res.json(enrichedActivities)
@@ -291,39 +326,29 @@ module.exports = (req, res, next) => {
 
   // --- GET /api/activities/:id ---
   // Renvoie l'activité avec l'état d'inscription de l'utilisateur connecté.
-  const activityDetailMatch = req.path.match(/^\/api\/activities\/([^/]+)$/)
+  const activityDetailMatch = req.path.match(ACTIVITY_DETAIL_ROUTE_REGEX)
   if (req.method === 'GET' && activityDetailMatch) {
     const activityId = activityDetailMatch[1]
 
-    const activity = db.get('activities').find({ id: activityId }).value()
-    if (!activity) {
-      return res.status(404).json({ message: 'Activité introuvable' })
-    }
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
 
     const registration = db
       .get('registrations')
       .find({ activityId, userId: req.user.id })
       .value()
 
-    return res.json({
-      ...activity,
-      requiresRegistration: activity.requiresRegistration !== false,
-      requiresAttendanceValidation: activity.requiresAttendanceValidation !== false,
-      isRegistered: !!registration,
-      registeredAt: registration ? registration.registeredAt : null,
-    })
+    return res.json(buildActivityResponse(activity, registration))
   }
 
   // --- GET /api/activities/:id/participants ---
   // Renvoie la liste des membres inscrits à une activité.
-  const activityParticipantsMatch = req.path.match(/^\/api\/activities\/([^/]+)\/participants$/)
+  const activityParticipantsMatch = req.path.match(ACTIVITY_PARTICIPANTS_ROUTE_REGEX)
   if (req.method === 'GET' && activityParticipantsMatch) {
     const activityId = activityParticipantsMatch[1]
 
-    const activity = db.get('activities').find({ id: activityId }).value()
-    if (!activity) {
-      return res.status(404).json({ message: 'Activité introuvable' })
-    }
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
 
     const registrations = db
       .get('registrations')
@@ -361,14 +386,12 @@ module.exports = (req, res, next) => {
   }
 
   // --- POST /api/activities/:id/register ---
-  const registerMatch = req.path.match(/^\/api\/activities\/([^/]+)\/register$/)
+  const registerMatch = req.path.match(REGISTER_ROUTE_REGEX)
   if (req.method === 'POST' && registerMatch) {
     const activityId = registerMatch[1]
 
-    const activity = db.get('activities').find({ id: activityId }).value()
-    if (!activity) {
-      return res.status(404).json({ message: 'Activité introuvable' })
-    }
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
 
     if (activity.requiresRegistration === false) {
       return res.status(400).json({ message: 'Les inscriptions ne sont pas requises pour cette activité' })
@@ -403,17 +426,15 @@ module.exports = (req, res, next) => {
   }
 
   // --- POST /api/activities/:id/participants/:userId/validate|invalidate ---
-  const attendanceValidationMatch = req.path.match(/^\/api\/activities\/([^/]+)\/participants\/([^/]+)\/(validate|invalidate)$/)
+  const attendanceValidationMatch = req.path.match(ATTENDANCE_VALIDATION_ROUTE_REGEX)
   if (req.method === 'POST' && attendanceValidationMatch) {
     const activityId = attendanceValidationMatch[1]
     const userId = attendanceValidationMatch[2]
     const action = attendanceValidationMatch[3]
     const isPresent = action === 'validate'
 
-    const activity = db.get('activities').find({ id: activityId }).value()
-    if (!activity) {
-      return res.status(404).json({ message: 'Activité introuvable' })
-    }
+    const activity = findActivityOr404(db, activityId, res)
+    if (!activity) return
 
     const user = db.get('users').find({ id: userId }).value()
     if (!user) {
@@ -471,7 +492,7 @@ module.exports = (req, res, next) => {
   }
 
   // --- POST /api/activities/:id/unregister ---
-  const unregisterMatch = req.path.match(/^\/api\/activities\/([^/]+)\/unregister$/)
+  const unregisterMatch = req.path.match(UNREGISTER_ROUTE_REGEX)
   if (req.method === 'POST' && unregisterMatch) {
     const activityId = unregisterMatch[1]
 
