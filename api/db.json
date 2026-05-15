@@ -346,6 +346,20 @@
       "userId": "u1",
       "registeredAt": "2026-05-08T15:01:56.744Z",
       "status": "confirmed"
+    },
+    {
+      "id": "r1778835302181",
+      "activityId": "pPQ4owx",
+      "userId": "u2",
+      "registeredAt": "2026-05-15T08:55:02.181Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "r1778835304428",
+      "activityId": "HtjHp7-",
+      "userId": "u2",
+      "registeredAt": "2026-05-15T08:55:04.428Z",
+      "status": "confirmed"
     }
   ],
   "passwordResets": []
