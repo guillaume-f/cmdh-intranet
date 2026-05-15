@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { TagModule } from 'primeng/tag';
 import { UserDto } from '../../../core/auth/user.model';
 import { UsersRepository } from '../../../repositories/users/users.repository';
 
 @Component({
   selector: 'app-user-list.component',
-  imports: [RouterLink],
+  imports: [RouterLink, TagModule],
   templateUrl: './user-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
