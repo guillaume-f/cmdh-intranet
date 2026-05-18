@@ -60,7 +60,8 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678901"
+      "niss": "12345678901",
+      "entryYear": 2010
     },
     {
       "id": "u2",
@@ -72,7 +73,8 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678902"
+      "niss": "12345678902",
+      "entryYear": 2012
     },
     {
       "id": "u3",
@@ -84,7 +86,8 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678903"
+      "niss": "12345678903",
+      "entryYear": 2015
     },
     {
       "id": "u4",
@@ -96,7 +99,8 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678904"
+      "niss": "12345678904",
+      "entryYear": null
     },
     {
       "id": "u5",
@@ -110,7 +114,8 @@
       ],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678905"
+      "niss": "12345678905",
+      "entryYear": 2018
     },
     {
       "id": "u6",
@@ -125,7 +130,8 @@
         "activity:publish"
       ],
       "active": true,
-      "niss": "12345678906"
+      "niss": "12345678906",
+      "entryYear": 2011
     },
     {
       "id": "u7",
@@ -137,7 +143,8 @@
       "extraPermissions": [],
       "deniedPermissions": [],
       "active": true,
-      "niss": "12345678910"
+      "niss": "12345678910",
+      "entryYear": 2020
     }
   ],
   "activities": [

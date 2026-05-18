@@ -128,6 +128,14 @@ function buildNextUserId(db) {
   return `u${maxId + 1}`
 }
 
+function normalizeEntryYear(rawEntryYear) {
+  const value = Number(String(rawEntryYear).trim())
+  if (!Number.isInteger(value) || value < 1000 || value > 9999) {
+    return null
+  }
+  return value
+}
+
 // ---------------------------------------------------------------------------
 // Routes publiques (pas de token requis)
 // ---------------------------------------------------------------------------
@@ -368,7 +376,7 @@ module.exports = (req, res, next) => {
       return res.status(403).json({ message: 'Seul un administrateur peut créer un utilisateur' })
     }
 
-    const { firstName, lastName, email, niss, role, active } = req.body || {}
+    const { firstName, lastName, email, niss, role, active, entryYear } = req.body || {}
 
     if (!firstName || !lastName || !email || !niss || !role) {
       return res.status(400).json({ message: 'Les champs firstName, lastName, email, niss et role sont obligatoires' })
@@ -393,6 +401,18 @@ module.exports = (req, res, next) => {
       return res.status(409).json({ message: 'Un utilisateur avec ce NISS existe déjà' })
     }
 
+    let normalizedEntryYear = null
+    if (normalizedRole !== 'candidate') {
+      if (entryYear === undefined || entryYear === null || String(entryYear).trim() === '') {
+        return res.status(400).json({ message: "Le champ entryYear est obligatoire pour les rôles admin, encoder et member" })
+      }
+
+      normalizedEntryYear = normalizeEntryYear(entryYear)
+      if (normalizedEntryYear === null) {
+        return res.status(400).json({ message: "Le champ entryYear doit être une année sur 4 chiffres" })
+      }
+    }
+
     const createdUser = {
       id: buildNextUserId(db),
       email: normalizedEmail,
@@ -404,6 +424,7 @@ module.exports = (req, res, next) => {
       deniedPermissions: [],
       active: typeof active === 'boolean' ? active : true,
       niss: normalizedNiss,
+      entryYear: normalizedRole === 'candidate' ? null : normalizedEntryYear,
     }
 
     db.get('users').push(createdUser).write()
@@ -412,6 +433,77 @@ module.exports = (req, res, next) => {
     const { password: _pwd, ...userWithoutPassword } = createdUser
 
     return res.status(201).json({
+      ...userWithoutPassword,
+      permissions,
+    })
+  }
+
+  const userDetailMatch = req.path.match(/^\/api\/users\/([^/]+)$/)
+  if ((req.method === 'PATCH' || req.method === 'PUT') && userDetailMatch) {
+    const userId = userDetailMatch[1]
+    const existingUser = db.get('users').find({ id: userId }).value()
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' })
+    }
+
+    const payload = req.body || {}
+    const nextRole = payload.role !== undefined ? String(payload.role).trim() : existingUser.role
+
+    const roleExists = !!db.get('roles').find({ id: nextRole }).value()
+    if (!roleExists) {
+      return res.status(400).json({ message: 'Rôle invalide' })
+    }
+
+    let normalizedEntryYear = null
+    const rawEntryYear = payload.entryYear !== undefined ? payload.entryYear : existingUser.entryYear
+
+    if (nextRole !== 'candidate') {
+      if (rawEntryYear === undefined || rawEntryYear === null || String(rawEntryYear).trim() === '') {
+        return res.status(400).json({ message: "Le champ entryYear est obligatoire pour les rôles admin, encoder et member" })
+      }
+
+      normalizedEntryYear = normalizeEntryYear(rawEntryYear)
+      if (normalizedEntryYear === null) {
+        return res.status(400).json({ message: "Le champ entryYear doit être une année sur 4 chiffres" })
+      }
+    }
+
+    let normalizedEmail
+    if (payload.email !== undefined) {
+      normalizedEmail = String(payload.email).trim().toLowerCase()
+      const emailExists = !!db.get('users').find((user) => user.id !== userId && String(user.email || '').toLowerCase() === normalizedEmail).value()
+      if (emailExists) {
+        return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà' })
+      }
+    }
+
+    let normalizedNiss
+    if (payload.niss !== undefined) {
+      normalizedNiss = String(payload.niss).trim()
+      const nissExists = !!db.get('users').find((user) => user.id !== userId && String(user.niss || '').trim() === normalizedNiss).value()
+      if (nissExists) {
+        return res.status(409).json({ message: 'Un utilisateur avec ce NISS existe déjà' })
+      }
+    }
+
+    const updates = {
+      ...payload,
+      role: nextRole,
+      entryYear: nextRole === 'candidate' ? null : normalizedEntryYear,
+      ...(payload.email !== undefined ? { email: normalizedEmail } : {}),
+      ...(payload.niss !== undefined ? { niss: normalizedNiss } : {}),
+      ...(payload.firstName !== undefined ? { firstName: String(payload.firstName).trim() } : {}),
+      ...(payload.lastName !== undefined ? { lastName: String(payload.lastName).trim() } : {}),
+    }
+
+    db.get('users').find({ id: userId }).assign(updates).write()
+
+    const updatedUser = db.get('users').find({ id: userId }).value()
+    const permissions = resolvePermissions(updatedUser, db)
+    const { password: _pwd, ...userWithoutPassword } = updatedUser
+
+    return res.json({
       ...userWithoutPassword,
       permissions,
     })

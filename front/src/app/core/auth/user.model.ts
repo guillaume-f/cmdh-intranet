@@ -12,4 +12,5 @@ export interface UserDto {
   permissions: Permission[]
   active: boolean
   niss: string
+  entryYear: number | null
 }
