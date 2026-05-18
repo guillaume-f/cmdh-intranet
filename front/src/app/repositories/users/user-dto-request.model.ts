@@ -5,7 +5,7 @@ export interface UserDtoRequest {
   lastName: string;
   email: string;
   niss: string;
-  entryYear: number | null;
+  entryYear?: number | null;
   role: UserRole;
   active: boolean;
 }

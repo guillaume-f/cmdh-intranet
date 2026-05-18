@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
@@ -13,15 +13,18 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { UserRole } from '../../../core/auth/user-role.type';
 import { UsersRepository } from '../../../repositories/users/users.repository';
-import { EMAIL_PATTERN } from '../../../utilities/patterns';
+import { UserEditFormValue } from './models/user-edit-form.model';
+import { UserEditFormService } from './user-edit-form.service';
 
 @Component({
   selector: 'app-user-edit',
+  providers: [UserEditFormService],
   imports: [
     ReactiveFormsModule,
     RouterLink,
     BreadcrumbModule,
     InputTextModule,
+    InputNumberModule,
     SelectModule,
     ToggleSwitchModule,
     ButtonModule,
@@ -31,18 +34,19 @@ import { EMAIL_PATTERN } from '../../../utilities/patterns';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserEditComponent implements OnInit {
-  private readonly destroyRef = inject(DestroyRef);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly usersRepository = inject(UsersRepository);
+  private readonly userEditFormService = inject(UserEditFormService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly fb = inject(FormBuilder);
 
   private readonly userId = signal(this.activatedRoute.snapshot.paramMap.get('userId') ?? '');
   private readonly isEditMode = computed(() => !!this.userId());
   private readonly userName = signal('');
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);
+  protected readonly entryYearMin = 1985;
+  protected readonly entryYearMax = new Date().getFullYear();
 
   protected readonly roleOptions: { label: string; value: UserRole }[] = [
     { label: 'Administrateur', value: 'admin' },
@@ -60,15 +64,7 @@ export class UserEditComponent implements OnInit {
   protected readonly submitLabel = computed(() => this.isEditMode() ? 'Enregistrer' : 'Créer');
   protected readonly cancelLink = computed<(string | number)[]>(() => this.isEditMode() ? ['/users', this.userId()] : ['/users']);
 
-  protected readonly form = this.fb.nonNullable.group({
-    firstName: ['', [Validators.required, Validators.maxLength(100)]],
-    lastName: ['', [Validators.required, Validators.maxLength(100)]],
-    email: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN)]],
-    niss: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
-    entryYear: ['', [Validators.pattern(/^\d{4}$/)]],
-    role: ['member' as UserRole, [Validators.required]],
-    active: [true],
-  });
+  protected readonly form = this.userEditFormService.buildForm();
 
   ngOnInit(): void {
     if (this.authService.userRole() !== 'admin') {
@@ -80,7 +76,6 @@ export class UserEditComponent implements OnInit {
       this.loadUser();
     }
 
-    this.setupEntryYearConstraints();
   }
 
   protected onSubmit(): void {
@@ -91,15 +86,11 @@ export class UserEditComponent implements OnInit {
 
     this.isSaving.set(true);
 
-    const rawValue = this.form.getRawValue();
-    const request = {
-      ...rawValue,
-      entryYear: rawValue.role === 'candidate' ? null : Number(rawValue.entryYear),
-    };
+    const formValue = this.form.getRawValue() as UserEditFormValue;
 
     const request$ = this.isEditMode() && this.userId()
-      ? this.usersRepository.updateUser(this.userId(), request)
-      : this.usersRepository.addUser(request);
+      ? this.usersRepository.updateUser(this.userId(), formValue)
+      : this.usersRepository.addUser(formValue);
 
     request$.pipe(
       finalize(() => this.isSaving.set(false))
@@ -119,36 +110,7 @@ export class UserEditComponent implements OnInit {
       finalize(() => this.isLoading.set(false))
     ).subscribe((user) => {
       this.userName.set(`${user.firstName} ${user.lastName}`.trim());
-      this.form.patchValue({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        niss: user.niss,
-        entryYear: user.entryYear ? String(user.entryYear) : '',
-        role: user.role,
-        active: user.active,
-      });
+      this.userEditFormService.patchValue(this.form, user);
     });
-  }
-
-  private setupEntryYearConstraints(): void {
-    this.updateEntryYearConstraints(this.form.controls.role.value);
-
-    this.form.controls.role.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((role) => this.updateEntryYearConstraints(role));
-  }
-
-  private updateEntryYearConstraints(role: UserRole): void {
-    if (role === 'candidate') {
-      this.form.controls.entryYear.setValue('');
-      this.form.controls.entryYear.clearValidators();
-      this.form.controls.entryYear.disable({ emitEvent: false });
-    } else {
-      this.form.controls.entryYear.enable({ emitEvent: false });
-      this.form.controls.entryYear.setValidators([Validators.required, Validators.pattern(/^\d{4}$/)]);
-    }
-
-    this.form.controls.entryYear.updateValueAndValidity();
   }
 }

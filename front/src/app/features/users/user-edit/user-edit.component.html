@@ -77,24 +77,6 @@
           </div>
 
           <div class="flex flex-col gap-1">
-            <label for="entryYear" class="text-sm font-medium text-slate-700">Année de rentrée</label>
-            <input
-              pInputText
-              id="entryYear"
-              type="number"
-              [formControl]="form.controls.entryYear"
-              class="w-full"
-              min="1900"
-            />
-            @if (form.controls.entryYear.errors?.['required'] && form.controls.entryYear.touched) {
-              <p-message severity="error" variant="simple" size="small">L'année de rentrée est obligatoire.</p-message>
-            }
-            @if (form.controls.entryYear.errors?.['pattern'] && form.controls.entryYear.touched) {
-              <p-message severity="error" variant="simple" size="small">L'année de rentrée doit contenir 4 chiffres.</p-message>
-            }
-          </div>
-
-          <div class="flex flex-col gap-1">
             <label for="role" class="text-sm font-medium text-slate-700">Rôle</label>
             <p-select
               inputId="role"
@@ -106,6 +88,31 @@
             />
           </div>
         </div>
+
+        @if (form.controls.entryYear) {
+          <div class="flex flex-col gap-1">
+            <label for="entryYear" class="text-sm font-medium text-slate-700">Année de rentrée</label>
+          <p-inputnumber
+              id="entryYear"
+              [formControl]="form.controls.entryYear"
+              class="w-full"
+            [min]="entryYearMin"
+            [max]="entryYearMax"
+            [useGrouping]="false"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="0"
+          />
+            @if (form.controls.entryYear.errors?.['required'] && form.controls.entryYear.touched) {
+              <p-message severity="error" variant="simple" size="small">L'année de rentrée est obligatoire.</p-message>
+            }
+          @if (form.controls.entryYear.errors?.['min'] && form.controls.entryYear.touched) {
+            <p-message severity="error" variant="simple" size="small">L'année de rentrée doit être supérieure ou égale à {{ entryYearMin }}.</p-message>
+          }
+          @if (form.controls.entryYear.errors?.['max'] && form.controls.entryYear.touched) {
+            <p-message severity="error" variant="simple" size="small">L'année de rentrée doit être inférieure ou égale à {{ entryYearMax }}.</p-message>
+            }
+          </div>
+      }
 
         <div class="flex items-center gap-3 rounded-xl bg-slate-50 p-4">
           <p-toggleswitch
