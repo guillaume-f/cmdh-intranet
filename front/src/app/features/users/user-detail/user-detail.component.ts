@@ -21,8 +21,8 @@ export class UserDetailComponent {
     private readonly activatedRoute = inject(ActivatedRoute);
     private readonly userRepository = inject(UsersRepository);
 
-      private readonly refreshDataSource = new BehaviorSubject<void>(void 0);
-      private readonly refreshData$ = this.refreshDataSource.asObservable();
+    private readonly refreshDataSource = new BehaviorSubject<void>(void 0);
+    private readonly refreshData$ = this.refreshDataSource.asObservable();
     
     protected readonly breadcrumbItems = computed<MenuItem[]>(() => [
     { label: this.translateService.instant('USERS.BREADCRUMB.LIST'), routerLink: '/users' },
@@ -30,13 +30,13 @@ export class UserDetailComponent {
   ]);
 
     protected readonly userId = toSignal(
-    this.activatedRoute.paramMap.pipe(
-      map((params) => params.get('userId')),
-      map((value) => value ?? ''),
-      tap(() => this.refreshDataSource.next())
-    ),
-    { initialValue: '' }
-  );
+      this.activatedRoute.paramMap.pipe(
+        map((params) => params.get('userId')),
+        map((value) => value ?? ''),
+        tap(() => this.refreshDataSource.next())
+      ),
+      { initialValue: '' }
+    );
 
     protected readonly user = toSignal(
       this.refreshData$.pipe(
@@ -44,4 +44,7 @@ export class UserDetailComponent {
       ),
       { initialValue: null }
     );
+
+    protected readonly isCandidate = computed(() => this.user()?.role === 'candidate');
+
 }
