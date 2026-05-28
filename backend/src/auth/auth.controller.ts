@@ -1,39 +1,48 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { MeResponseDto } from './dto/me-response.dto';
+import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @Post('login')
-  login(@Body() payload: Record<string, unknown>) {
-    return {
-      token: '',
-      user: {},
-      request: payload,
-    };
+  @ApiOkResponse({ type: LoginResponseDto })
+  login(@Body() payload: LoginRequestDto): LoginResponseDto {
+    return this.authService.login(payload as unknown as Record<string, unknown>);
   }
 
   @Post('forgot-password')
-  forgotPassword(@Body() payload: Record<string, unknown>) {
-    return {
-      message: 'If this email exists, a reset link has been sent.',
-      request: payload,
-    };
+  @ApiOkResponse({ type: ForgotPasswordResponseDto })
+  forgotPassword(
+    @Body() payload: ForgotPasswordRequestDto,
+  ): ForgotPasswordResponseDto {
+    return this.authService.forgotPassword(
+      payload as unknown as Record<string, unknown>,
+    );
   }
 
   @Post('reset-password')
-  resetPassword(@Body() payload: Record<string, unknown>) {
-    return {
-      message: 'Password updated successfully.',
-      request: payload,
-    };
+  @ApiOkResponse({ type: ResetPasswordResponseDto })
+  resetPassword(
+    @Body() payload: ResetPasswordRequestDto,
+  ): ResetPasswordResponseDto {
+    return this.authService.resetPassword(
+      payload as unknown as Record<string, unknown>,
+    );
   }
 
   @Get('me')
-  me() {
-    return {
-      id: '',
-      email: '',
-      role: '',
-      permissions: [],
-    };
+  @ApiOkResponse({ type: MeResponseDto })
+  me(): MeResponseDto {
+    return this.authService.me();
   }
 }
