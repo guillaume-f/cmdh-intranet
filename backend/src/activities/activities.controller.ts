@@ -1,44 +1,17 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ActivitiesService } from './activities.service';
+import { ActivityDto } from './activity.dto';
 
+@ApiTags('activities')
 @Controller('activities')
 export class ActivitiesController {
+  constructor(private readonly activitiesService: ActivitiesService) {}
+
   @Get()
-  getAllActivities() {
-    return [];
-  }
-
-  @Get(':activityId')
-  getActivityById(@Param('activityId') activityId: string) {
-    return {
-      id: activityId,
-    };
-  }
-
-  @Post()
-  addActivity(@Body() payload: Record<string, unknown>) {
-    return {
-      id: '',
-      created: payload,
-    };
-  }
-
-  @Patch(':activityId')
-  updateActivity(
-    @Param('activityId') activityId: string,
-    @Body() payload: Record<string, unknown>,
-  ) {
-    return {
-      id: activityId,
-      updates: payload,
-    };
+  @ApiOkResponse({ type: [ActivityDto] })
+  getAllActivities(): ActivityDto[] {
+    return this.activitiesService.findAll();
   }
 
   @Delete(':activityId')
