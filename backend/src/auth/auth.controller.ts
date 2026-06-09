@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
@@ -8,6 +8,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { MeResponseDto } from './dto/me-response.dto';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,7 +17,7 @@ export class AuthController {
 
   @Post('login')
   @ApiOkResponse({ type: LoginResponseDto })
-  login(@Body() payload: LoginRequestDto): LoginResponseDto {
+  async login(@Body() payload: LoginRequestDto): Promise<LoginResponseDto> {
     return this.authService.login(payload as unknown as Record<string, unknown>);
   }
 
@@ -41,8 +42,9 @@ export class AuthController {
   }
 
   @Get('me')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: MeResponseDto })
-  me(): MeResponseDto {
-    return this.authService.me();
+  async me(@Request() req: { user: any }): Promise<MeResponseDto> {
+    return this.authService.me(req.user);
   }
 }

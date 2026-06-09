@@ -5,8 +5,32 @@ export class UpdateUserResponseDto {
   id!: string;
 
   @ApiProperty()
-  found!: boolean;
+  email!: string;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  updates!: Record<string, unknown>;
+  @ApiProperty()
+  firstName!: string;
+
+  @ApiProperty()
+  lastName!: string;
+
+  @ApiProperty()
+  role!: string;
+
+  @ApiProperty({ type: [String] })
+  extraPermissions!: string[];
+
+  @ApiProperty({ type: [String] })
+  deniedPermissions!: string[];
+
+  @ApiProperty()
+  active!: boolean;
+
+  @ApiProperty()
+  niss!: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  entryYear!: number | null;
+
+  @ApiProperty({ type: [String] })
+  permissions!: string[];
 }

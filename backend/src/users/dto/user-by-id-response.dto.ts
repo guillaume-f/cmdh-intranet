@@ -1,39 +1,36 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+﻿import { ApiProperty } from '@nestjs/swagger';
 
 export class UserByIdResponseDto {
   @ApiProperty()
   id!: string;
 
   @ApiProperty()
-  found!: boolean;
+  email!: string;
 
-  @ApiPropertyOptional()
-  email?: string;
+  @ApiProperty()
+  firstName!: string;
 
-  @ApiPropertyOptional()
-  firstName?: string;
+  @ApiProperty()
+  lastName!: string;
 
-  @ApiPropertyOptional()
-  lastName?: string;
+  @ApiProperty()
+  role!: string;
 
-  @ApiPropertyOptional()
-  role?: string;
+  @ApiProperty({ type: [String] })
+  extraPermissions!: string[];
 
-  @ApiPropertyOptional({ type: [String] })
-  extraPermissions?: string[];
+  @ApiProperty({ type: [String] })
+  deniedPermissions!: string[];
 
-  @ApiPropertyOptional({ type: [String] })
-  deniedPermissions?: string[];
+  @ApiProperty()
+  active!: boolean;
 
-  @ApiPropertyOptional()
-  active?: boolean;
+  @ApiProperty()
+  niss!: string;
 
-  @ApiPropertyOptional()
-  niss?: string;
+  @ApiProperty({ required: false, nullable: true })
+  entryYear!: number | null;
 
-  @ApiPropertyOptional({ nullable: true })
-  entryYear?: number | null;
-
-  @ApiPropertyOptional({ type: [String] })
-  permissions?: string[];
+  @ApiProperty({ type: [String] })
+  permissions!: string[];
 }

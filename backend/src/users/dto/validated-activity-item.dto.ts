@@ -14,8 +14,8 @@ export class ValidatedActivityItemDto {
   points!: number;
 
   @ApiProperty()
-  validatedAt!: string;
+  validatedAt!: Date;
 
-  @ApiProperty()
-  validatedBy!: string;
+  @ApiProperty({ nullable: true })
+  validatedBy!: string | null;
 }

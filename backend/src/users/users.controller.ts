@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiParam,
-  ApiTags,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiParam,
+    ApiTags,
 } from '@nestjs/swagger';
 import { AddUserResponseDto } from './dto/add-user-response.dto';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';
@@ -20,33 +20,33 @@ export class UsersController {
 
   @Get()
   @ApiOkResponse({ type: [UserResponseDto] })
-  getAllUsers(): UserResponseDto[] {
+  async getAllUsers(): Promise<UserResponseDto[]> {
     return this.usersService.getAllUsers();
   }
 
   @Get(':userId')
   @ApiParam({ name: 'userId', type: String })
   @ApiOkResponse({ type: UserByIdResponseDto })
-  getUserById(@Param('userId') userId: string): UserByIdResponseDto {
+  async getUserById(@Param('userId') userId: string): Promise<UserByIdResponseDto> {
     return this.usersService.getUserById(userId);
   }
 
   @Get(':userId/validated-activities')
   @ApiParam({ name: 'userId', type: String })
   @ApiOkResponse({ type: UserValidatedActivitiesResponseDto })
-  getValidatedActivitiesByUserId(
+  async getValidatedActivitiesByUserId(
     @Param('userId') userId: string,
-  ): UserValidatedActivitiesResponseDto {
+  ): Promise<UserValidatedActivitiesResponseDto> {
     return this.usersService.getValidatedActivitiesByUserId(userId);
   }
 
   @Patch(':userId')
   @ApiParam({ name: 'userId', type: String })
   @ApiOkResponse({ type: UpdateUserResponseDto })
-  updateUser(
+  async updateUser(
     @Param('userId') userId: string,
     @Body() payload: UserPayloadDto,
-  ): UpdateUserResponseDto {
+  ): Promise<UpdateUserResponseDto> {
     return this.usersService.updateUser(
       userId,
       payload as unknown as Record<string, unknown>,
@@ -55,7 +55,7 @@ export class UsersController {
 
   @Post()
   @ApiCreatedResponse({ type: AddUserResponseDto })
-  addUser(@Body() payload: UserPayloadDto): AddUserResponseDto {
+  async addUser(@Body() payload: UserPayloadDto): Promise<AddUserResponseDto> {
     return this.usersService.addUser(payload as unknown as Record<string, unknown>);
   }
 }
