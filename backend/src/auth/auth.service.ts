@@ -1,9 +1,16 @@
 ﻿import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { ForgotPasswordDto } from 'src/models/auth/forgot-password.dto';
+import { ForgotPasswordRequest } from 'src/models/auth/forgot-password.request';
+import { LoginDto } from 'src/models/auth/login.dto';
+import { LoginRequest } from 'src/models/auth/login.request';
+import { MeDto } from 'src/models/auth/me.dto';
+import { ResetPasswordDto } from 'src/models/auth/reset-password.dto';
+import { ResetPasswordRequest } from 'src/models/auth/reset-password.request';
 import { RolesService } from '../roles/roles.service';
-import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -13,9 +20,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(payload: Record<string, unknown>) {
-    const email = typeof payload.email === 'string' ? payload.email : '';
-    const password = typeof payload.password === 'string' ? payload.password : '';
+  async login(payload: LoginRequest): Promise<LoginDto> {
+    const { email, password } = payload;
 
     const user = await this.usersService.findByEmail(email);
 
@@ -39,27 +45,26 @@ export class AuthService {
     };
   }
 
-  forgotPassword(payload: Record<string, unknown>) {
+  forgotPassword(payload: ForgotPasswordRequest): ForgotPasswordDto {
     return {
       message: 'If this email exists, a reset link has been sent.',
-      request: payload,
     };
   }
 
-  resetPassword(payload: Record<string, unknown>) {
+  resetPassword(payload: ResetPasswordRequest): ResetPasswordDto {
     return {
       message: 'Password updated successfully.',
-      request: payload,
     };
   }
 
-  async me(user: User) {
+  me(user: User): MeDto {
     const permissions = this.rolesService.resolvePermissions(user);
     return {
       id: user.id,
-      email: user.email,
       role: user.role?.id ?? '',
       permissions,
+      firstName: user.firstName,
+      lastName: user.lastName,
     };
   }
 }

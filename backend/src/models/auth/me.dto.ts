@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class MeResponseDto {
+export class MeDto {
   @ApiProperty()
   id!: string;
 
   @ApiProperty()
-  email!: string;
+  firstName!: string;
+
+  @ApiProperty()
+  lastName!: string;
 
   @ApiProperty()
   role!: string;

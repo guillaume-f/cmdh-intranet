@@ -21,6 +21,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { OptionalLabelDirective } from '../../../directives/optional-label.directive';
 import { AuthRepository } from '../../../repositories/auth/auth.repository';
@@ -80,7 +81,12 @@ export class LoginComponent {
 
     this.authRepository.login(request)
     .pipe(
-      takeUntilDestroyed(this.destroyRef))
+      takeUntilDestroyed(this.destroyRef),
+      catchError((error) => {
+        this.isLoading.set(false);
+        return throwError(() => error);
+      }
+    ))
       .subscribe((loginInfos: LoginDto) => {
         this.authService.setUser(loginInfos.user);
         this.authService.setToken(loginInfos.token);
