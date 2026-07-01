@@ -1,7 +1,7 @@
 ﻿import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ActivityDto } from 'src/models/activities/activity.dto';
 import { ActivitiesService } from './activities.service';
-import { ActivityDto } from './activity.dto';
 
 @ApiTags('activities')
 @Controller('activities')

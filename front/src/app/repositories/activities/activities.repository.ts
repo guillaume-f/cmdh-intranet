@@ -10,7 +10,7 @@ import { ActivityDto, ActivityDtoRequest } from './activity.model';
 })
 export class ActivitiesRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/api/activities`;
+  private readonly apiUrl = `${environment.apiUrl}/activities`;
 
   getAllActivities(): Observable<ActivityDto[]> {
     const token = this.getCookie('access_token');
