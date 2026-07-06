@@ -22,3 +22,7 @@ export interface AuthUserDto {
   firstName: string;
   lastName: string;
 }
+
+export interface RefreshDto {
+  token: string;
+}

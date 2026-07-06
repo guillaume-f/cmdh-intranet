@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiParam,
-    ApiTags,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { AddUserResponseDto } from './dto/add-user-response.dto';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';
@@ -27,7 +27,9 @@ export class UsersController {
   @Get(':userId')
   @ApiParam({ name: 'userId', type: String })
   @ApiOkResponse({ type: UserByIdResponseDto })
-  async getUserById(@Param('userId') userId: string): Promise<UserByIdResponseDto> {
+  async getUserById(
+    @Param('userId') userId: string,
+  ): Promise<UserByIdResponseDto> {
     return this.usersService.getUserById(userId);
   }
 
@@ -56,6 +58,8 @@ export class UsersController {
   @Post()
   @ApiCreatedResponse({ type: AddUserResponseDto })
   async addUser(@Body() payload: UserPayloadDto): Promise<AddUserResponseDto> {
-    return this.usersService.addUser(payload as unknown as Record<string, unknown>);
+    return this.usersService.addUser(
+      payload as unknown as Record<string, unknown>,
+    );
   }
 }

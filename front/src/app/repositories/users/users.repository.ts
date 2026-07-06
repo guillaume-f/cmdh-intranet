@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -7,70 +7,31 @@ import { UserDtoRequest } from './user-dto-request.model';
 import { UserValidatedActivitiesSummaryDto } from './user-validated-activity.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/api/users`;
+  private readonly apiUrl = `${environment.apiUrl}/users`;
 
   getAllUsers(): Observable<UserDto[]> {
-    const token = this.getCookie('access_token');
-    const headers = new HttpHeaders().set(
-      'Authorization',
-      `Bearer ${token}`
-    );
-
-    return this.http.get<UserDto[]>(this.apiUrl, { headers });
+    return this.http.get<UserDto[]>(this.apiUrl);
   }
 
-   getUserById(userId: string): Observable<UserDto> {
-      const token = this.getCookie('access_token');
-      const headers = new HttpHeaders().set(
-        'Authorization',
-        `Bearer ${token}`
-      );
-  
-      return this.http.get<UserDto>(`${this.apiUrl}/${userId}`, { headers });
-    }
+  getUserById(userId: string): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.apiUrl}/${userId}`);
+  }
 
-    getValidatedActivitiesByUserId(userId: string): Observable<UserValidatedActivitiesSummaryDto> {
-      const token = this.getCookie('access_token');
-      const headers = new HttpHeaders().set(
-        'Authorization',
-        `Bearer ${token}`
-      );
+  getValidatedActivitiesByUserId(userId: string): Observable<UserValidatedActivitiesSummaryDto> {
+    return this.http.get<UserValidatedActivitiesSummaryDto>(
+      `${this.apiUrl}/${userId}/validated-activities`,
+    );
+  }
 
-      return this.http.get<UserValidatedActivitiesSummaryDto>(`${this.apiUrl}/${userId}/validated-activities`, { headers });
-    }
+  updateUser(userId: string, user: UserDtoRequest): Observable<UserDto> {
+    return this.http.patch<UserDto>(`${this.apiUrl}/${userId}`, user);
+  }
 
-    updateUser(userId: string, user: UserDtoRequest): Observable<UserDto> {
-      const token = this.getCookie('access_token');
-      const headers = new HttpHeaders().set(
-        'Authorization',
-        `Bearer ${token}`
-      );
-
-      return this.http.patch<UserDto>(`${this.apiUrl}/${userId}`, user, { headers });
-    }
-
-    addUser(user: UserDtoRequest): Observable<UserDto> {
-      const token = this.getCookie('access_token');
-      const headers = new HttpHeaders().set(
-        'Authorization',
-        `Bearer ${token}`
-      );
-
-      return this.http.post<UserDto>(`${this.apiUrl}`, user, { headers });
-    }
-
-  private getCookie(name: string): string | undefined {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-
-    if (parts.length === 2) {
-      return (parts.pop() as string).split(';').shift();
-    }
-
-    return undefined;
+  addUser(user: UserDtoRequest): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}`, user);
   }
 }

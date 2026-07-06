@@ -16,8 +16,16 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'change_me_in_production'),
-        signOptions: { expiresIn: (config.get<string>('JWT_EXPIRATION', '7d')) as unknown as number },
+        secret: config.get<string>(
+          'JWT_ACCESS_SECRET',
+          config.get<string>('JWT_SECRET', 'change_me_in_production'),
+        ),
+        signOptions: {
+          expiresIn: config.get<string>(
+            'JWT_ACCESS_EXPIRATION',
+            '10m',
+          ) as unknown as number,
+        },
       }),
     }),
     UsersModule,

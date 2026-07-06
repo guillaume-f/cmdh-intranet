@@ -18,7 +18,6 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { email },
-      relations: { role: true },
     });
   }
 
@@ -29,8 +28,33 @@ export class UsersService {
     });
   }
 
+  async setRefreshTokenSession(
+    userId: string,
+    refreshTokenHash: string,
+    refreshTokenId: string,
+    refreshTokenExpiresAt: Date,
+  ): Promise<void> {
+    await this.usersRepository.update(
+      { id: userId },
+      { refreshTokenHash, refreshTokenId, refreshTokenExpiresAt },
+    );
+  }
+
+  async clearRefreshTokenSession(userId: string): Promise<void> {
+    await this.usersRepository.update(
+      { id: userId },
+      {
+        refreshTokenHash: null,
+        refreshTokenId: null,
+        refreshTokenExpiresAt: null,
+      },
+    );
+  }
+
   async getAllUsers() {
-    const users = await this.usersRepository.find({ relations: { role: true } });
+    const users = await this.usersRepository.find({
+      relations: { role: true },
+    });
     return users.map((user) => this.toResponseDto(user));
   }
 
@@ -79,13 +103,14 @@ export class UsersService {
       throw new NotFoundException(`User ${userId} not found`);
     }
 
-    if (typeof payload.firstName === 'string') user.firstName = payload.firstName;
+    if (typeof payload.firstName === 'string')
+      user.firstName = payload.firstName;
     if (typeof payload.lastName === 'string') user.lastName = payload.lastName;
     if (typeof payload.email === 'string') user.email = payload.email;
     if (typeof payload.niss === 'string') user.niss = payload.niss;
     if (typeof payload.active === 'boolean') user.active = payload.active;
     if (payload.entryYear === null || typeof payload.entryYear === 'number') {
-      user.entryYear = payload.entryYear as number | null;
+      user.entryYear = payload.entryYear;
     }
     if (Array.isArray(payload.extraPermissions)) {
       user.extraPermissions = payload.extraPermissions as string[];
@@ -104,14 +129,21 @@ export class UsersService {
 
   async addUser(payload: Record<string, unknown>) {
     const user = this.usersRepository.create();
-    user.firstName = typeof payload.firstName === 'string' ? payload.firstName : '';
-    user.lastName = typeof payload.lastName === 'string' ? payload.lastName : '';
+    user.firstName =
+      typeof payload.firstName === 'string' ? payload.firstName : '';
+    user.lastName =
+      typeof payload.lastName === 'string' ? payload.lastName : '';
     user.email = typeof payload.email === 'string' ? payload.email : '';
     user.niss = typeof payload.niss === 'string' ? payload.niss : '';
     user.active = typeof payload.active === 'boolean' ? payload.active : true;
-    user.entryYear = typeof payload.entryYear === 'number' ? payload.entryYear : null;
-    user.extraPermissions = Array.isArray(payload.extraPermissions) ? (payload.extraPermissions as string[]) : [];
-    user.deniedPermissions = Array.isArray(payload.deniedPermissions) ? (payload.deniedPermissions as string[]) : [];
+    user.entryYear =
+      typeof payload.entryYear === 'number' ? payload.entryYear : null;
+    user.extraPermissions = Array.isArray(payload.extraPermissions)
+      ? (payload.extraPermissions as string[])
+      : [];
+    user.deniedPermissions = Array.isArray(payload.deniedPermissions)
+      ? (payload.deniedPermissions as string[])
+      : [];
 
     // Temporary placeholder password â€” must be set via reset flow
     user.password = '';

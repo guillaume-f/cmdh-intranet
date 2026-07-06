@@ -1,11 +1,11 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 
@@ -44,6 +44,15 @@ export class User {
 
   @Column({ type: 'int', nullable: true })
   entryYear!: number | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  refreshTokenHash!: string | null;
+
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  refreshTokenId!: string | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  refreshTokenExpiresAt!: Date | null;
 
   @CreateDateColumn()
   createdAt!: Date;

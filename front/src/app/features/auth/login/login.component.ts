@@ -1,18 +1,7 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
@@ -43,7 +32,7 @@ import { LoginForm } from './models/login.model';
     MessageModule,
     ToastModule,
     TranslatePipe,
-    OptionalLabelDirective
+    OptionalLabelDirective,
   ],
   providers: [MessageService],
   templateUrl: './login.component.html',
@@ -65,33 +54,32 @@ export class LoginComponent {
   protected readonly isLoading = signal(false);
 
   constructor() {
-    // TODO : en attente deploy https://github.com/ngx-translate/core/milestone/3 
-    this.translateService.use('fr')
+    // TODO : en attente deploy https://github.com/ngx-translate/core/milestone/3
+    this.translateService.use('fr');
   }
 
   onSubmit(): void {
-    
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    
+
     this.isLoading.set(true);
     const request: LoginDtoRequest = this.form.value as LoginDtoRequest;
 
-    this.authRepository.login(request)
-    .pipe(
-      takeUntilDestroyed(this.destroyRef),
-      catchError((error) => {
-        this.isLoading.set(false);
-        return throwError(() => error);
-      }
-    ))
+    this.authRepository
+      .login(request)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((error) => {
+          this.isLoading.set(false);
+          return throwError(() => error);
+        }),
+      )
       .subscribe((loginInfos: LoginDto) => {
-        this.authService.setUser(loginInfos.user);
-        this.authService.setToken(loginInfos.token);
+        this.authService.setAccessToken(loginInfos.token);
         void this.router.navigate(['/activities']);
-        this.isLoading.set(false)
+        this.isLoading.set(false);
       });
-    }
+  }
 }

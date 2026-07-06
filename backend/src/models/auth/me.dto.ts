@@ -5,6 +5,9 @@ export class MeDto {
   id!: string;
 
   @ApiProperty()
+  email!: string;
+
+  @ApiProperty()
   firstName!: string;
 
   @ApiProperty()
