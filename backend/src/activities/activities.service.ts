@@ -1,4 +1,8 @@
-﻿import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
@@ -67,6 +71,36 @@ export class ActivitiesService {
       activity: { id: activityId },
       user: { id: userId },
     });
+  }
+
+  async register(activityId: string, userId: string): Promise<Registration> {
+    const activity = await this.findById(activityId);
+
+    if (!activity.requiresRegistration) {
+      throw new BadRequestException(
+        `Activity ${activityId} does not require registration`,
+      );
+    }
+
+    const existing = await this.registrationsRepository.findOne({
+      where: { activity: { id: activityId }, user: { id: userId } },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    const registration = this.registrationsRepository.create({
+      activity: { id: activityId } as Activity,
+      user: { id: userId },
+    });
+
+    return this.registrationsRepository.save(registration);
+  }
+
+  async unregister(activityId: string, userId: string): Promise<void> {
+    await this.findById(activityId);
+    await this.deleteParticipant(activityId, userId);
   }
 
   async bulkAddParticipants(

@@ -1,7 +1,18 @@
-﻿import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+﻿import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityDto } from 'src/models/activities/activity.dto';
 import { CreateActivityDto } from 'src/models/activities/create-activity.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../users/entities/user.entity';
 import { ActivitiesService } from './activities.service';
 
 @ApiTags('activities')
@@ -99,12 +110,35 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/register')
-  async register(@Param('activityId') activityId: string) {
-    return { message: 'Registration confirmed.', activityId };
+  @UseGuards(JwtAuthGuard)
+  async register(
+    @Param('activityId') activityId: string,
+    @Request() req: { user: User },
+  ) {
+    const registration = await this.activitiesService.register(
+      activityId,
+      req.user.id,
+    );
+    return {
+      message: 'Registration confirmed.',
+      activityId,
+      userId: req.user.id,
+      registrationId: registration.id,
+      registeredAt: registration.registeredAt,
+    };
   }
 
   @Post(':activityId/unregister')
-  async unregister(@Param('activityId') activityId: string) {
-    return { message: 'Unregistered successfully.', activityId };
+  @UseGuards(JwtAuthGuard)
+  async unregister(
+    @Param('activityId') activityId: string,
+    @Request() req: { user: User },
+  ) {
+    await this.activitiesService.unregister(activityId, req.user.id);
+    return {
+      message: 'Unregistered successfully.',
+      activityId,
+      userId: req.user.id,
+    };
   }
 }
