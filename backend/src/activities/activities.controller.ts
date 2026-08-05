@@ -24,25 +24,35 @@ export class ActivitiesController {
   @ApiOkResponse({ type: [ActivityDto] })
   async getAllActivities(): Promise<ActivityDto[]> {
     const activities = await this.activitiesService.findAll();
-    return activities as unknown as ActivityDto[];
+    return activities as ActivityDto[];
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ActivityDto })
   async createActivity(
     @Body() activityDto: CreateActivityDto,
+    @Request() req: { user: User },
   ): Promise<ActivityDto> {
-    const activity = await this.activitiesService.create(activityDto);
-    return activity as unknown as ActivityDto;
+    const activity = await this.activitiesService.create(
+      activityDto,
+      req.user.id,
+    );
+    return activity as ActivityDto;
   }
 
   @Get(':activityId')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ActivityDto })
   async getActivityById(
     @Param('activityId') activityId: string,
+    @Request() req: { user: User },
   ): Promise<ActivityDto> {
-    const activity = await this.activitiesService.findById(activityId);
-    return activity as unknown as ActivityDto;
+    const activity = await this.activitiesService.findByIdWithRegistration(
+      activityId,
+      req.user.id,
+    );
+    return activity as ActivityDto;
   }
 
   @Delete(':activityId')

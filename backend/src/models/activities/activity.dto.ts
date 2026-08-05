@@ -29,7 +29,7 @@ export class ActivityDto {
   status!: string;
 
   @ApiProperty()
-  createdBy!: string;
+  createdById!: string;
 
   @ApiProperty()
   createdAt!: Date;

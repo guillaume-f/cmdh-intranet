@@ -2,11 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 export enum ActivityStatus {
   DRAFT = 'draft',
@@ -36,9 +33,8 @@ export class Activity {
   @Column({ type: 'enum', enum: ActivityStatus, default: ActivityStatus.DRAFT })
   status!: ActivityStatus;
 
-  @ManyToOne(() => User, { nullable: true, eager: false })
-  @JoinColumn({ name: 'createdById' })
-  createdBy!: User | null;
+  @Column({ type: 'uuid', nullable: true })
+  createdById!: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;

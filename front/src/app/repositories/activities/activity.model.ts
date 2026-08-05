@@ -8,7 +8,7 @@ export interface ActivityDto {
   requiresRegistration: boolean;
   requiresAttendanceValidation: boolean;
   status: string;
-  createdBy: string;
+  createdById: string;
   createdAt: Date;
   isRegistered: boolean;
   registeredAt?: Date | null;

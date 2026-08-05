@@ -21,16 +21,38 @@ export class ActivitiesService {
   ) {}
 
   async findAll(): Promise<Activity[]> {
-    return this.activitiesRepository.find({ relations: { createdBy: true } });
+    return this.activitiesRepository.find();
   }
 
   async findById(id: string): Promise<Activity> {
-    const activity = await this.activitiesRepository.findOne({
-      where: { id },
-      relations: { createdBy: true },
-    });
+    const activity = await this.activitiesRepository.findOne({ where: { id } });
     if (!activity) throw new NotFoundException(`Activity ${id} not found`);
     return activity;
+  }
+
+  async findByIdWithRegistration(
+    id: string,
+    userId?: string,
+  ): Promise<Activity & { isRegistered: boolean; registeredAt: Date | null }> {
+    const activity = await this.findById(id);
+
+    if (!activity.requiresRegistration) {
+      return {
+        ...activity,
+        isRegistered: false,
+        registeredAt: null,
+      };
+    }
+
+    const registration = await this.registrationsRepository.findOne({
+      where: { activity: { id }, user: { id: userId } },
+    });
+
+    return {
+      ...activity,
+      isRegistered: Boolean(registration),
+      registeredAt: registration?.registeredAt ?? null,
+    };
   }
 
   async getParticipants(activityId: string): Promise<AttendanceValidation[]> {
@@ -126,8 +148,13 @@ export class ActivitiesService {
     await this.activitiesRepository.delete(id);
   }
 
-  async create(activityData: Partial<Activity>): Promise<Activity> {
+  async create(
+    activityData: Partial<Activity>,
+    userId: string,
+  ): Promise<Activity> {
     const activity = this.activitiesRepository.create(activityData);
-    return this.activitiesRepository.save(activity);
+    activity.createdById = userId;
+    const savedActivity = await this.activitiesRepository.save(activity);
+    return this.findById(savedActivity.id);
   }
 }
