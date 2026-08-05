@@ -1,6 +1,7 @@
 ﻿import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityDto } from 'src/models/activities/activity.dto';
+import { CreateActivityDto } from 'src/models/activities/create-activity.dto';
 import { ActivitiesService } from './activities.service';
 
 @ApiTags('activities')
@@ -13,6 +14,15 @@ export class ActivitiesController {
   async getAllActivities(): Promise<ActivityDto[]> {
     const activities = await this.activitiesService.findAll();
     return activities as unknown as ActivityDto[];
+  }
+
+  @Post()
+  @ApiCreatedResponse({ type: ActivityDto })
+  async createActivity(
+    @Body() activityDto: CreateActivityDto,
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesService.create(activityDto);
+    return activity as unknown as ActivityDto;
   }
 
   @Get(':activityId')
@@ -34,7 +44,7 @@ export class ActivitiesController {
   async getActivityParticipants(@Param('activityId') activityId: string) {
     const participants =
       await this.activitiesService.getParticipants(activityId);
-    return { activityId, participants };
+    return participants;
   }
 
   @Post(':activityId/participants/:userId/validate')

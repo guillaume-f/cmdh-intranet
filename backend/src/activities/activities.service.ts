@@ -91,4 +91,9 @@ export class ActivitiesService {
   async deleteActivity(id: string): Promise<void> {
     await this.activitiesRepository.delete(id);
   }
+
+  async create(activityData: Partial<Activity>): Promise<Activity> {
+    const activity = this.activitiesRepository.create(activityData);
+    return this.activitiesRepository.save(activity);
+  }
 }
