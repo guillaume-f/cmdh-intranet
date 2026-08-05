@@ -15,6 +15,15 @@ export class ActivitiesController {
     return activities as unknown as ActivityDto[];
   }
 
+  @Get(':activityId')
+  @ApiOkResponse({ type: ActivityDto })
+  async getActivityById(
+    @Param('activityId') activityId: string,
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesService.findById(activityId);
+    return activity as unknown as ActivityDto;
+  }
+
   @Delete(':activityId')
   async deleteActivity(@Param('activityId') activityId: string) {
     await this.activitiesService.deleteActivity(activityId);
