@@ -23,7 +23,8 @@ export class ActivitiesController {
 
   @Get(':activityId/participants')
   async getActivityParticipants(@Param('activityId') activityId: string) {
-    const participants = await this.activitiesService.getParticipants(activityId);
+    const participants =
+      await this.activitiesService.getParticipants(activityId);
     return { activityId, participants };
   }
 
@@ -33,7 +34,12 @@ export class ActivitiesController {
     @Param('userId') userId: string,
   ) {
     await this.activitiesService.validatePresence(activityId, userId, true);
-    return { message: 'Presence validated.', activityId, userId, isPresent: true };
+    return {
+      message: 'Presence validated.',
+      activityId,
+      userId,
+      isPresent: true,
+    };
   }
 
   @Post(':activityId/participants/:userId/invalidate')
@@ -42,7 +48,12 @@ export class ActivitiesController {
     @Param('userId') userId: string,
   ) {
     await this.activitiesService.validatePresence(activityId, userId, false);
-    return { message: 'Absence validated.', activityId, userId, isPresent: false };
+    return {
+      message: 'Absence validated.',
+      activityId,
+      userId,
+      isPresent: false,
+    };
   }
 
   @Delete(':activityId/participants/:userId')

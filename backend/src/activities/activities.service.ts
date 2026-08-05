@@ -36,7 +36,11 @@ export class ActivitiesService {
     });
   }
 
-  async validatePresence(activityId: string, userId: string, isPresent: boolean): Promise<AttendanceValidation> {
+  async validatePresence(
+    activityId: string,
+    userId: string,
+    isPresent: boolean,
+  ): Promise<AttendanceValidation> {
     let validation = await this.attendanceRepository.findOne({
       where: { activity: { id: activityId }, user: { id: userId } },
     });
@@ -44,7 +48,7 @@ export class ActivitiesService {
     if (!validation) {
       validation = this.attendanceRepository.create({
         activity: { id: activityId } as Activity,
-        user: { id: userId } as any,
+        user: { id: userId },
         isPresent,
       });
     } else {
@@ -65,7 +69,10 @@ export class ActivitiesService {
     });
   }
 
-  async bulkAddParticipants(activityId: string, userIds: string[]): Promise<void> {
+  async bulkAddParticipants(
+    activityId: string,
+    userIds: string[],
+  ): Promise<void> {
     for (const userId of userIds) {
       const exists = await this.attendanceRepository.findOne({
         where: { activity: { id: activityId }, user: { id: userId } },
@@ -73,7 +80,7 @@ export class ActivitiesService {
       if (!exists) {
         const validation = this.attendanceRepository.create({
           activity: { id: activityId } as Activity,
-          user: { id: userId } as any,
+          user: { id: userId },
           isPresent: true,
         });
         await this.attendanceRepository.save(validation);
@@ -85,4 +92,3 @@ export class ActivitiesService {
     await this.activitiesRepository.delete(id);
   }
 }
-

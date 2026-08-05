@@ -7,7 +7,9 @@ import { AttendanceValidation } from './entities/attendance-validation.entity';
 import { Registration } from './entities/registration.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Activity, Registration, AttendanceValidation])],
+  imports: [
+    TypeOrmModule.forFeature([Activity, Registration, AttendanceValidation]),
+  ],
   controllers: [ActivitiesController],
   providers: [ActivitiesService],
   exports: [ActivitiesService],
