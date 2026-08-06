@@ -4,6 +4,11 @@
     "YES": "Oui",
     "NO": "Non"
   },
+  "ACTIONS": {
+    "CANCEL": "Annuler",
+    "SUBMIT": "Enregistrer",
+    "UPDATE": "Mettre à jour"
+  },
   "ACTIVITIES": {
     "BREADCRUMB": {
       "LIST": "Activités",
@@ -22,9 +27,7 @@
       "POINTS_LABEL": "Points",
       "POINTS_PLACEHOLDER": "Sélectionner les points",
       "REQUIRES_REGISTRATION_LABEL": "Inscription requise",
-      "REQUIRES_ATTENDANCE_VALIDATION_LABEL": "Validation de présence requise",
-      "SUBMIT": "Enregistrer",
-      "UPDATE": "Mettre à jour"
+      "REQUIRES_ATTENDANCE_VALIDATION_LABEL": "Validation de présence requise"
     },
     "ERRORS": {
       "TITRE_REQUIRED": "Le titre est obligatoire",

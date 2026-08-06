@@ -28,19 +28,6 @@ export class ActivitiesController {
     return activities as ActivityDto[];
   }
 
-  @Post()
-  @ApiCreatedResponse({ type: ActivityDto })
-  async createActivity(
-    @Body() activityDto: CreateActivityDto,
-    @Request() req: { user: User },
-  ): Promise<ActivityDto> {
-    const activity = await this.activitiesService.create(
-      activityDto,
-      req.user.id,
-    );
-    return activity as ActivityDto;
-  }
-
   @Get(':activityId')
   @ApiOkResponse({ type: ActivityDto })
   async getActivityById(
@@ -49,6 +36,19 @@ export class ActivitiesController {
   ): Promise<ActivityDto> {
     const activity = await this.activitiesService.findByIdWithRegistration(
       activityId,
+      req.user.id,
+    );
+    return activity as ActivityDto;
+  }
+
+  @Post()
+  @ApiCreatedResponse({ type: ActivityDto })
+  async createActivity(
+    @Body() activityDto: CreateActivityDto,
+    @Request() req: { user: User },
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesService.create(
+      activityDto,
       req.user.id,
     );
     return activity as ActivityDto;

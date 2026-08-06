@@ -167,7 +167,14 @@
     </div>
 
     <!-- Submit -->
-    <div class="flex justify-end">
+    <div class="flex justify-between">
+       <p-button
+        type="button"
+        severity="secondary"
+        [label]="'ACTIONS.CANCEL' | translate"
+        [disabled]="isLoading()"
+        (click)="onCancel()"
+      />
       <p-button
         type="submit"
         [label]="submitLabelKey() | translate"

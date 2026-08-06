@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,7 +51,9 @@ export class ActivityFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
 
-  protected readonly activityId = signal(this.activatedRoute.snapshot.paramMap.get('activityId') ?? '');
+  protected readonly activityId = signal(
+    this.activatedRoute.snapshot.paramMap.get('activityId') ?? '',
+  );
   protected readonly isEditMode = computed(() => !!this.activityId());
   protected readonly isLoading = signal(false);
 
@@ -51,7 +61,11 @@ export class ActivityFormComponent implements OnInit {
 
   protected readonly breadcrumbItems: MenuItem[] = [
     { label: this.translate.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
-    { label: this.translate.instant(this.isEditMode() ? 'ACTIVITIES.BREADCRUMB.EDIT' : 'ACTIVITIES.BREADCRUMB.NEW') },
+    {
+      label: this.translate.instant(
+        this.isEditMode() ? 'ACTIVITIES.BREADCRUMB.EDIT' : 'ACTIVITIES.BREADCRUMB.NEW',
+      ),
+    },
   ];
 
   protected readonly form: FormGroup<ActivityForm> = this.fb.group({
@@ -65,11 +79,11 @@ export class ActivityFormComponent implements OnInit {
   });
 
   protected readonly pageTitleKey = computed(() =>
-    this.isEditMode() ? 'ACTIVITIES.BREADCRUMB.EDIT' : 'ACTIVITIES.BREADCRUMB.NEW'
+    this.isEditMode() ? 'ACTIVITIES.BREADCRUMB.EDIT' : 'ACTIVITIES.BREADCRUMB.NEW',
   );
 
   protected readonly submitLabelKey = computed(() =>
-    this.isEditMode() ? 'ACTIVITIES.FORM.UPDATE' : 'ACTIVITIES.FORM.SUBMIT'
+    this.isEditMode() ? 'ACTIONS.UPDATE' : 'ACTIONS.SUBMIT',
   );
 
   ngOnInit(): void {
@@ -87,16 +101,23 @@ export class ActivityFormComponent implements OnInit {
     const formValue = this.form.getRawValue() as ActivityFormValue;
     const request = toActivityDtoRequest(formValue);
 
-    const request$ = this.isEditMode() && this.activityId()
-      ? this.activitiesRepository.updateActivity(this.activityId(), request)
-      : this.activitiesRepository.addActivity(request);
+    const request$ =
+      this.isEditMode() && this.activityId()
+        ? this.activitiesRepository.updateActivity(this.activityId(), request)
+        : this.activitiesRepository.addActivity(request);
 
-    request$.pipe(
-      finalize(() => this.isLoading.set(false)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((activity: ActivityDto) => {
+    request$
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((activity: ActivityDto) => {
         void this.router.navigate(['/activities', activity.id]);
-    });
+      });
+  }
+
+  protected onCancel(): void {
+    void this.router.navigate(['/activities', this.activityId()]);
   }
 
   private loadActivityForEdit(): void {
@@ -106,19 +127,22 @@ export class ActivityFormComponent implements OnInit {
 
     this.isLoading.set(true);
 
-    this.activitiesRepository.getActivityById(this.activityId()).pipe(
-      finalize(() => this.isLoading.set(false)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((activity: ActivityDto) => {
-      this.form.patchValue({
-        titre: activity.title,
-        description: activity.description ?? '',
-        dateHeure: activity.datetime,
-        adresse: activity.location ?? '',
-        points: activity.points,
-        requiresRegistration: activity.requiresRegistration ?? true,
-        requiresAttendanceValidation: activity.requiresAttendanceValidation ?? true,
+    this.activitiesRepository
+      .getActivityById(this.activityId())
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((activity: ActivityDto) => {
+        this.form.patchValue({
+          titre: activity.title,
+          description: activity.description ?? '',
+          dateHeure: activity.datetime,
+          adresse: activity.location ?? '',
+          points: activity.points,
+          requiresRegistration: activity.requiresRegistration ?? true,
+          requiresAttendanceValidation: activity.requiresAttendanceValidation ?? true,
+        });
       });
-    });
   }
 }
