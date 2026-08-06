@@ -4,7 +4,7 @@
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
 import { AttendanceValidation } from './entities/attendance-validation.entity';
 import { Registration } from './entities/registration.entity';
@@ -20,8 +20,57 @@ export class ActivitiesService {
     private readonly attendanceRepository: Repository<AttendanceValidation>,
   ) {}
 
-  async findAll(): Promise<Activity[]> {
-    return this.activitiesRepository.find();
+  async findAll(
+    userId?: string,
+  ): Promise<
+    Array<Activity & { isRegistered: boolean; registeredAt: Date | null }>
+  > {
+    const activities = await this.activitiesRepository.find();
+
+    if (!userId) {
+      return activities.map((activity) => ({
+        ...activity,
+        isRegistered: false,
+        registeredAt: null,
+      }));
+    }
+
+    const registrationActivityIds = activities
+      .filter((activity) => activity.requiresRegistration)
+      .map((activity) => activity.id);
+
+    if (registrationActivityIds.length === 0) {
+      return activities.map((activity) => ({
+        ...activity,
+        isRegistered: false,
+        registeredAt: null,
+      }));
+    }
+
+    const registrations = await this.registrationsRepository.find({
+      where: {
+        activity: { id: In(registrationActivityIds) },
+        user: { id: userId },
+      },
+      relations: { activity: true },
+    });
+
+    const registrationsByActivityId = new Map(
+      registrations.map((registration) => [
+        registration.activity.id,
+        registration,
+      ]),
+    );
+
+    return activities.map((activity) => {
+      const registration = registrationsByActivityId.get(activity.id);
+
+      return {
+        ...activity,
+        isRegistered: Boolean(registration),
+        registeredAt: registration?.registeredAt ?? null,
+      };
+    });
   }
 
   async findById(id: string): Promise<Activity> {

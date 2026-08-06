@@ -23,8 +23,10 @@ export class ActivitiesController {
 
   @Get()
   @ApiOkResponse({ type: [ActivityDto] })
-  async getAllActivities(): Promise<ActivityDto[]> {
-    const activities = await this.activitiesService.findAll();
+  async getAllActivities(
+    @Request() req: { user: User },
+  ): Promise<ActivityDto[]> {
+    const activities = await this.activitiesService.findAll(req.user.id);
     return activities as ActivityDto[];
   }
 
