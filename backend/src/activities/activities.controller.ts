@@ -17,6 +17,7 @@ import { ActivitiesService } from './activities.service';
 
 @ApiTags('activities')
 @Controller('activities')
+@UseGuards(JwtAuthGuard)
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
@@ -28,7 +29,6 @@ export class ActivitiesController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ActivityDto })
   async createActivity(
     @Body() activityDto: CreateActivityDto,
@@ -42,7 +42,6 @@ export class ActivitiesController {
   }
 
   @Get(':activityId')
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ActivityDto })
   async getActivityById(
     @Param('activityId') activityId: string,
@@ -120,7 +119,6 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/register')
-  @UseGuards(JwtAuthGuard)
   async register(
     @Param('activityId') activityId: string,
     @Request() req: { user: User },
@@ -139,7 +137,6 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/unregister')
-  @UseGuards(JwtAuthGuard)
   async unregister(
     @Param('activityId') activityId: string,
     @Request() req: { user: User },
