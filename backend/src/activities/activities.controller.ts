@@ -11,7 +11,8 @@
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityDto } from 'src/models/activities/activity.dto';
-import { CreateActivityDto } from 'src/models/activities/create-activity.dto';
+import { CreateActivityRequest } from 'src/models/activities/create-activity.request';
+import { UpdateActivityRequest } from 'src/models/activities/update-activity.request';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { ActivitiesService } from './activities.service';
@@ -48,12 +49,25 @@ export class ActivitiesController {
   @Post()
   @ApiCreatedResponse({ type: ActivityDto })
   async createActivity(
-    @Body() activityDto: CreateActivityDto,
+    @Body() activityDto: CreateActivityRequest,
     @Request() req: { user: User },
   ): Promise<ActivityDto> {
     const activity = await this.activitiesService.create(
       activityDto,
       req.user.id,
+    );
+    return activity;
+  }
+
+  @Patch(':activityId')
+  @ApiOkResponse({ type: ActivityDto })
+  async updateActivity(
+    @Param('activityId') activityId: string,
+    @Body() activityDto: UpdateActivityRequest,
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesService.updateActivity(
+      activityId,
+      activityDto,
     );
     return activity;
   }

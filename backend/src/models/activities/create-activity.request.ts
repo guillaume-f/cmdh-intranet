@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus } from 'src/activities/entities/activity.entity';
 
-export class CreateActivityDto {
+export class CreateActivityRequest {
   @ApiProperty()
   title!: string;
 
