@@ -4,11 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum ActivityStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-}
+import { ActivityStatus } from '../enums/activity-status.enum';
 
 @Entity('activities')
 export class Activity {

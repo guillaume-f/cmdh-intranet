@@ -4,14 +4,16 @@
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ActivityDto } from 'src/models/activities/activity.dto';
-import { AttendanceValidationDto } from 'src/models/activities/attendance-validation.dto';
-import { CreateActivityRequest } from 'src/models/activities/create-activity.request';
-import { UpdateActivityRequest } from 'src/models/activities/update-activity.request';
+import { activityDateValidator } from 'src/validators/business-rules/activity-date';
 import { Repository } from 'typeorm';
-import { Activity, ActivityStatus } from './entities/activity.entity';
+import { Activity } from './entities/activity.entity';
 import { AttendanceValidation } from './entities/attendance-validation.entity';
 import { Registration } from './entities/registration.entity';
+import { ActivityStatus } from './enums/activity-status.enum';
+import { ActivityDto } from './models/activity.dto';
+import { AttendanceValidationDto } from './models/attendance-validation.dto';
+import { CreateActivityRequest } from './models/create-activity.request';
+import { UpdateActivityRequest } from './models/update-activity.request';
 
 @Injectable()
 export class ActivitiesService {
@@ -124,6 +126,13 @@ export class ActivitiesService {
     activityData: CreateActivityRequest,
     userId: string,
   ): Promise<ActivityDto> {
+    const activityDate = new Date(activityData.datetime);
+    if (!activityDateValidator(activityDate)) {
+      throw new BadRequestException(
+        'The activity datetime must be a valid date and in the future.',
+      );
+    }
+
     const activity = this.activitiesRepository.create(activityData);
     activity.createdById = userId;
     const savedActivity = await this.activitiesRepository.save(activity);
@@ -134,47 +143,15 @@ export class ActivitiesService {
     activityId: string,
     activityData: UpdateActivityRequest,
   ): Promise<ActivityDto> {
-    const activity = await this.activitiesRepository.findOne({
+    let activity = await this.activitiesRepository.findOne({
       where: { id: activityId },
     });
 
     if (!activity) {
       throw new NotFoundException(`Activity ${activityId} not found`);
     }
-    if (activityData.id !== undefined) {
-      activity.id = activityData.id;
-    }
-    if (activityData.title !== undefined) {
-      activity.title = activityData.title;
-    }
-    if (activityData.description !== undefined) {
-      activity.description = activityData.description;
-    }
-    if (activityData.datetime !== undefined) {
-      activity.datetime = activityData.datetime;
-    }
-    if (activityData.points !== undefined) {
-      activity.points = activityData.points;
-    }
-    if (activityData.location !== undefined) {
-      activity.location = activityData.location;
-    }
-    if (activityData.requiresRegistration !== undefined) {
-      activity.requiresRegistration = activityData.requiresRegistration;
-    }
-    if (activityData.requiresAttendanceValidation !== undefined) {
-      activity.requiresAttendanceValidation =
-        activityData.requiresAttendanceValidation;
-    }
-    if (activityData.status !== undefined) {
-      if (!Object.values(ActivityStatus).includes(activityData.status)) {
-        throw new BadRequestException(
-          `Invalid activity status: ${activityData.status}. Allowed values: ${Object.values(ActivityStatus).join(', ')}`,
-        );
-      }
 
-      activity.status = activityData.status;
-    }
+    activity = { ...activity, ...activityData };
 
     const updatedActivity = await this.activitiesRepository.save(activity);
     return this.findById(updatedActivity.id);

@@ -15,16 +15,16 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ActivityDto } from 'src/models/activities/activity.dto';
-import { CreateActivityRequest } from 'src/models/activities/create-activity.request';
-import { UpdateActivityRequest } from 'src/models/activities/update-activity.request';
 import { PERMISSIONS } from '../auth/constants/permissions.constants';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { User } from '../users/entities/user.entity';
 import { ActivitiesService } from './activities.service';
-import { ActivityStatus } from './entities/activity.entity';
+import { ActivityStatus } from './enums/activity-status.enum';
+import { ActivityDto } from './models/activity.dto';
+import { CreateActivityRequest } from './models/create-activity.request';
+import { UpdateActivityRequest } from './models/update-activity.request';
 
 @ApiTags('activities')
 @ApiBearerAuth('access-token')
