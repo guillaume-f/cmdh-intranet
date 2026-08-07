@@ -9,7 +9,12 @@
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ActivityDto } from 'src/models/activities/activity.dto';
 import { CreateActivityRequest } from 'src/models/activities/create-activity.request';
 import { UpdateActivityRequest } from 'src/models/activities/update-activity.request';
@@ -22,6 +27,7 @@ import { ActivitiesService } from './activities.service';
 import { ActivityStatus } from './entities/activity.entity';
 
 @ApiTags('activities')
+@ApiBearerAuth('access-token')
 @Controller('activities')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ActivitiesController {

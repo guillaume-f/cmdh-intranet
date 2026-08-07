@@ -8,7 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { Request as ExpressRequest, Response } from 'express';
 import { ForgotPasswordDto } from 'src/models/auth/forgot-password.dto';
 import { ForgotPasswordRequest } from 'src/models/auth/forgot-password.request';
@@ -82,6 +82,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: MeDto })
   me(@Request() req: { user: User }): MeDto {
     return this.authService.me(req.user);

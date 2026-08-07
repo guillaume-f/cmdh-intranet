@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesService } from '../../roles/roles.service';
@@ -35,7 +35,7 @@ export class PermissionsGuard implements CanActivate {
     const user = req.user;
 
     if (!user) {
-      throw new ForbiddenException('Missing authenticated user context.');
+      throw new UnauthorizedException('Missing authenticated user context.');
     }
 
     const userPermissions = this.rolesService.resolvePermissions(user);
@@ -44,7 +44,9 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (missingPermission) {
-      throw new ForbiddenException(`Missing permission: ${missingPermission}`);
+      throw new UnauthorizedException(
+        `Missing permission: ${missingPermission}`,
+      );
     }
 
     return true;

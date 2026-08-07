@@ -26,6 +26,14 @@ async function bootstrap() {
     .setTitle('CMDH Intranet API')
     .setDescription('The CMDH Intranet API')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .addTag('CMDH')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
