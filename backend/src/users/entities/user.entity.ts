@@ -36,7 +36,7 @@ export class User {
   @Column({ type: 'simple-json' })
   deniedPermissions!: string[];
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: false })
   active!: boolean;
 
   @Column({ type: 'varchar', length: 20 })
