@@ -54,6 +54,7 @@ export class ActivityFormComponent implements OnInit {
   protected readonly activityId = signal(
     this.activatedRoute.snapshot.paramMap.get('activityId') ?? '',
   );
+  private readonly activity = signal<ActivityDto | null>(null);
   protected readonly isEditMode = computed(() => !!this.activityId());
   protected readonly isLoading = signal(false);
 
@@ -86,11 +87,17 @@ export class ActivityFormComponent implements OnInit {
     this.isEditMode() ? 'ACTIONS.UPDATE' : 'ACTIONS.SUBMIT',
   );
 
+  protected readonly publishLabelKey = computed(() =>
+    this.activity()?.status === 'draft' ? 'ACTIONS.PUBLISH' : 'ACTIONS.UNPUBLISH',
+  );
+
+  protected readonly canPublish = computed(() => this.activity()?.status === 'draft');
+
   ngOnInit(): void {
     this.loadActivityForEdit();
   }
 
-  protected onSubmit(): void {
+  protected submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -116,9 +123,11 @@ export class ActivityFormComponent implements OnInit {
       });
   }
 
-  protected onCancel(): void {
+  protected cancel(): void {
     void this.router.navigate(['/activities', this.activityId()]);
   }
+
+  protected setStatus(): void {}
 
   private loadActivityForEdit(): void {
     if (!this.activityId()) {
@@ -134,6 +143,7 @@ export class ActivityFormComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((activity: ActivityDto) => {
+        this.activity.set(activity);
         this.form.patchValue({
           titre: activity.title,
           description: activity.description ?? '',

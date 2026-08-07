@@ -4,6 +4,8 @@
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ActivityDto } from 'src/models/activities/activity.dto';
+import { AttendanceValidationDto } from 'src/models/activities/attendance-validation.dto';
 import { Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
 import { AttendanceValidation } from './entities/attendance-validation.entity';
@@ -20,19 +22,18 @@ export class ActivitiesService {
     private readonly attendanceRepository: Repository<AttendanceValidation>,
   ) {}
 
-  async findAll(
-    userId?: string,
-  ): Promise<
-    Array<Activity & { isRegistered: boolean; registeredAt: Date | null }>
-  > {
+  async findAll(userId?: string): Promise<Array<ActivityDto>> {
     const activities = await this.activitiesRepository.find();
 
     if (!userId) {
-      return activities.map((activity) => ({
-        ...activity,
-        isRegistered: false,
-        registeredAt: null,
-      }));
+      return activities.map(
+        (activity) =>
+          ({
+            ...activity,
+            isRegistered: false,
+            registeredAt: null,
+          }) as ActivityDto,
+      );
     }
 
     const registrationActivityIds = activities
@@ -40,11 +41,14 @@ export class ActivitiesService {
       .map((activity) => activity.id);
 
     if (registrationActivityIds.length === 0) {
-      return activities.map((activity) => ({
-        ...activity,
-        isRegistered: false,
-        registeredAt: null,
-      }));
+      return activities.map(
+        (activity) =>
+          ({
+            ...activity,
+            isRegistered: false,
+            registeredAt: null,
+          }) as ActivityDto,
+      );
     }
 
     const registrations = await this.registrationsRepository
@@ -71,20 +75,20 @@ export class ActivitiesService {
         ...activity,
         isRegistered: Boolean(registration),
         registeredAt: registration ? new Date(registration.registeredAt) : null,
-      };
+      } as ActivityDto;
     });
   }
 
-  async findById(id: string): Promise<Activity> {
+  async findById(id: string): Promise<ActivityDto> {
     const activity = await this.activitiesRepository.findOne({ where: { id } });
     if (!activity) throw new NotFoundException(`Activity ${id} not found`);
-    return activity;
+    return activity as ActivityDto;
   }
 
   async findByIdWithRegistration(
     id: string,
     userId?: string,
-  ): Promise<Activity & { isRegistered: boolean; registeredAt: Date | null }> {
+  ): Promise<ActivityDto> {
     const activity = await this.findById(id);
 
     if (!activity.requiresRegistration) {
@@ -110,35 +114,36 @@ export class ActivitiesService {
     };
   }
 
-  async getParticipants(activityId: string): Promise<AttendanceValidation[]> {
-    return this.attendanceRepository.find({
-      where: { activity: { id: activityId } },
-      relations: { user: true, validatedBy: true },
-    });
+  async deleteActivity(id: string): Promise<void> {
+    await this.activitiesRepository.delete(id);
   }
 
-  async validatePresence(
-    activityId: string,
+  async create(
+    activityData: Partial<Activity>,
     userId: string,
-    isPresent: boolean,
-  ): Promise<AttendanceValidation> {
-    let validation = await this.attendanceRepository
+  ): Promise<ActivityDto> {
+    const activity = this.activitiesRepository.create(activityData);
+    activity.createdById = userId;
+    const savedActivity = await this.activitiesRepository.save(activity);
+    return this.findById(savedActivity.id);
+  }
+
+  async getParticipants(
+    activityId: string,
+  ): Promise<AttendanceValidationDto[]> {
+    const validations = await this.attendanceRepository
       .createQueryBuilder('attendance')
+      .leftJoinAndSelect('attendance.user', 'user')
       .where('attendance.activityId = :activityId', { activityId })
-      .andWhere('attendance.userId = :userId', { userId })
-      .getOne();
+      .getMany();
 
-    if (!validation) {
-      validation = this.attendanceRepository.create({
-        activity: { id: activityId } as Activity,
-        user: { id: userId },
-        isPresent,
-      });
-    } else {
-      validation.isPresent = isPresent;
-    }
-
-    return this.attendanceRepository.save(validation);
+    return validations.map((validation) => ({
+      userId: validation.user.id,
+      firstName: validation.user.firstName,
+      lastName: validation.user.lastName,
+      isPresent: validation.isPresent,
+      presenceValidatedAt: validation.validatedAt,
+    }));
   }
 
   async deleteParticipant(activityId: string, userId: string): Promise<void> {
@@ -156,6 +161,51 @@ export class ActivitiesService {
       .where('activityId = :activityId', { activityId })
       .andWhere('userId = :userId', { userId })
       .execute();
+  }
+
+  async validatePresence(
+    activityId: string,
+    userId: string,
+    isPresent: boolean,
+  ): Promise<void> {
+    let validation = await this.attendanceRepository
+      .createQueryBuilder('attendance')
+      .where('attendance.activityId = :activityId', { activityId })
+      .andWhere('attendance.userId = :userId', { userId })
+      .getOne();
+
+    if (!validation) {
+      validation = this.attendanceRepository.create({
+        activity: { id: activityId } as Activity,
+        user: { id: userId },
+        isPresent,
+      });
+    } else {
+      validation.isPresent = isPresent;
+    }
+
+    await this.attendanceRepository.save(validation);
+  }
+
+  async bulkAddParticipants(
+    activityId: string,
+    userIds: string[],
+  ): Promise<void> {
+    for (const userId of userIds) {
+      const exists = await this.attendanceRepository
+        .createQueryBuilder('attendance')
+        .where('attendance.activityId = :activityId', { activityId })
+        .andWhere('attendance.userId = :userId', { userId })
+        .getOne();
+      if (!exists) {
+        const validation = this.attendanceRepository.create({
+          activity: { id: activityId } as Activity,
+          user: { id: userId },
+          isPresent: true,
+        });
+        await this.attendanceRepository.save(validation);
+      }
+    }
   }
 
   async register(activityId: string, userId: string): Promise<Registration> {
@@ -188,40 +238,5 @@ export class ActivitiesService {
   async unregister(activityId: string, userId: string): Promise<void> {
     await this.findById(activityId);
     await this.deleteParticipant(activityId, userId);
-  }
-
-  async bulkAddParticipants(
-    activityId: string,
-    userIds: string[],
-  ): Promise<void> {
-    for (const userId of userIds) {
-      const exists = await this.attendanceRepository
-        .createQueryBuilder('attendance')
-        .where('attendance.activityId = :activityId', { activityId })
-        .andWhere('attendance.userId = :userId', { userId })
-        .getOne();
-      if (!exists) {
-        const validation = this.attendanceRepository.create({
-          activity: { id: activityId } as Activity,
-          user: { id: userId },
-          isPresent: true,
-        });
-        await this.attendanceRepository.save(validation);
-      }
-    }
-  }
-
-  async deleteActivity(id: string): Promise<void> {
-    await this.activitiesRepository.delete(id);
-  }
-
-  async create(
-    activityData: Partial<Activity>,
-    userId: string,
-  ): Promise<Activity> {
-    const activity = this.activitiesRepository.create(activityData);
-    activity.createdById = userId;
-    const savedActivity = await this.activitiesRepository.save(activity);
-    return this.findById(savedActivity.id);
   }
 }

@@ -6,7 +6,9 @@
   },
   "ACTIONS": {
     "CANCEL": "Annuler",
+    "PUBLISH": "Publier",
     "SUBMIT": "Enregistrer",
+    "UNPUBLISH": "Dépublier",
     "UPDATE": "Mettre à jour"
   },
   "ACTIVITIES": {
@@ -36,6 +38,10 @@
       "DATETIME_REQUIRED": "La date et l'heure sont obligatoires",
       "ADRESSE_REQUIRED": "L'adresse est obligatoire",
       "POINTS_REQUIRED": "Le nombre de points est obligatoire"
+    },
+    "STATUS": {
+      "DRAFT": "Brouillon",
+      "PUBLISHED": "Publié"
     }
   },
   "USERS": {

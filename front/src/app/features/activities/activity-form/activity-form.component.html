@@ -5,8 +5,7 @@
 <p-breadcrumb [model]="breadcrumbItems" />
 
 <div class="w-full p-4 xl:mx-auto xl:max-w-6xl">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
     <!-- Titre -->
     <div class="form-input-wrapper">
       <label for="titre" class="form-label required">
@@ -48,7 +47,9 @@
           class="w-full"
           rows="4"
           [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
-          [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched"
+          [attr.aria-invalid]="
+            form.controls.description.invalid && form.controls.description.touched
+          "
         ></textarea>
         @if (form.controls.description.errors?.['required'] && form.controls.description.touched) {
           <p-message severity="error" variant="simple" size="small">
@@ -168,22 +169,29 @@
 
     <!-- Submit -->
     <div class="flex justify-between">
-       <p-button
+      <p-button
         type="button"
         severity="secondary"
         [label]="'ACTIONS.CANCEL' | translate"
         [disabled]="isLoading()"
-        (click)="onCancel()"
+        (click)="cancel()"
       />
-      <p-button
-        type="submit"
-        [label]="submitLabelKey() | translate"
-        [disabled]="isLoading()"
-      />
+      <div>
+        <p-button
+          class="ml-4"
+          type="button"
+          severity="secondary"
+          [label]="'ACTIONS.PUBLISH' | translate"
+          [disabled]="isLoading()"
+          (click)="setStatus()"
+        />
+        <p-button
+          class="ml-4"
+          type="submit"
+          [label]="submitLabelKey() | translate"
+          [disabled]="isLoading()"
+        />
+      </div>
     </div>
-
   </form>
 </div>
-
-
-

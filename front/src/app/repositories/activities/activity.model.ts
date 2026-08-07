@@ -7,7 +7,7 @@ export interface ActivityDto {
   location: string;
   requiresRegistration: boolean;
   requiresAttendanceValidation: boolean;
-  status: string;
+  status: 'published' | 'draft';
   createdById: string;
   createdAt: Date;
   isRegistered: boolean;

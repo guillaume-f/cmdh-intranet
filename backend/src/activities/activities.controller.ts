@@ -27,7 +27,7 @@ export class ActivitiesController {
     @Request() req: { user: User },
   ): Promise<ActivityDto[]> {
     const activities = await this.activitiesService.findAll(req.user.id);
-    return activities as ActivityDto[];
+    return activities;
   }
 
   @Get(':activityId')
@@ -40,7 +40,7 @@ export class ActivitiesController {
       activityId,
       req.user.id,
     );
-    return activity as ActivityDto;
+    return activity;
   }
 
   @Post()
@@ -53,7 +53,7 @@ export class ActivitiesController {
       activityDto,
       req.user.id,
     );
-    return activity as ActivityDto;
+    return activity;
   }
 
   @Delete(':activityId')
