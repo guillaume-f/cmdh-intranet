@@ -91,8 +91,6 @@ export class ActivityFormComponent implements OnInit {
     this.activity()?.status === 'draft' ? 'ACTIONS.PUBLISH' : 'ACTIONS.UNPUBLISH',
   );
 
-  protected readonly canPublish = computed(() => this.activity()?.status === 'draft');
-
   ngOnInit(): void {
     this.loadActivityForEdit();
   }
@@ -127,7 +125,17 @@ export class ActivityFormComponent implements OnInit {
     void this.router.navigate(['/activities', this.activityId()]);
   }
 
-  protected setStatus(): void {}
+  protected setStatus(): void {
+    this.activitiesRepository
+      .setStatus(this.activityId(), this.activity()?.status === 'draft' ? 'published' : 'draft')
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((activity: ActivityDto) => {
+        this.activity.set(activity);
+      });
+  }
 
   private loadActivityForEdit(): void {
     if (!this.activityId()) {

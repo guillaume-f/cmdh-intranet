@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityDto } from 'src/models/activities/activity.dto';
 import { AttendanceValidationDto } from 'src/models/activities/attendance-validation.dto';
 import { Repository } from 'typeorm';
-import { Activity } from './entities/activity.entity';
+import { Activity, ActivityStatus } from './entities/activity.entity';
 import { AttendanceValidation } from './entities/attendance-validation.entity';
 import { Registration } from './entities/registration.entity';
 
@@ -238,5 +238,33 @@ export class ActivitiesService {
   async unregister(activityId: string, userId: string): Promise<void> {
     await this.findById(activityId);
     await this.deleteParticipant(activityId, userId);
+  }
+
+  async updateStatus(
+    activityId: string,
+    status: ActivityStatus,
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesRepository.findOne({
+      where: { id: activityId },
+    });
+
+    if (!Object.values(ActivityStatus).includes(status)) {
+      throw new BadRequestException(
+        `Invalid activity status: ${status}. Allowed values: ${Object.values(ActivityStatus).join(', ')}`,
+      );
+    }
+
+    if (!activity) {
+      throw new NotFoundException(`Activity ${activityId} not found`);
+    }
+
+    activity.status = status;
+    const updatedActivity = await this.activitiesRepository.save(activity);
+
+    return {
+      ...updatedActivity,
+      isRegistered: false,
+      registeredAt: null,
+    } as ActivityDto;
   }
 }

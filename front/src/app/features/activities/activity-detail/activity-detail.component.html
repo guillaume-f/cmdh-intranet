@@ -4,7 +4,9 @@
   <div class="space-y-4">
     @if (activity(); as currentActivity) {
       <div class="grid gap-6 lg:grid-cols-3">
-        <section class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+        <section
+          class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2"
+        >
           <div class="space-y-2">
             <h2 class="text-3xl font-semibold text-slate-900">{{ currentActivity.title }}</h2>
           </div>
@@ -15,6 +17,12 @@
             </p>
           </div>
 
+          @if (currentActivity.status === 'draft') {
+            <span class="rounded-full bg-slate-100 px-3 py-1">
+              {{ 'ACTIVITIES.STATUS.DRAFT' | translate }}
+            </span>
+          }
+
           <app-activity-attendance
             [activityId]="activityId()"
             [canValidateAttendance]="canValidateAttendanceForActivity()"
@@ -22,7 +30,9 @@
 
           @if (canRegister()) {
             <div class="rounded-xl bg-slate-50 p-4">
-              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Nombre de points</p>
+              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
+                Nombre de points
+              </p>
               <p class="mt-2 text-2xl font-semibold text-slate-900">{{ currentActivity.points }}</p>
             </div>
           }
@@ -31,7 +41,9 @@
         <aside class="space-y-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
           <div class="space-y-4">
             <div>
-              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Date et heure</p>
+              <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
+                Date et heure
+              </p>
               <p class="mt-2 text-base font-medium text-slate-900">
                 {{ currentActivity.datetime | date: 'dd/MM/yyyy HH:mm' }}
               </p>
@@ -44,14 +56,25 @@
           </div>
 
           <div class="space-y-3 border-t border-slate-200 pt-6">
-            @if (canRegister() && isFutureActivity() && currentActivity.requiresRegistration && currentActivity.status !== 'draft') {
+            @if (
+              canRegister() &&
+              isFutureActivity() &&
+              currentActivity.requiresRegistration &&
+              currentActivity.status !== 'draft'
+            ) {
               @if (currentActivity.isRegistered) {
                 <p class="text-sm text-slate-600">
-                  Inscrit le: {{ currentActivity.registeredAt ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+                  Inscrit le:
+                  {{
+                    currentActivity.registeredAt
+                      ? (currentActivity.registeredAt | date: 'dd/MM/yyyy HH:mm')
+                      : '-'
+                  }}
                 </p>
                 <button
                   pButton
-                  type="button" class="w-full"
+                  type="button"
+                  class="w-full"
                   (click)="onUnregister()"
                   [disabled]="isSubmitting()"
                 >
@@ -59,7 +82,8 @@
                 </button>
               } @else {
                 <button
-                  pButton  class="w-full"
+                  pButton
+                  class="w-full"
                   type="button"
                   (click)="onRegister()"
                   [disabled]="isSubmitting()"
@@ -70,13 +94,7 @@
             }
 
             @if (canEditActivity()) {
-              <button
-                pButton
-                type="button"
-                severity="secondary"
-                class="w-full"
-                (click)="onEdit()"
-              >
+              <button pButton type="button" severity="secondary" class="w-full" (click)="onEdit()">
                 Modifier l'activite
               </button>
             }
@@ -101,7 +119,5 @@
     }
   </div>
 </div>
-
-
 
 <p-confirmdialog />

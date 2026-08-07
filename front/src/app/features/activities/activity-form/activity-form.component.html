@@ -181,7 +181,7 @@
           class="ml-4"
           type="button"
           severity="secondary"
-          [label]="'ACTIONS.PUBLISH' | translate"
+          [label]="publishLabelKey() | translate"
           [disabled]="isLoading()"
           (click)="setStatus()"
         />

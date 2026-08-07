@@ -48,6 +48,10 @@ export class ActivitiesRepository {
     return this.http.post<ActivityDto>(this.apiUrl, activity);
   }
 
+  setStatus(activityId: string, status: 'published' | 'draft'): Observable<ActivityDto> {
+    return this.http.patch<ActivityDto>(`${this.apiUrl}/${activityId}/status/${status}`, null);
+  }
+
   updateActivity(activityId: string, activity: ActivityDtoRequest): Observable<ActivityDto> {
     return this.http.patch<ActivityDto>(`${this.apiUrl}/${activityId}`, activity);
   }

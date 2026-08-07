@@ -1,8 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import dayjs from 'dayjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -16,7 +23,14 @@ import { ActivityAttendanceComponent } from './activity-attendance/activity-atte
 @Component({
   selector: 'app-activity-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbModule, ConfirmDialogModule, DatePipe, ButtonDirective, ActivityAttendanceComponent],
+  imports: [
+    BreadcrumbModule,
+    ConfirmDialogModule,
+    DatePipe,
+    ButtonDirective,
+    ActivityAttendanceComponent,
+    TranslatePipe,
+  ],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],
 })
@@ -33,19 +47,22 @@ export class ActivityDetailComponent {
 
   private readonly refreshDataSource = new BehaviorSubject<void>(void 0);
   private readonly refreshData$ = this.refreshDataSource.asObservable();
-  
+
   protected readonly activityId = toSignal(
     this.activatedRoute.paramMap.pipe(
       map((params) => params.get('activityId')),
       map((value) => value ?? ''),
-      tap(() => this.refreshDataSource.next())
+      tap(() => this.refreshDataSource.next()),
     ),
-    { initialValue: '' }
+    { initialValue: '' },
   );
 
   protected readonly breadcrumbItems = computed<MenuItem[]>(() => [
-    { label: this.translateService.instant('ACTIVITIES.BREADCRUMB.LIST'), routerLink: '/activities' },
-    { label: this.activity()?.title  },
+    {
+      label: this.translateService.instant('ACTIVITIES.BREADCRUMB.LIST'),
+      routerLink: '/activities',
+    },
+    { label: this.activity()?.title },
   ]);
 
   protected readonly activity = toSignal(
@@ -53,9 +70,9 @@ export class ActivityDetailComponent {
       filter(() => !!this.activityId()),
       switchMap(() => {
         return this.activitiesRepository.getActivityById(this.activityId());
-      })
+      }),
     ),
-    { initialValue: null }
+    { initialValue: null },
   );
 
   protected canRegister = signal(this.authService.can('registration:create'));
@@ -66,18 +83,25 @@ export class ActivityDetailComponent {
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    return dayjs(activity.datetime).isAfter(dayjs(), 'day') || dayjs(activity.datetime).isSame(dayjs(), 'day');
+    return (
+      dayjs(activity.datetime).isAfter(dayjs(), 'day') ||
+      dayjs(activity.datetime).isSame(dayjs(), 'day')
+    );
   });
 
   protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());
-  protected readonly canDeleteActivity = computed(() => this.canDelete() && this.isFutureActivity());
+  protected readonly canDeleteActivity = computed(
+    () => this.canDelete() && this.isFutureActivity(),
+  );
   private readonly isAttendanceValidationAvailable = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    return activity.requiresAttendanceValidation && dayjs(activity.datetime).isBefore(dayjs(), 'day');
+    return (
+      activity.requiresAttendanceValidation && dayjs(activity.datetime).isBefore(dayjs(), 'day')
+    );
   });
-  protected readonly canValidateAttendanceForActivity = computed(() =>
-    this.canValidateAttendance() && this.isAttendanceValidationAvailable()
+  protected readonly canValidateAttendanceForActivity = computed(
+    () => this.canValidateAttendance() && this.isAttendanceValidationAvailable(),
   );
 
   protected onEdit(): void {
@@ -99,7 +123,7 @@ export class ActivityDetailComponent {
       .register(this.activityId())
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
         this.refreshDataSource.next();
@@ -132,7 +156,7 @@ export class ActivityDetailComponent {
       .deleteActivity(this.activityId())
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
         void this.router.navigate(['/activities']);
@@ -150,7 +174,7 @@ export class ActivityDetailComponent {
       .unregister(this.activityId())
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
         this.refreshDataSource.next();

@@ -4,6 +4,7 @@
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -14,6 +15,7 @@ import { CreateActivityDto } from 'src/models/activities/create-activity.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { ActivitiesService } from './activities.service';
+import { ActivityStatus } from './entities/activity.entity';
 
 @ApiTags('activities')
 @Controller('activities')
@@ -149,5 +151,18 @@ export class ActivitiesController {
       activityId,
       userId: req.user.id,
     };
+  }
+
+  @Patch(':activityId/status/:activityStatus')
+  @ApiOkResponse({ type: ActivityDto })
+  async updateActivityStatus(
+    @Param('activityId') activityId: string,
+    @Param('activityStatus') activityStatus: ActivityStatus,
+  ): Promise<ActivityDto> {
+    const activity = await this.activitiesService.updateStatus(
+      activityId,
+      activityStatus,
+    );
+    return activity;
   }
 }
