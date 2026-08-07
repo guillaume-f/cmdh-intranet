@@ -12,30 +12,35 @@ export const routes: Routes = [
         extend: true,
         loader: provideTranslateHttpLoader({
           prefix: '/assets/i18n/auth/',
-          suffix: '.json'
-        })
-      })
+          suffix: '.json',
+        }),
+      }),
     ],
-    
   },
   {
     path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/shell/shell.component').then(m => m.ShellComponent),
+    loadComponent: () => import('./features/shell/shell.component').then((m) => m.ShellComponent),
     children: [
       {
         path: 'activities',
-        loadChildren: () => import('./features/activities/activities.routes').then(m => m.activitiesRoutes),
+        loadChildren: () =>
+          import('./features/activities/activities.routes').then((m) => m.activitiesRoutes),
       },
       {
         path: 'users',
-        loadChildren: () => import('./features/users/users.routes').then(m => m.usersRoutes),
+        loadChildren: () => import('./features/users/users.routes').then((m) => m.usersRoutes),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile.component').then((m) => m.ProfileComponent),
       },
       {
         path: '',
         pathMatch: 'full',
         redirectTo: 'activities',
-      }
+      },
     ],
   },
 ];
