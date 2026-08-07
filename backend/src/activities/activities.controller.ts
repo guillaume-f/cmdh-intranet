@@ -13,14 +13,17 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityDto } from 'src/models/activities/activity.dto';
 import { CreateActivityRequest } from 'src/models/activities/create-activity.request';
 import { UpdateActivityRequest } from 'src/models/activities/update-activity.request';
+import { PERMISSIONS } from '../auth/constants/permissions.constants';
+import { Permissions } from '../auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { User } from '../users/entities/user.entity';
 import { ActivitiesService } from './activities.service';
 import { ActivityStatus } from './entities/activity.entity';
 
 @ApiTags('activities')
 @Controller('activities')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
@@ -48,6 +51,7 @@ export class ActivitiesController {
 
   @Post()
   @ApiCreatedResponse({ type: ActivityDto })
+  @Permissions(PERMISSIONS.ACTIVITY_CREATE)
   async createActivity(
     @Body() activityDto: CreateActivityRequest,
     @Request() req: { user: User },
@@ -61,6 +65,7 @@ export class ActivitiesController {
 
   @Patch(':activityId')
   @ApiOkResponse({ type: ActivityDto })
+  @Permissions(PERMISSIONS.ACTIVITY_EDIT)
   async updateActivity(
     @Param('activityId') activityId: string,
     @Body() activityDto: UpdateActivityRequest,
@@ -73,12 +78,14 @@ export class ActivitiesController {
   }
 
   @Delete(':activityId')
+  @Permissions(PERMISSIONS.ACTIVITY_DELETE)
   async deleteActivity(@Param('activityId') activityId: string) {
     await this.activitiesService.deleteActivity(activityId);
     return { message: 'Activity deleted.', activityId };
   }
 
   @Get(':activityId/participants')
+  @Permissions(PERMISSIONS.REGISTRATION_READ)
   async getActivityParticipants(@Param('activityId') activityId: string) {
     const participants =
       await this.activitiesService.getParticipants(activityId);
@@ -86,6 +93,7 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/participants/:userId/validate')
+  @Permissions(PERMISSIONS.ATTENDANCE_VALIDATE)
   async validateParticipantPresence(
     @Param('activityId') activityId: string,
     @Param('userId') userId: string,
@@ -100,6 +108,7 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/participants/:userId/invalidate')
+  @Permissions(PERMISSIONS.ATTENDANCE_VALIDATE)
   async invalidateParticipantPresence(
     @Param('activityId') activityId: string,
     @Param('userId') userId: string,
@@ -114,6 +123,7 @@ export class ActivitiesController {
   }
 
   @Delete(':activityId/participants/:userId')
+  @Permissions(PERMISSIONS.ATTENDANCE_VALIDATE)
   async deleteParticipantRegistration(
     @Param('activityId') activityId: string,
     @Param('userId') userId: string,
@@ -123,6 +133,7 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/participants/bulk-add')
+  @Permissions(PERMISSIONS.ATTENDANCE_VALIDATE)
   async addParticipantsWithPresence(
     @Param('activityId') activityId: string,
     @Body() payload: { userIds?: string[] },
@@ -137,6 +148,7 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/register')
+  @Permissions(PERMISSIONS.REGISTRATION_CREATE)
   async register(
     @Param('activityId') activityId: string,
     @Request() req: { user: User },
@@ -155,6 +167,7 @@ export class ActivitiesController {
   }
 
   @Post(':activityId/unregister')
+  @Permissions(PERMISSIONS.REGISTRATION_DELETE)
   async unregister(
     @Param('activityId') activityId: string,
     @Request() req: { user: User },
@@ -169,6 +182,7 @@ export class ActivitiesController {
 
   @Patch(':activityId/status/:activityStatus')
   @ApiOkResponse({ type: ActivityDto })
+  @Permissions(PERMISSIONS.ACTIVITY_PUBLISH)
   async updateActivityStatus(
     @Param('activityId') activityId: string,
     @Param('activityStatus') activityStatus: ActivityStatus,
