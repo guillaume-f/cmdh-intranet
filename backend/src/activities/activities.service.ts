@@ -4,7 +4,7 @@
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
 import { AttendanceValidation } from './entities/attendance-validation.entity';
 import { Registration } from './entities/registration.entity';
@@ -47,17 +47,19 @@ export class ActivitiesService {
       }));
     }
 
-    const registrations = await this.registrationsRepository.find({
-      where: {
-        activity: { id: In(registrationActivityIds) },
-        user: { id: userId },
-      },
-      relations: { activity: true },
-    });
+    const registrations = await this.registrationsRepository
+      .createQueryBuilder('registration')
+      .select('registration.activityId', 'activityId')
+      .addSelect('registration.registeredAt', 'registeredAt')
+      .where('registration.activityId IN (:...activityIds)', {
+        activityIds: registrationActivityIds,
+      })
+      .andWhere('registration.userId = :userId', { userId })
+      .getRawMany<{ activityId: string; registeredAt: Date }>();
 
     const registrationsByActivityId = new Map(
       registrations.map((registration) => [
-        registration.activity.id,
+        registration.activityId,
         registration,
       ]),
     );
@@ -68,7 +70,7 @@ export class ActivitiesService {
       return {
         ...activity,
         isRegistered: Boolean(registration),
-        registeredAt: registration?.registeredAt ?? null,
+        registeredAt: registration ? new Date(registration.registeredAt) : null,
       };
     });
   }
@@ -93,9 +95,13 @@ export class ActivitiesService {
       };
     }
 
-    const registration = await this.registrationsRepository.findOne({
-      where: { activity: { id }, user: { id: userId } },
-    });
+    const registration = await this.registrationsRepository
+      .createQueryBuilder('registration')
+      .select('registration.id', 'id')
+      .addSelect('registration.registeredAt', 'registeredAt')
+      .where('registration.activityId = :activityId', { activityId: id })
+      .andWhere('registration.userId = :userId', { userId })
+      .getRawOne<{ id: string; registeredAt: Date }>();
 
     return {
       ...activity,
@@ -116,9 +122,11 @@ export class ActivitiesService {
     userId: string,
     isPresent: boolean,
   ): Promise<AttendanceValidation> {
-    let validation = await this.attendanceRepository.findOne({
-      where: { activity: { id: activityId }, user: { id: userId } },
-    });
+    let validation = await this.attendanceRepository
+      .createQueryBuilder('attendance')
+      .where('attendance.activityId = :activityId', { activityId })
+      .andWhere('attendance.userId = :userId', { userId })
+      .getOne();
 
     if (!validation) {
       validation = this.attendanceRepository.create({
@@ -134,14 +142,20 @@ export class ActivitiesService {
   }
 
   async deleteParticipant(activityId: string, userId: string): Promise<void> {
-    await this.registrationsRepository.delete({
-      activity: { id: activityId },
-      user: { id: userId },
-    });
-    await this.attendanceRepository.delete({
-      activity: { id: activityId },
-      user: { id: userId },
-    });
+    await this.registrationsRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Registration)
+      .where('activityId = :activityId', { activityId })
+      .andWhere('userId = :userId', { userId })
+      .execute();
+    await this.attendanceRepository
+      .createQueryBuilder()
+      .delete()
+      .from(AttendanceValidation)
+      .where('activityId = :activityId', { activityId })
+      .andWhere('userId = :userId', { userId })
+      .execute();
   }
 
   async register(activityId: string, userId: string): Promise<Registration> {
@@ -153,9 +167,11 @@ export class ActivitiesService {
       );
     }
 
-    const existing = await this.registrationsRepository.findOne({
-      where: { activity: { id: activityId }, user: { id: userId } },
-    });
+    const existing = await this.registrationsRepository
+      .createQueryBuilder('registration')
+      .where('registration.activityId = :activityId', { activityId })
+      .andWhere('registration.userId = :userId', { userId })
+      .getOne();
 
     if (existing) {
       return existing;
@@ -179,9 +195,11 @@ export class ActivitiesService {
     userIds: string[],
   ): Promise<void> {
     for (const userId of userIds) {
-      const exists = await this.attendanceRepository.findOne({
-        where: { activity: { id: activityId }, user: { id: userId } },
-      });
+      const exists = await this.attendanceRepository
+        .createQueryBuilder('attendance')
+        .where('attendance.activityId = :activityId', { activityId })
+        .andWhere('attendance.userId = :userId', { userId })
+        .getOne();
       if (!exists) {
         const validation = this.attendanceRepository.create({
           activity: { id: activityId } as Activity,
