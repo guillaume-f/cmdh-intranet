@@ -4,6 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -15,8 +16,6 @@ interface AuthenticatedRequest extends Request {
   user?: { id?: string };
 }
 
-const LOG_BODY = process.env.LOG_BODY !== 'false';
-
 /**
  * Logs every incoming HTTP request (method, url, params, query, sanitized
  * body, ip, authenticated user) and its outcome (status code, duration).
@@ -25,12 +24,16 @@ const LOG_BODY = process.env.LOG_BODY !== 'false';
  */
 @Injectable()
 export class HttpLoggingInterceptor implements NestInterceptor {
-  constructor(private readonly logger: AppLogger) {}
+  constructor(
+    private readonly logger: AppLogger,
+    private readonly configService: ConfigService,
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const httpContext = context.switchToHttp();
     const req = httpContext.getRequest<AuthenticatedRequest>();
     const res = httpContext.getResponse<Response>();
+    const logBody = this.configService.get<boolean>('LOG_BODY') ?? false;
 
     if (req.user?.id) {
       RequestContext.setUserId(req.user.id);
@@ -44,7 +47,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
       url,
       params: sanitize(req.params),
       query: sanitize(req.query),
-      ...(LOG_BODY ? { body: sanitize(req.body) } : {}),
+      ...(logBody ? { body: sanitize(req.body) } : {}),
       ip: req.ip,
       userId: req.user?.id,
     });
@@ -57,7 +60,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
             url,
             statusCode: res.statusCode,
             durationMs: Date.now() - startedAt,
-            ...(LOG_BODY ? { responseBody: sanitize(data) } : {}),
+            ...(logBody ? { responseBody: sanitize(data) } : {}),
           });
         },
         error: () => {

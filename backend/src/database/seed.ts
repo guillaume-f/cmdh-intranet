@@ -2,9 +2,12 @@ import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { validateEnvironment } from '../config/env.validation';
 import { AppDataSource } from './datasource';
 
 dotenv.config();
+
+const env = validateEnvironment(process.env);
 
 const ROLES = [
   {
@@ -58,7 +61,6 @@ const ROLES = [
 const USERS = [
   {
     email: 'admin@intranet.be',
-    password: 'admin123',
     firstName: 'Sophie',
     lastName: 'Dumont',
     roleId: 'admin',
@@ -70,7 +72,6 @@ const USERS = [
   },
   {
     email: 'encoder@intranet.be',
-    password: 'encoder123',
     firstName: 'Marc',
     lastName: 'Lefevreeee',
     roleId: 'encoder',
@@ -82,7 +83,6 @@ const USERS = [
   },
   {
     email: 'member@intranet.be',
-    password: 'member123',
     firstName: 'Julie',
     lastName: 'Martin',
     roleId: 'member',
@@ -94,7 +94,6 @@ const USERS = [
   },
   {
     email: 'candidate@intranet.be',
-    password: 'candidate123',
     firstName: 'Thomas',
     lastName: 'Bernard',
     roleId: 'candidate',
@@ -106,9 +105,8 @@ const USERS = [
   },
   {
     email: 'julie.special@intranet.be',
-    password: 'special123',
     firstName: 'Julie',
-    lastName: 'Spéciale',
+    lastName: 'Speciale',
     roleId: 'member',
     extraPermissions: ['activity:create'],
     deniedPermissions: [],
@@ -118,9 +116,8 @@ const USERS = [
   },
   {
     email: 'encoder.limite@intranet.be',
-    password: 'limite123',
     firstName: 'Paul',
-    lastName: 'Limité',
+    lastName: 'Limite',
     roleId: 'encoder',
     extraPermissions: [],
     deniedPermissions: ['activity:delete', 'activity:publish'],
@@ -130,7 +127,6 @@ const USERS = [
   },
   {
     email: 'jpd@gmail.com',
-    password: 'changeMe123!',
     firstName: 'Jean Paul',
     lastName: 'Doe',
     roleId: 'member',
@@ -212,6 +208,19 @@ const ACTIVITIES = [
 ];
 
 async function seed(dataSource: DataSource) {
+  if (!env.ALLOW_SEED) {
+    throw new Error(
+      'Seeding is disabled. Set ALLOW_SEED=true and provide SEED_DEFAULT_PASSWORD to run this script.',
+    );
+  }
+
+  const seedPassword = env.SEED_DEFAULT_PASSWORD;
+  if (!seedPassword) {
+    throw new Error(
+      'SEED_DEFAULT_PASSWORD is required when seeding is enabled.',
+    );
+  }
+
   const roleRepo = dataSource.getRepository('roles');
   const userRepo = dataSource.getRepository('users');
   const activityRepo = dataSource.getRepository('activities');
@@ -229,7 +238,7 @@ async function seed(dataSource: DataSource) {
   for (const user of USERS) {
     const exists = await userRepo.findOneBy({ email: user.email });
     if (!exists) {
-      const hashed = await bcrypt.hash(user.password, 10);
+      const hashed = await bcrypt.hash(seedPassword, 10);
       const role = await roleRepo.findOneBy({ id: user.roleId });
       await userRepo.save(
         userRepo.create({

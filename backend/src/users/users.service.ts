@@ -135,7 +135,7 @@ export class UsersService {
       typeof payload.lastName === 'string' ? payload.lastName : '';
     user.email = typeof payload.email === 'string' ? payload.email : '';
     user.niss = typeof payload.niss === 'string' ? payload.niss : '';
-    user.active = typeof payload.active === 'boolean' ? payload.active : true;
+    user.active = false;
     user.entryYear =
       typeof payload.entryYear === 'number' ? payload.entryYear : null;
     user.extraPermissions = Array.isArray(payload.extraPermissions)
@@ -145,8 +145,7 @@ export class UsersService {
       ? (payload.deniedPermissions as string[])
       : [];
 
-    // Temporary placeholder password â€” must be set via reset flow
-    user.password = '';
+    user.password = null;
 
     if (typeof payload.role === 'string') {
       const role = await this.rolesService.findById(payload.role);

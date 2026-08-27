@@ -31,6 +31,30 @@
 $ npm install
 ```
 
+## Environment configuration
+
+Copy `.env.example` to `.env` for local development. In staging and production, inject the same variables through your deployment platform instead of committing environment files.
+
+Required deployment variables:
+
+- `NODE_ENV=production`
+- `PORT`
+- `CORS_ORIGINS` as a comma-separated allowlist
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`
+- `JWT_ACCESS_EXPIRATION`, `JWT_REFRESH_EXPIRATION`
+- `SWAGGER_ENABLED=false`
+- `LOG_LEVEL=log` or `warn`
+- `LOG_BODY=false`
+- `ALLOW_SEED=false`
+
+Security rules enforced by the application:
+
+- The API fails fast if JWT secrets are missing.
+- Production requires an explicit `CORS_ORIGINS` value.
+- Production rejects an empty `DB_PASSWORD`.
+- Seed execution requires `ALLOW_SEED=true` and `SEED_DEFAULT_PASSWORD`, and it must remain disabled in production.
+
 ## Compile and run the project
 
 ```bash
@@ -58,6 +82,17 @@ $ npm run test:cov
 ```
 
 ## Deployment
+
+Minimum deployment flow:
+
+```bash
+$ npm ci
+$ npm run build
+$ npm run migration:run
+$ npm run start:prod
+```
+
+Before the first production deployment, rotate any database credential or JWT key that may already have been used locally.
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 

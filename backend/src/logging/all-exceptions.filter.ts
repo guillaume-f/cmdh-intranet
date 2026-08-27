@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { AppLogger } from './app-logger.service';
 import { sanitize } from './redact.util';
@@ -22,7 +23,10 @@ interface AuthenticatedRequest extends Request {
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly logger: AppLogger) {}
+  constructor(
+    private readonly logger: AppLogger,
+    private readonly configService: ConfigService,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -45,7 +49,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         statusCode: status,
         params: sanitize(request.params),
         query: sanitize(request.query),
-        body: sanitize(request.body),
+        ...(this.configService.get<boolean>('LOG_BODY')
+          ? { body: sanitize(request.body) }
+          : {}),
         userId: request.user?.id,
         stack: exception instanceof Error ? exception.stack : undefined,
       },
@@ -82,7 +88,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const message =
-      isServerError && process.env.NODE_ENV === 'production'
+      isServerError &&
+      this.configService.get<string>('NODE_ENV') === 'production'
         ? 'Internal server error'
         : this.getMessage(exception);
 

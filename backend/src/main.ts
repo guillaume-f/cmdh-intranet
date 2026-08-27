@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -6,6 +7,7 @@ import { AppLogger } from './logging/app-logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const configService = app.get(ConfigService);
 
   app.useLogger(app.get(AppLogger));
 
@@ -22,8 +24,10 @@ async function bootstrap() {
     }),
   );
 
+  const corsOrigins = configService.get<string[]>('CORS_ORIGINS') ?? [];
+
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+    origin: corsOrigins,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -31,23 +35,25 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  const config = new DocumentBuilder()
-    .setTitle('CMDH Intranet API')
-    .setDescription('The CMDH Intranet API')
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-      },
-      'access-token',
-    )
-    .addTag('CMDH')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  if (configService.get<boolean>('SWAGGER_ENABLED') ?? false) {
+    const config = new DocumentBuilder()
+      .setTitle('CMDH Intranet API')
+      .setDescription('The CMDH Intranet API')
+      .setVersion('1.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+        'access-token',
+      )
+      .addTag('CMDH')
+      .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
+  }
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get<number>('PORT') ?? 3000);
 }
 void bootstrap();

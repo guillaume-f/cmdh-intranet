@@ -48,7 +48,11 @@ export class AuthService {
 
     const user = await this.usersService.findByEmail(email);
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !user.active || !user.password) {
+      throw new UnauthorizedException('Invalid credentials.');
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
@@ -171,34 +175,30 @@ export class AuthService {
   }
 
   private get accessSecret(): string {
-    return this.configService.get<string>(
-      'JWT_ACCESS_SECRET',
-      this.configService.get<string>('JWT_SECRET', 'change_me_in_production'),
-    );
+    return this.configService.get<string>('JWT_ACCESS_SECRET') as string;
   }
 
   private get refreshSecret(): string {
-    return this.configService.get<string>(
-      'JWT_REFRESH_SECRET',
-      this.configService.get<string>('JWT_SECRET', 'change_me_in_production'),
-    );
+    return this.configService.get<string>('JWT_REFRESH_SECRET') as string;
   }
 
   private get accessExpiration(): string {
-    return this.configService.get<string>('JWT_ACCESS_EXPIRATION', '10m');
+    return this.configService.get<string>('JWT_ACCESS_EXPIRATION') as string;
   }
 
   private get refreshExpiration(): string {
-    return this.configService.get<string>('JWT_REFRESH_EXPIRATION', '7d');
+    return this.configService.get<string>('JWT_REFRESH_EXPIRATION') as string;
   }
 
   forgotPassword(payload: ForgotPasswordRequest): ForgotPasswordDto {
+    void payload;
     return {
       message: 'If this email exists, a reset link has been sent.',
     };
   }
 
   resetPassword(payload: ResetPasswordRequest): ResetPasswordDto {
+    void payload;
     return {
       message: 'Password updated successfully.',
     };

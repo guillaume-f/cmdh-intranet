@@ -4,9 +4,9 @@ export class CreateInitialSchema1781011294781 implements MigrationInterface {
   name = 'CreateInitialSchema1781011294781';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const existingRoles = await queryRunner.query(
+    const existingRoles = (await queryRunner.query(
       "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'roles' LIMIT 1",
-    );
+    )) as unknown[];
 
     // If the schema already exists (e.g. created manually or via sync),
     // skip creation so this migration can be marked as executed.
