@@ -5,10 +5,11 @@ import { TagModule } from 'primeng/tag';
 import { UserRole } from '../../../core/auth/user-role.type';
 import { UserDto } from '../../../core/auth/user.model';
 import { UsersRepository } from '../../../repositories/users/users.repository';
+import { PageHeaderComponent } from '../../shell/page-header.component';
 
 @Component({
   selector: 'app-user-list.component',
-  imports: [RouterLink, TagModule],
+  imports: [RouterLink, TagModule, PageHeaderComponent],
   templateUrl: './user-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,9 +22,12 @@ export class UserListComponent {
     candidate: 3,
   };
 
-  protected readonly users: Signal<UserDto[] | null> = toSignal(this.usersRepository.getAllUsers(), {
-    initialValue: null
-  });
+  protected readonly users: Signal<UserDto[] | null> = toSignal(
+    this.usersRepository.getAllUsers(),
+    {
+      initialValue: null,
+    },
+  );
 
   protected readonly sortedUsers = computed(() => {
     const users = this.users();

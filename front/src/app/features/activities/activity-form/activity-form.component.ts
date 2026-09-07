@@ -23,6 +23,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
 import { ActivityDto } from '../../../repositories/activities/activity.model';
+import { PageHeaderComponent } from '../../shell/page-header.component';
 import { toActivityDtoRequest } from './activity-form.converter';
 import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
 
@@ -39,6 +40,7 @@ import { ActivityForm, ActivityFormValue } from './models/activity-form.model';
     ToggleSwitchModule,
     TranslatePipe,
     BreadcrumbModule,
+    PageHeaderComponent,
   ],
   templateUrl: './activity-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

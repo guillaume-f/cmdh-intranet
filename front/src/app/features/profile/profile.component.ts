@@ -16,12 +16,20 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ProfileRepository } from '../../repositories/profile/profile.repository';
 import { FormValidatorsService } from '../../services/form-validators.service';
 import { EMAIL_PATTERN } from '../../utilities/patterns';
+import { PageHeaderComponent } from '../shell/page-header.component';
 import { ProfilePasswordForm } from './profile.model';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, BreadcrumbModule, InputTextModule, ButtonModule, MessageModule],
+  imports: [
+    ReactiveFormsModule,
+    BreadcrumbModule,
+    InputTextModule,
+    ButtonModule,
+    MessageModule,
+    PageHeaderComponent,
+  ],
   providers: [FormValidatorsService],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,8 +47,6 @@ export class ProfileComponent {
   protected readonly emailErrorMessage = signal('');
   protected readonly passwordSuccessMessage = signal('');
   protected readonly passwordErrorMessage = signal('');
-
-  protected readonly breadcrumbItems = [{ label: 'Mon profil' }];
 
   protected readonly emailControl: FormControl<string> = this.fb.nonNullable.control('', [
     Validators.required,

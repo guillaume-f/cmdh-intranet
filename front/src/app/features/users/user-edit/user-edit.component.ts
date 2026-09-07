@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
@@ -13,6 +20,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { UserRole } from '../../../core/auth/user-role.type';
 import { UsersRepository } from '../../../repositories/users/users.repository';
+import { PageHeaderComponent } from '../../shell/page-header.component';
 import { UserEditFormValue } from './models/user-edit-form.model';
 import { UserEditFormService } from './user-edit-form.service';
 
@@ -29,6 +37,7 @@ import { UserEditFormService } from './user-edit-form.service';
     ToggleSwitchModule,
     ButtonModule,
     MessageModule,
+    PageHeaderComponent,
   ],
   templateUrl: './user-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,12 +66,17 @@ export class UserEditComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<MenuItem[]>(() => [
     { label: 'Utilisateurs', routerLink: '/users' },
-    { label: this.isEditMode() ? (this.userName() || 'Modification utilisateur') : 'Nouvel utilisateur' },
+    {
+      label: this.isEditMode()
+        ? this.userName() || 'Modification utilisateur'
+        : 'Nouvel utilisateur',
+    },
   ]);
 
-  protected readonly pageTitle = computed(() => this.isEditMode() ? 'Modification utilisateur' : 'Nouvel utilisateur');
-  protected readonly submitLabel = computed(() => this.isEditMode() ? 'Enregistrer' : 'Créer');
-  protected readonly cancelLink = computed<(string | number)[]>(() => this.isEditMode() ? ['/users', this.userId()] : ['/users']);
+  protected readonly submitLabel = computed(() => (this.isEditMode() ? 'Enregistrer' : 'Créer'));
+  protected readonly cancelLink = computed<(string | number)[]>(() =>
+    this.isEditMode() ? ['/users', this.userId()] : ['/users'],
+  );
 
   protected readonly form = this.userEditFormService.buildForm();
 
@@ -75,7 +89,6 @@ export class UserEditComponent implements OnInit {
     if (this.isEditMode()) {
       this.loadUser();
     }
-
   }
 
   protected onSubmit(): void {
@@ -88,13 +101,12 @@ export class UserEditComponent implements OnInit {
 
     const formValue = this.form.getRawValue() as UserEditFormValue;
 
-    const request$ = this.isEditMode() && this.userId()
-      ? this.usersRepository.updateUser(this.userId(), formValue)
-      : this.usersRepository.addUser(formValue);
+    const request$ =
+      this.isEditMode() && this.userId()
+        ? this.usersRepository.updateUser(this.userId(), formValue)
+        : this.usersRepository.addUser(formValue);
 
-    request$.pipe(
-      finalize(() => this.isSaving.set(false))
-    ).subscribe((savedUser) => {
+    request$.pipe(finalize(() => this.isSaving.set(false))).subscribe((savedUser) => {
       void this.router.navigate(['/users', savedUser.id]);
     });
   }
@@ -106,11 +118,12 @@ export class UserEditComponent implements OnInit {
 
     this.isLoading.set(true);
 
-    this.usersRepository.getUserById(this.userId()).pipe(
-      finalize(() => this.isLoading.set(false))
-    ).subscribe((user) => {
-      this.userName.set(`${user.firstName} ${user.lastName}`.trim());
-      this.userEditFormService.patchValue(this.form, user);
-    });
+    this.usersRepository
+      .getUserById(this.userId())
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe((user) => {
+        this.userName.set(`${user.firstName} ${user.lastName}`.trim());
+        this.userEditFormService.patchValue(this.form, user);
+      });
   }
 }

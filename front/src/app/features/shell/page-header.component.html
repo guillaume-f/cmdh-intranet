@@ -1,0 +1,25 @@
+<header class="flex min-h-20 items-center justify-between py-6">
+  <div class="min-w-0 flex-1">
+    <ng-content />
+  </div>
+  <div class="relative">
+    <button
+      type="button"
+      class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-slate-100"
+      (click)="userMenu.toggle($event)"
+      aria-label="Ouvrir le menu utilisateur"
+    >
+      <p-avatar
+        [label]="userInitials()"
+        shape="circle"
+        styleClass="bg-primary-100 text-primary-700"
+      />
+      <span class="hidden sm:block">
+        <span class="block text-sm font-medium text-slate-900">{{ userName() }}</span>
+        <span class="block text-xs text-slate-500">{{ roleLabel() }}</span>
+      </span>
+      <i class="pi pi-chevron-down text-xs text-slate-500"></i>
+    </button>
+    <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
+  </div>
+</header>

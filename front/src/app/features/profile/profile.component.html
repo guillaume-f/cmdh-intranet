@@ -1,156 +1,151 @@
-<div class="p-4 bg-primary-500 color-gray-900">
-  <h1 class="text-3xl font-semibold">Mon profil</h1>
-</div>
-
-<div class="w-full p-4 xl:mx-auto xl:max-w-5xl">
-  <p-breadcrumb [model]="breadcrumbItems" />
-
-  <div class="mt-6 grid gap-6 lg:grid-cols-2">
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-      <h2 class="text-lg font-semibold text-slate-900">Modifier mon email</h2>
-      <p class="mt-1 text-sm text-slate-600">
-        Mettez a jour l'adresse email utilisee pour vous connecter.
-      </p>
-
-      <form (ngSubmit)="onSubmitEmail()" class="mt-5 space-y-4">
-        <div class="flex flex-col gap-1">
-          <label for="profile-email" class="text-sm font-medium text-slate-700"
-            >Adresse email</label
-          >
-          <input
-            pInputText
-            id="profile-email"
-            type="email"
-            [formControl]="emailControl"
-            class="w-full"
-          />
-          @if (emailControl.errors?.['required'] && emailControl.touched) {
-            <p-message severity="error" variant="simple" size="small"
-              >L'adresse email est obligatoire.</p-message
-            >
-          }
-          @if (emailControl.errors?.['pattern'] && emailControl.touched) {
-            <p-message severity="error" variant="simple" size="small"
-              >Le format de l'email est invalide.</p-message
-            >
-          }
-        </div>
-
-        @if (emailErrorMessage()) {
-          <p-message severity="error" [text]="emailErrorMessage()" />
-        }
-        @if (emailSuccessMessage()) {
-          <p-message severity="success" [text]="emailSuccessMessage()" />
-        }
-
-        <div class="flex justify-end">
-          <p-button type="submit" label="Mettre a jour l'email" [disabled]="isSavingEmail()" />
-        </div>
-      </form>
-    </section>
-
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-      <h2 class="text-lg font-semibold text-slate-900">Modifier mon mot de passe</h2>
-      <p class="mt-1 text-sm text-slate-600">
-        Renseignez votre mot de passe actuel puis choisissez un nouveau mot de passe.
-      </p>
-
-      <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()" class="mt-5 space-y-4">
-        <div class="flex flex-col gap-1">
-          <label for="current-password" class="text-sm font-medium text-slate-700"
-            >Mot de passe actuel</label
-          >
-          <input
-            pInputText
-            id="current-password"
-            type="password"
-            [formControl]="passwordForm.controls.currentPassword"
-            class="w-full"
-          />
-          @if (
-            passwordForm.controls.currentPassword.errors?.['required'] &&
-            passwordForm.controls.currentPassword.touched
-          ) {
-            <p-message severity="error" variant="simple" size="small"
-              >Le mot de passe actuel est obligatoire.</p-message
-            >
-          }
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label for="new-password" class="text-sm font-medium text-slate-700"
-            >Nouveau mot de passe</label
-          >
-          <input
-            pInputText
-            id="new-password"
-            type="password"
-            [formControl]="passwordForm.controls.newPassword"
-            class="w-full"
-          />
-          @if (
-            passwordForm.controls.newPassword.errors?.['required'] &&
-            passwordForm.controls.newPassword.touched
-          ) {
-            <p-message severity="error" variant="simple" size="small"
-              >Le nouveau mot de passe est obligatoire.</p-message
-            >
-          }
-          @if (
-            passwordForm.controls.newPassword.errors?.['passwordStrength'] &&
-            passwordForm.controls.newPassword.touched
-          ) {
-            <p-message severity="error" variant="simple" size="small">
-              Le mot de passe doit contenir 8 caracteres minimum, une majuscule, une minuscule, un
-              chiffre et un caractere special.
-            </p-message>
-          }
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label for="confirm-password" class="text-sm font-medium text-slate-700"
-            >Confirmer le mot de passe</label
-          >
-          <input
-            pInputText
-            id="confirm-password"
-            type="password"
-            [formControl]="passwordForm.controls.confirmPassword"
-            class="w-full"
-          />
-          @if (
-            passwordForm.controls.confirmPassword.errors?.['required'] &&
-            passwordForm.controls.confirmPassword.touched
-          ) {
-            <p-message severity="error" variant="simple" size="small"
-              >La confirmation est obligatoire.</p-message
-            >
-          }
-          @if (
-            passwordForm.errors?.['passwordMismatch'] &&
-            passwordForm.controls.confirmPassword.touched
-          ) {
-            <p-message severity="error" variant="simple" size="small"
-              >Les mots de passe ne correspondent pas.</p-message
-            >
-          }
-        </div>
-
-        @if (passwordErrorMessage()) {
-          <p-message severity="error" [text]="passwordErrorMessage()" />
-        }
-        @if (passwordSuccessMessage()) {
-          <p-message severity="success" [text]="passwordSuccessMessage()" />
-        }
-
-        <div class="flex justify-end">
-          <p-button
-            type="submit"
-            label="Mettre a jour le mot de passe"
-            [disabled]="isSavingPassword()"
-          />
-        </div>
-      </form>
-    </section>
+<app-page-header>
+  <div class="flex flex-wrap items-center gap-4">
+    <h1 class="text-2xl font-semibold text-slate-900">Mon profil</h1>
   </div>
+</app-page-header>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+    <h2 class="text-lg font-semibold text-slate-900">Modifier mon email</h2>
+    <p class="mt-1 text-sm text-slate-600">
+      Mettez a jour l'adresse email utilisee pour vous connecter.
+    </p>
+
+    <form (ngSubmit)="onSubmitEmail()" class="mt-5 space-y-4">
+      <div class="flex flex-col gap-1">
+        <label for="profile-email" class="text-sm font-medium text-slate-700">Adresse email</label>
+        <input
+          pInputText
+          id="profile-email"
+          type="email"
+          [formControl]="emailControl"
+          class="w-full"
+        />
+        @if (emailControl.errors?.['required'] && emailControl.touched) {
+          <p-message severity="error" variant="simple" size="small"
+            >L'adresse email est obligatoire.</p-message
+          >
+        }
+        @if (emailControl.errors?.['pattern'] && emailControl.touched) {
+          <p-message severity="error" variant="simple" size="small"
+            >Le format de l'email est invalide.</p-message
+          >
+        }
+      </div>
+
+      @if (emailErrorMessage()) {
+        <p-message severity="error" [text]="emailErrorMessage()" />
+      }
+      @if (emailSuccessMessage()) {
+        <p-message severity="success" [text]="emailSuccessMessage()" />
+      }
+
+      <div class="flex justify-end">
+        <p-button type="submit" label="Mettre a jour l'email" [disabled]="isSavingEmail()" />
+      </div>
+    </form>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+    <h2 class="text-lg font-semibold text-slate-900">Modifier mon mot de passe</h2>
+    <p class="mt-1 text-sm text-slate-600">
+      Renseignez votre mot de passe actuel puis choisissez un nouveau mot de passe.
+    </p>
+
+    <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()" class="mt-5 space-y-4">
+      <div class="flex flex-col gap-1">
+        <label for="current-password" class="text-sm font-medium text-slate-700"
+          >Mot de passe actuel</label
+        >
+        <input
+          pInputText
+          id="current-password"
+          type="password"
+          [formControl]="passwordForm.controls.currentPassword"
+          class="w-full"
+        />
+        @if (
+          passwordForm.controls.currentPassword.errors?.['required'] &&
+          passwordForm.controls.currentPassword.touched
+        ) {
+          <p-message severity="error" variant="simple" size="small"
+            >Le mot de passe actuel est obligatoire.</p-message
+          >
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="new-password" class="text-sm font-medium text-slate-700"
+          >Nouveau mot de passe</label
+        >
+        <input
+          pInputText
+          id="new-password"
+          type="password"
+          [formControl]="passwordForm.controls.newPassword"
+          class="w-full"
+        />
+        @if (
+          passwordForm.controls.newPassword.errors?.['required'] &&
+          passwordForm.controls.newPassword.touched
+        ) {
+          <p-message severity="error" variant="simple" size="small"
+            >Le nouveau mot de passe est obligatoire.</p-message
+          >
+        }
+        @if (
+          passwordForm.controls.newPassword.errors?.['passwordStrength'] &&
+          passwordForm.controls.newPassword.touched
+        ) {
+          <p-message severity="error" variant="simple" size="small">
+            Le mot de passe doit contenir 8 caracteres minimum, une majuscule, une minuscule, un
+            chiffre et un caractere special.
+          </p-message>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="confirm-password" class="text-sm font-medium text-slate-700"
+          >Confirmer le mot de passe</label
+        >
+        <input
+          pInputText
+          id="confirm-password"
+          type="password"
+          [formControl]="passwordForm.controls.confirmPassword"
+          class="w-full"
+        />
+        @if (
+          passwordForm.controls.confirmPassword.errors?.['required'] &&
+          passwordForm.controls.confirmPassword.touched
+        ) {
+          <p-message severity="error" variant="simple" size="small"
+            >La confirmation est obligatoire.</p-message
+          >
+        }
+        @if (
+          passwordForm.errors?.['passwordMismatch'] && passwordForm.controls.confirmPassword.touched
+        ) {
+          <p-message severity="error" variant="simple" size="small"
+            >Les mots de passe ne correspondent pas.</p-message
+          >
+        }
+      </div>
+
+      @if (passwordErrorMessage()) {
+        <p-message severity="error" [text]="passwordErrorMessage()" />
+      }
+      @if (passwordSuccessMessage()) {
+        <p-message severity="success" [text]="passwordSuccessMessage()" />
+      }
+
+      <div class="flex justify-end">
+        <p-button
+          type="submit"
+          label="Mettre a jour le mot de passe"
+          [disabled]="isSavingPassword()"
+        />
+      </div>
+    </form>
+  </section>
 </div>

@@ -1,197 +1,198 @@
-<div class="p-4 bg-primary-500 color-gray-900">
-  <h1 class="text-3xl font-semibold">{{ pageTitleKey() | translate }}</h1>
-</div>
+<app-page-header>
+  <div class="flex flex-wrap items-center gap-4">
+    <h1 class="text-2xl font-semibold text-slate-900">
+      {{ isEditMode() ? 'Modifier une activité' : 'Nouvelle activité' }}
+    </h1>
+    <p-breadcrumb [model]="breadcrumbItems">
+      <ng-template #separator> / </ng-template>
+    </p-breadcrumb>
+  </div>
+</app-page-header>
 
-<p-breadcrumb [model]="breadcrumbItems" />
+<form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+  <!-- Titre -->
+  <div class="form-input-wrapper">
+    <label for="titre" class="form-label required">
+      {{ 'ACTIVITIES.FORM.TITRE_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <input
+        pInputText
+        id="titre"
+        type="text"
+        [formControl]="form.controls.titre"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.TITRE_PLACEHOLDER' | translate"
+        [attr.aria-invalid]="form.controls.titre.invalid && form.controls.titre.touched"
+      />
+      @if (form.controls.titre.errors?.['required'] && form.controls.titre.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.TITRE_REQUIRED' | translate }}
+        </p-message>
+      }
+      @if (form.controls.titre.errors?.['maxlength'] && form.controls.titre.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.TITRE_MAX_LENGTH' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
 
-<div class="w-full p-4 xl:mx-auto xl:max-w-6xl">
-  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
-    <!-- Titre -->
-    <div class="form-input-wrapper">
-      <label for="titre" class="form-label required">
-        {{ 'ACTIVITIES.FORM.TITRE_LABEL' | translate }}
-      </label>
-      <div class="flex flex-col gap-1">
-        <input
-          pInputText
-          id="titre"
-          type="text"
-          [formControl]="form.controls.titre"
-          class="w-full"
-          [placeholder]="'ACTIVITIES.FORM.TITRE_PLACEHOLDER' | translate"
-          [attr.aria-invalid]="form.controls.titre.invalid && form.controls.titre.touched"
-        />
-        @if (form.controls.titre.errors?.['required'] && form.controls.titre.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.TITRE_REQUIRED' | translate }}
-          </p-message>
+  <!-- Description -->
+  <div class="form-input-wrapper">
+    <label for="description" class="form-label required">
+      {{ 'ACTIVITIES.FORM.DESCRIPTION_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <textarea
+        pTextarea
+        id="description"
+        [formControl]="form.controls.description"
+        class="w-full"
+        rows="4"
+        [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
+        [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched"
+      ></textarea>
+      @if (form.controls.description.errors?.['required'] && form.controls.description.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.DESCRIPTION_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Date et heure -->
+  <div class="form-input-wrapper">
+    <label for="dateHeure" class="form-label required">
+      {{ 'ACTIVITIES.FORM.DATETIME_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <p-datepicker
+        inputId="dateHeure"
+        [formControl]="form.controls.dateHeure"
+        dateFormat="dd/mm/yy"
+        [showTime]="true"
+        hourFormat="24"
+        [showIcon]="true"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.DATETIME_PLACEHOLDER' | translate"
+      />
+      @if (form.controls.dateHeure.errors?.['required'] && form.controls.dateHeure.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.DATETIME_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Adresse -->
+  <div class="form-input-wrapper">
+    <label for="adresse" class="form-label required">
+      {{ 'ACTIVITIES.FORM.ADRESSE_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <input
+        pInputText
+        id="adresse"
+        type="text"
+        [formControl]="form.controls.adresse"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.ADRESSE_PLACEHOLDER' | translate"
+        [attr.aria-invalid]="form.controls.adresse.invalid && form.controls.adresse.touched"
+      />
+      @if (form.controls.adresse.errors?.['required'] && form.controls.adresse.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.ADRESSE_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Points -->
+  <div class="form-input-wrapper">
+    <label for="points" class="form-label required">
+      {{ 'ACTIVITIES.FORM.POINTS_LABEL' | translate }}
+    </label>
+    <div class="flex flex-col gap-1">
+      <p-select
+        inputId="points"
+        [formControl]="form.controls.points"
+        [options]="pointsOptions"
+        class="w-full"
+        [placeholder]="'ACTIVITIES.FORM.POINTS_PLACEHOLDER' | translate"
+      />
+      @if (form.controls.points.errors?.['required'] && form.controls.points.touched) {
+        <p-message severity="error" variant="simple" size="small">
+          {{ 'ACTIVITIES.ERRORS.POINTS_REQUIRED' | translate }}
+        </p-message>
+      }
+    </div>
+  </div>
+
+  <!-- Validation de présence requise -->
+  <div class="form-input-wrapper">
+    <label for="requiresAttendanceValidation" class="form-label">
+      {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_LABEL' | translate }}
+    </label>
+    <div class="flex items-center gap-3">
+      <p-toggleswitch
+        inputId="requiresAttendanceValidation"
+        [formControl]="form.controls.requiresAttendanceValidation"
+      />
+      <span class="text-sm text-slate-600">
+        @if (form.controls.requiresAttendanceValidation.value) {
+          {{ 'COMMON.YES' | translate }}
+        } @else {
+          {{ 'COMMON.NO' | translate }}
         }
-        @if (form.controls.titre.errors?.['maxlength'] && form.controls.titre.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.TITRE_MAX_LENGTH' | translate }}
-          </p-message>
+      </span>
+    </div>
+  </div>
+
+  <!-- Inscription requise -->
+  <div class="form-input-wrapper">
+    <label for="requiresRegistration" class="form-label">
+      {{ 'ACTIVITIES.FORM.REQUIRES_REGISTRATION_LABEL' | translate }}
+    </label>
+    <div class="flex items-center gap-3">
+      <p-toggleswitch
+        inputId="requiresRegistration"
+        [formControl]="form.controls.requiresRegistration"
+      />
+      <span class="text-sm text-slate-600">
+        @if (form.controls.requiresRegistration.value) {
+          {{ 'COMMON.YES' | translate }}
+        } @else {
+          {{ 'COMMON.NO' | translate }}
         }
-      </div>
+      </span>
     </div>
+  </div>
 
-    <!-- Description -->
-    <div class="form-input-wrapper">
-      <label for="description" class="form-label required">
-        {{ 'ACTIVITIES.FORM.DESCRIPTION_LABEL' | translate }}
-      </label>
-      <div class="flex flex-col gap-1">
-        <textarea
-          pTextarea
-          id="description"
-          [formControl]="form.controls.description"
-          class="w-full"
-          rows="4"
-          [placeholder]="'ACTIVITIES.FORM.DESCRIPTION_PLACEHOLDER' | translate"
-          [attr.aria-invalid]="
-            form.controls.description.invalid && form.controls.description.touched
-          "
-        ></textarea>
-        @if (form.controls.description.errors?.['required'] && form.controls.description.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.DESCRIPTION_REQUIRED' | translate }}
-          </p-message>
-        }
-      </div>
-    </div>
-
-    <!-- Date et heure -->
-    <div class="form-input-wrapper">
-      <label for="dateHeure" class="form-label required">
-        {{ 'ACTIVITIES.FORM.DATETIME_LABEL' | translate }}
-      </label>
-      <div class="flex flex-col gap-1">
-        <p-datepicker
-          inputId="dateHeure"
-          [formControl]="form.controls.dateHeure"
-          dateFormat="dd/mm/yy"
-          [showTime]="true"
-          hourFormat="24"
-          [showIcon]="true"
-          class="w-full"
-          [placeholder]="'ACTIVITIES.FORM.DATETIME_PLACEHOLDER' | translate"
-        />
-        @if (form.controls.dateHeure.errors?.['required'] && form.controls.dateHeure.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.DATETIME_REQUIRED' | translate }}
-          </p-message>
-        }
-      </div>
-    </div>
-
-    <!-- Adresse -->
-    <div class="form-input-wrapper">
-      <label for="adresse" class="form-label required">
-        {{ 'ACTIVITIES.FORM.ADRESSE_LABEL' | translate }}
-      </label>
-      <div class="flex flex-col gap-1">
-        <input
-          pInputText
-          id="adresse"
-          type="text"
-          [formControl]="form.controls.adresse"
-          class="w-full"
-          [placeholder]="'ACTIVITIES.FORM.ADRESSE_PLACEHOLDER' | translate"
-          [attr.aria-invalid]="form.controls.adresse.invalid && form.controls.adresse.touched"
-        />
-        @if (form.controls.adresse.errors?.['required'] && form.controls.adresse.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.ADRESSE_REQUIRED' | translate }}
-          </p-message>
-        }
-      </div>
-    </div>
-
-    <!-- Points -->
-    <div class="form-input-wrapper">
-      <label for="points" class="form-label required">
-        {{ 'ACTIVITIES.FORM.POINTS_LABEL' | translate }}
-      </label>
-      <div class="flex flex-col gap-1">
-        <p-select
-          inputId="points"
-          [formControl]="form.controls.points"
-          [options]="pointsOptions"
-          class="w-full"
-          [placeholder]="'ACTIVITIES.FORM.POINTS_PLACEHOLDER' | translate"
-        />
-        @if (form.controls.points.errors?.['required'] && form.controls.points.touched) {
-          <p-message severity="error" variant="simple" size="small">
-            {{ 'ACTIVITIES.ERRORS.POINTS_REQUIRED' | translate }}
-          </p-message>
-        }
-      </div>
-    </div>
-
-    <!-- Validation de présence requise -->
-    <div class="form-input-wrapper">
-      <label for="requiresAttendanceValidation" class="form-label">
-        {{ 'ACTIVITIES.FORM.REQUIRES_ATTENDANCE_VALIDATION_LABEL' | translate }}
-      </label>
-      <div class="flex items-center gap-3">
-        <p-toggleswitch
-          inputId="requiresAttendanceValidation"
-          [formControl]="form.controls.requiresAttendanceValidation"
-        />
-        <span class="text-sm text-slate-600">
-          @if (form.controls.requiresAttendanceValidation.value) {
-            {{ 'COMMON.YES' | translate }}
-          } @else {
-            {{ 'COMMON.NO' | translate }}
-          }
-        </span>
-      </div>
-    </div>
-
-    <!-- Inscription requise -->
-    <div class="form-input-wrapper">
-      <label for="requiresRegistration" class="form-label">
-        {{ 'ACTIVITIES.FORM.REQUIRES_REGISTRATION_LABEL' | translate }}
-      </label>
-      <div class="flex items-center gap-3">
-        <p-toggleswitch
-          inputId="requiresRegistration"
-          [formControl]="form.controls.requiresRegistration"
-        />
-        <span class="text-sm text-slate-600">
-          @if (form.controls.requiresRegistration.value) {
-            {{ 'COMMON.YES' | translate }}
-          } @else {
-            {{ 'COMMON.NO' | translate }}
-          }
-        </span>
-      </div>
-    </div>
-
-    <!-- Submit -->
-    <div class="flex justify-between">
+  <!-- Submit -->
+  <div class="flex justify-between">
+    <p-button
+      type="button"
+      severity="secondary"
+      [label]="'ACTIONS.CANCEL' | translate"
+      [disabled]="isLoading()"
+      (click)="cancel()"
+    />
+    <div>
       <p-button
+        class="ml-4"
         type="button"
         severity="secondary"
-        [label]="'ACTIONS.CANCEL' | translate"
+        [label]="publishLabelKey() | translate"
         [disabled]="isLoading()"
-        (click)="cancel()"
+        (click)="setStatus()"
       />
-      <div>
-        <p-button
-          class="ml-4"
-          type="button"
-          severity="secondary"
-          [label]="publishLabelKey() | translate"
-          [disabled]="isLoading()"
-          (click)="setStatus()"
-        />
-        <p-button
-          class="ml-4"
-          type="submit"
-          [label]="submitLabelKey() | translate"
-          [disabled]="isLoading()"
-        />
-      </div>
+      <p-button
+        class="ml-4"
+        type="submit"
+        [label]="submitLabelKey() | translate"
+        [disabled]="isLoading()"
+      />
     </div>
-  </form>
-</div>
+  </div>
+</form>

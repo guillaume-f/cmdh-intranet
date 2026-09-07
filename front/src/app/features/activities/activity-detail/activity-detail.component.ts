@@ -18,6 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BehaviorSubject, filter, finalize, map, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
+import { PageHeaderComponent } from '../../shell/page-header.component';
 import { ActivityAttendanceComponent } from './activity-attendance/activity-attendance.component';
 
 @Component({
@@ -30,6 +31,7 @@ import { ActivityAttendanceComponent } from './activity-attendance/activity-atte
     ButtonDirective,
     ActivityAttendanceComponent,
     TranslatePipe,
+    PageHeaderComponent,
   ],
   templateUrl: './activity-detail.component.html',
   providers: [ConfirmationService],

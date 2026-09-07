@@ -8,6 +8,7 @@ import { ButtonDirective } from 'primeng/button';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ActivitiesRepository } from '../../../repositories/activities/activities.repository';
+import { PageHeaderComponent } from '../../shell/page-header.component';
 
 @Component({
   selector: 'app-activity-list',
@@ -22,6 +23,7 @@ import { ActivitiesRepository } from '../../../repositories/activities/activitie
     TabPanels,
     TabPanel,
     TranslatePipe,
+    PageHeaderComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './activity-list.component.html',
