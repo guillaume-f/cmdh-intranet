@@ -119,7 +119,33 @@ export class ActivitiesService {
   }
 
   async deleteActivity(id: string): Promise<void> {
+    const activity = await this.findById(id);
+    this.assertNotPast(activity, 'A past activity cannot be deleted.');
     await this.activitiesRepository.delete(id);
+  }
+
+  private isPast(activity: Pick<Activity, 'datetime'>): boolean {
+    return new Date(activity.datetime).getTime() <= Date.now();
+  }
+
+  private assertNotPast(
+    activity: Pick<Activity, 'datetime'>,
+    message: string,
+  ): void {
+    if (this.isPast(activity)) {
+      throw new BadRequestException(message);
+    }
+  }
+
+  private async assertRequiresAttendanceValidation(
+    activityId: string,
+  ): Promise<void> {
+    const activity = await this.findById(activityId);
+    if (!activity.requiresAttendanceValidation) {
+      throw new BadRequestException(
+        `Activity ${activityId} does not require attendance validation`,
+      );
+    }
   }
 
   async create(
@@ -149,6 +175,17 @@ export class ActivitiesService {
 
     if (!activity) {
       throw new NotFoundException(`Activity ${activityId} not found`);
+    }
+
+    this.assertNotPast(activity, 'A past activity cannot be modified.');
+
+    if (
+      activityData.datetime !== undefined &&
+      !activityDateValidator(new Date(activityData.datetime))
+    ) {
+      throw new BadRequestException(
+        'The activity datetime must be a valid date and in the future.',
+      );
     }
 
     activity = { ...activity, ...activityData };
@@ -197,6 +234,8 @@ export class ActivitiesService {
     userId: string,
     isPresent: boolean,
   ): Promise<void> {
+    await this.assertRequiresAttendanceValidation(activityId);
+
     let validation = await this.attendanceRepository
       .createQueryBuilder('attendance')
       .where('attendance.activityId = :activityId', { activityId })
@@ -220,6 +259,8 @@ export class ActivitiesService {
     activityId: string,
     userIds: string[],
   ): Promise<void> {
+    await this.assertRequiresAttendanceValidation(activityId);
+
     for (const userId of userIds) {
       const exists = await this.attendanceRepository
         .createQueryBuilder('attendance')
@@ -246,6 +287,8 @@ export class ActivitiesService {
       );
     }
 
+    this.assertNotPast(activity, 'The registration deadline has passed.');
+
     const existing = await this.registrationsRepository
       .createQueryBuilder('registration')
       .where('registration.activityId = :activityId', { activityId })
@@ -265,7 +308,8 @@ export class ActivitiesService {
   }
 
   async unregister(activityId: string, userId: string): Promise<void> {
-    await this.findById(activityId);
+    const activity = await this.findById(activityId);
+    this.assertNotPast(activity, 'The unregistration deadline has passed.');
     await this.deleteParticipant(activityId, userId);
   }
 
@@ -286,6 +330,8 @@ export class ActivitiesService {
     if (!activity) {
       throw new NotFoundException(`Activity ${activityId} not found`);
     }
+
+    this.assertNotPast(activity, 'A past activity cannot be modified.');
 
     activity.status = status;
     const updatedActivity = await this.activitiesRepository.save(activity);

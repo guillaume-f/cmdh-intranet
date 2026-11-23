@@ -85,10 +85,7 @@ export class ActivityDetailComponent {
   protected readonly isFutureActivity = computed(() => {
     const activity = this.activity();
     if (!activity) return false;
-    return (
-      dayjs(activity.datetime).isAfter(dayjs(), 'day') ||
-      dayjs(activity.datetime).isSame(dayjs(), 'day')
-    );
+    return dayjs(activity.datetime).isAfter(dayjs());
   });
 
   protected readonly canEditActivity = computed(() => this.canEdit() && this.isFutureActivity());
