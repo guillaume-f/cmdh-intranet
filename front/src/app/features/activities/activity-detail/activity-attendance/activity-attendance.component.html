@@ -1,11 +1,13 @@
-<div class="space-y-2 rounded-xl border border-slate-200 p-4">
+<div class="space-y-2 border border-slate-200 p-4">
   <h3 class="text-lg font-semibold text-slate-900">Membres inscrits</h3>
 
   @if (participants().length > 0) {
     <ul class="space-y-1">
       @for (participant of participants(); track participant.userId) {
-        <li class="rounded-lg border border-slate-200 p-3">
-          <p class="font-medium text-slate-900">{{ participant.firstName }} {{ participant.lastName }}</p>
+        <li class="border border-slate-200 p-3">
+          <p class="font-medium text-slate-900">
+            {{ participant.firstName }} {{ participant.lastName }}
+          </p>
           <p class="text-sm text-slate-600">
             @if (participant.isPresent === true) {
               Présence validée
@@ -73,9 +75,7 @@
           filterBy="firstName,lastName"
           placeholder="Sélectionner des membres..."
         >
-          <ng-template #item let-user>
-            {{ user.firstName }} {{ user.lastName }}
-          </ng-template>
+          <ng-template #item let-user> {{ user.firstName }} {{ user.lastName }} </ng-template>
         </p-multiselect>
 
         <button

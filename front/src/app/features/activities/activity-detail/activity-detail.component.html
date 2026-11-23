@@ -9,9 +9,7 @@
 <div class="space-y-4">
   @if (activity(); as currentActivity) {
     <div class="grid gap-6 lg:grid-cols-3">
-      <section
-        class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2"
-      >
+      <section class="space-y-6 border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
         <div class="space-y-2">
           <h2 class="text-3xl font-semibold text-slate-900">{{ currentActivity.title }}</h2>
         </div>
@@ -34,7 +32,7 @@
         ></app-activity-attendance>
 
         @if (canRegister()) {
-          <div class="rounded-xl bg-slate-50 p-4">
+          <div class="bg-slate-50 p-4">
             <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
               Nombre de points
             </p>
@@ -43,7 +41,7 @@
         }
       </section>
 
-      <aside class="space-y-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+      <aside class="space-y-6 border border-slate-200 bg-slate-50 p-6 shadow-sm">
         <div class="space-y-4">
           <div>
             <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
