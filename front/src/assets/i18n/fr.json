@@ -47,6 +47,9 @@
   "USERS": {
     "BREADCRUMB": {
       "LIST": "Utilisateurs"
+    },
+    "EDIT": {
+      "ACTIVE_SELF_LOCKED": "Vous ne pouvez pas désactiver votre propre compte. Un autre administrateur peut le faire si nécessaire."
     }
   }
 }

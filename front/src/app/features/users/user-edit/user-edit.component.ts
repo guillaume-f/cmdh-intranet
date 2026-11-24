@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
@@ -38,6 +39,7 @@ import { UserEditFormService } from './user-edit-form.service';
     ButtonModule,
     MessageModule,
     PageHeaderComponent,
+    TranslatePipe,
   ],
   templateUrl: './user-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +53,12 @@ export class UserEditComponent implements OnInit {
 
   private readonly userId = signal(this.activatedRoute.snapshot.paramMap.get('userId') ?? '');
   private readonly isEditMode = computed(() => !!this.userId());
+  protected readonly isOwnRecord = computed(
+    () => this.isEditMode() && this.userId() === this.authService.currentUser()?.id,
+  );
+  protected readonly activeSwitchPt = computed(() =>
+    this.isOwnRecord() ? { input: { 'aria-describedby': 'active-self-locked-help' } } : undefined,
+  );
   private readonly userName = signal('');
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);
@@ -84,6 +92,11 @@ export class UserEditComponent implements OnInit {
     if (this.authService.userRole() !== 'admin') {
       void this.router.navigate(['/users']);
       return;
+    }
+
+    // UI comfort only: the server rejects self-deactivation (400). getRawValue() still sends active.
+    if (this.isOwnRecord()) {
+      this.form.controls.active.disable({ emitEvent: false });
     }
 
     if (this.isEditMode()) {
