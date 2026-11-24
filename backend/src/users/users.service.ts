@@ -1,4 +1,8 @@
-﻿import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AttendanceValidation } from '../activities/entities/attendance-validation.entity';
@@ -34,8 +38,10 @@ export class UsersService {
     refreshTokenId: string,
     refreshTokenExpiresAt: Date,
   ): Promise<void> {
+    // Filtering on `active` prevents a concurrent refresh from rewriting a
+    // session that a deactivation has just purged.
     await this.usersRepository.update(
-      { id: userId },
+      { id: userId, active: true },
       { refreshTokenHash, refreshTokenId, refreshTokenExpiresAt },
     );
   }
@@ -93,7 +99,14 @@ export class UsersService {
     };
   }
 
-  async updateUser(userId: string, payload: Record<string, unknown>) {
+  async updateUser(
+    userId: string,
+    payload: Record<string, unknown>,
+    actorId: string,
+  ) {
+    // Checked before any read/write: the whole update is rejected.
+    this.assertNotSelfDeactivation(userId, actorId, payload);
+
     const user = await this.usersRepository.findOne({
       where: { id: userId },
       relations: { role: true },
@@ -102,6 +115,10 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User ${userId} not found`);
     }
+
+    // Re-checked on the loaded id: the DB lookup is case-insensitive, so a
+    // differently-cased param can resolve to the actor's own row. Nothing saved yet.
+    this.assertNotSelfDeactivation(user.id, actorId, payload);
 
     if (typeof payload.firstName === 'string')
       user.firstName = payload.firstName;
@@ -121,6 +138,13 @@ export class UsersService {
     if (typeof payload.role === 'string') {
       const role = await this.rolesService.findById(payload.role);
       if (role) user.role = role;
+    }
+
+    // Inactive account → revoke its refresh session in the same save.
+    if (!user.active) {
+      user.refreshTokenHash = null;
+      user.refreshTokenId = null;
+      user.refreshTokenExpiresAt = null;
     }
 
     const updated = await this.usersRepository.save(user);
@@ -154,6 +178,18 @@ export class UsersService {
 
     const created = await this.usersRepository.save(user);
     return this.toResponseDto(created);
+  }
+
+  private assertNotSelfDeactivation(
+    targetId: string,
+    actorId: string,
+    payload: Record<string, unknown>,
+  ): void {
+    if (targetId === actorId && payload.active === false) {
+      throw new BadRequestException(
+        'An administrator cannot deactivate their own account.',
+      );
+    }
   }
 
   private toResponseDto(user: User) {

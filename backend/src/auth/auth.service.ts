@@ -101,6 +101,11 @@ export class AuthService {
       throw new UnauthorizedException('Refresh session not found.');
     }
 
+    if (!user.active) {
+      await this.usersService.clearRefreshTokenSession(user.id);
+      throw new UnauthorizedException('Refresh session expired or invalid.');
+    }
+
     const isExpired = user.refreshTokenExpiresAt.getTime() <= Date.now();
     const isHashMismatch =
       user.refreshTokenHash !== this.hashToken(refreshToken);

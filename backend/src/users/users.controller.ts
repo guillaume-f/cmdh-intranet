@@ -5,9 +5,11 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -26,6 +28,7 @@ import { UserByIdResponseDto } from './dto/user-by-id-response.dto';
 import { UserPayloadDto } from './dto/user-payload.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UserValidatedActivitiesResponseDto } from './dto/user-validated-activities-response.dto';
+import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
@@ -67,14 +70,19 @@ export class UsersController {
   @Patch(':userId')
   @ApiParam({ name: 'userId', type: String })
   @ApiOkResponse({ type: UpdateUserResponseDto })
+  @ApiBadRequestResponse({
+    description: 'An administrator cannot deactivate their own account.',
+  })
   @Permissions(PERMISSIONS.USER_MANAGE)
   async updateUser(
     @Param('userId') userId: string,
     @Body() payload: UserPayloadDto,
+    @Request() req: { user: User },
   ): Promise<UpdateUserResponseDto> {
     return this.usersService.updateUser(
       userId,
       payload as unknown as Record<string, unknown>,
+      req.user.id,
     );
   }
 
