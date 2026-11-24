@@ -2,7 +2,7 @@
 id: US-001
 title: "Couper la session d'un compte inactif"
 slug: couper-la-session-d-un-compte-inactif
-status: arch
+status: done
 priority: high
 track: full
 team: [ux-designer, dev-back, dev-front, tester]
@@ -437,13 +437,110 @@ Aucun : vérification d'état par requête déjà en place (lookup DB dans `JwtS
 | T3 | tester | `backend/src/auth/strategies/jwt.strategy.spec.ts`, `backend/src/auth/auth.service.spec.ts`, `backend/src/users/users.service.spec.ts`, `backend/src/users/users.controller.spec.ts`, `front/src/app/features/users/user-edit/user-edit.component.spec.ts` | — (écrit en parallèle sur les contrats C1–C5 ; exécution finale après T1, T2) | une assertion par scénario du tableau « Stratégie de test » ; `npx jest` et `npx ng test --watch=false` verts |
 
 ## 6. Implementation Notes
-_(pending)_
+
+### dev-back
+**Fichiers (T1)**
+- `backend/src/auth/strategies/jwt.strategy.ts` — C1 : `validate(): Promise<User | null>` renvoie `null` si compte absent ou `active = false` (→ 401 via `JwtAuthGuard`).
+- `backend/src/auth/auth.service.ts` — C2 : dans `refresh`, après le contrôle « session absente » et avant expiration/hash/tokenId, `!user.active` → `clearRefreshTokenSession(user.id)` puis 401 `'Refresh session expired or invalid.'`.
+- `backend/src/users/users.service.ts` — C3 : `setRefreshTokenSession` filtre l'`update` sur `{ id: userId, active: true }`. C4 : `updateUser(userId, payload, actorId)` ; garde d'auto-désactivation en tout premier (`userId === actorId && payload.active === false` → `BadRequestException('An administrator cannot deactivate their own account.')`, aucun `findOne`/`save`) ; après application du payload, `!user.active` → les 3 champs de session à `null`, persistés par le même `save`.
+- `backend/src/users/users.controller.ts` — C4 : `@Request() req: { user: User }` ajouté, `req.user.id` transmis comme `actorId` ; `@ApiBadRequestResponse` ajouté.
+
+**Commandes**
+- `cd backend; npm run build` → OK (exit 0).
+- `cd backend; npx eslint "{src,apps,libs,test}/**/*.ts"` → 3 erreurs prettier, **toutes dans `src/auth/auth.service.spec.ts`** (fichier du tester, en cours d'écriture en parallèle : lignes 97, 98, 189). Sur les 4 fichiers dev-back : `npx eslint <4 fichiers>` → 0 problème (exit 0).
+- Tests : non lancés (specs en cours d'écriture par le tester, T3).
+
+**Écarts mineurs vs §5**
+- Type de retour de `UsersService.updateUser` laissé inféré : aucun type `UserResponse` n'existe dans le code (le contrôleur reste typé `Promise<UpdateUserResponseDto>`). Comportement identique.
+
+**Points d'attention reviewer/tester**
+- La révocation dans `updateUser` se déclenche sur l'état **enregistré** (`!user.active`), pas sur `payload.active === false` : enregistrer une fiche d'un compte déjà inactif (sans toucher `active`) purge aussi sa session — sans effet, une telle session étant déjà inutilisable (C1/C2).
+- Un `payload.active` non booléen (ex. `"false"`) ne déclenche pas la garde ; il est aussi ignoré par l'application du payload (`typeof === 'boolean'`), donc aucune auto-désactivation possible par ce biais.
+- Mocks : `setRefreshTokenSession` attend désormais `update({ id, active: true }, …)` ; `refresh` d'un compte inactif appelle `clearRefreshTokenSession` et jamais `setRefreshTokenSession`.
+
+**Rework 1 (T1) — finding 🔴 security-perf-reviewer (auto-désactivation via UUID en casse différente)**
+- `backend/src/users/users.service.ts` — garde extraite dans `private assertNotSelfDeactivation(targetId, actorId, payload)` ; appelée (1) avant `findOne` avec `userId` (inchangé) et (2) juste après `findOne`/404, avec `user.id` chargé, **avant** l'application du payload. La collation MySQL insensible à la casse de `users.id` fait qu'un `PATCH /api/users/<propre UUID en MAJUSCULES>` charge la ligne de l'admin : le 2ᵉ contrôle le rejette (400, même message), rien n'est sauvegardé → rejet tout-ou-rien (D7) conservé.
+- `cd backend; npm run build` → OK (exit 0). `npx eslint` sur les 4 fichiers dev-back → 0 problème (exit 0).
+- Tester : cas à couvrir — `updateUser('<ID EN MAJ>', { active: false }, '<id>')` avec `findOne` renvoyant `{ id: '<id>' }` → `BadRequestException`, `save` non appelé. Note : dans ce cas `findOne` **est** appelé (contrairement au cas d'ID identique).
+
+### dev-front
+**Fichiers (T2)**
+- `front/src/app/features/users/user-edit/user-edit.component.ts` — C5 : `isOwnRecord` (`isEditMode() && userId() === authService.currentUser()?.id`), `activeSwitchPt` (`{ input: { 'aria-describedby': 'active-self-locked-help' } }` ou `undefined`), `form.controls.active.disable({ emitEvent: false })` dans `ngOnInit` après le contrôle admin et avant `loadUser()` ; `TranslatePipe` importé. `onSubmit` reste sur `getRawValue()` (inchangé) → `active` envoyé même désactivé.
+- `front/src/app/features/users/user-edit/user-edit.component.html` — bloc « Compte actif » passé en `flex-col gap-2` (ligne interrupteur + libellé inchangée), `[pt]="activeSwitchPt()"` sur `p-toggleswitch`, `<p id="active-self-locked-help" class="text-sm text-slate-600">` sous `@if (isOwnRecord())`. Exactement le gabarit de C5.
+- `front/src/assets/i18n/fr.json` — `USERS.EDIT.ACTIVE_SELF_LOCKED` = « Vous ne pouvez pas désactiver votre propre compte. Un autre administrateur peut le faire si nécessaire. » (texte §4 mot pour mot).
+
+**Commandes**
+- `cd front; npm run build` → OK (exit 0). 2 avertissements **préexistants, sans lien** : budget initial 517.62 kB > 500 kB (`UserEditComponent` est chargé à la demande via `users.routes.ts:20,28`, donc hors bundle initial) et `dayjs` CommonJS (`activity-detail`).
+- Lint front : aucun (WORKFLOW.md). Prettier sur les 3 fichiers (via l'API, `prettier.format` comparé ligne à ligne) : seuls écarts = fins de ligne CRLF déjà présentes dans tout le dépôt + absence de retour à la ligne final de `fr.json` (déjà le cas à HEAD). Aucun écart de mise en forme dans les blocs modifiés ; CRLF conservé (0 LF seul).
+- `fr.json` : JSON valide (`JSON.parse`) ; chargé par le loader racine `prefix: '/assets/i18n/'` (`app.config.ts:24-25`).
+- Tests : aucun écrit (T3 = tester).
+
+**`aria-describedby` sur `#active` — vérifié vs supposé**
+- *Vérifié en lisant le code PrimeNG 21.1.5 installé* : le template de `ToggleSwitch` rend `<input #input [attr.id]="inputId" [attr.disabled]="$disabled() ? '' : undefined" … [pBind]="ptm('input')">` (`front/node_modules/primeng/fesm2022/primeng-toggleswitch.mjs:218-235`) ; `ptm('input')` → `_getPTValue(this.$pt(), 'input', …)` qui renvoie `{ ...global, ...self, ...datasets }`, `self` = `pt.input` (`primeng-basecomponent.mjs:334-341,396-397`) ; la directive `Bind` applique chaque clé non `on*`/non `class`/non `style` via `renderer.setAttribute(el, key, value)` (`primeng-bind.mjs:25-43`). Donc `aria-describedby="active-self-locked-help"` atterrit sur le même `<input>` qui porte `id="active"`. L'état désactivé est lui aussi un `disabled` natif sur cet input (hors tabulation, lu « indisponible »).
+- *Non vérifié à l'exécution* : pas de rendu DOM réel (pas de navigateur ni de spec autorisée de mon côté). Le spec `user-edit.component.spec.ts` (T3) prévu par §5 doit l'asserter sur `#active` ; R2 reste à clore par ce test.
+
+**Écarts vs §4/§5** : aucun.
+
+**Points d'attention reviewer/tester**
+- `isOwnRecord` est figé de fait par instance : `userId` vient de `paramMap` **snapshot** (comportement existant) et `currentUser` est posé par `authGuard` avant l'instanciation. La directive `Bind` ne retire pas un attribut quand `pt` repasse à `undefined` (elle ne supprime que les clés à `null`) ; sans conséquence ici puisque la valeur ne change pas pendant la vie du composant.
+- `form.patchValue(user)` (`user-edit-form.service.ts:40-42`) met à jour un contrôle désactivé → l'interrupteur reflète la valeur serveur (cas limite §4), et le changement de rôle déclenché par `patchValue` (`entryYear` ajouté/retiré) ne touche pas `active`.
+- Pour tester : `getRawValue()` contient `active: true` sur sa propre fiche ; `form.value` ne le contiendrait pas — ne pas l'utiliser comme référence. Création (`/users/new`) : `userId` = `''` → `isEditMode()` faux → jamais verrouillé.
+- `AuthService` est injecté par le composant (déjà le cas) : le mock du spec doit exposer `currentUser` (signal) en plus de `userRole`.
 
 ## 7. Test Report
-_(pending)_
+
+**Fichiers** (tests unitaires, dépendances mockées, aucune base de données, horloge simulée via `jest.useFakeTimers`, `bcrypt` mocké) :
+- `backend/src/auth/strategies/jwt.strategy.spec.ts` (4)
+- `backend/src/auth/auth.service.spec.ts` (7)
+- `backend/src/users/users.service.spec.ts` (11, dont 1 ajouté au rework 1)
+- `backend/src/users/users.controller.spec.ts` (2)
+- `front/src/app/features/users/user-edit/user-edit.component.spec.ts` (7, Vitest/TestBed, `AuthService`/`UsersRepository`/`ActivatedRoute` simulés)
+
+**Commandes et résultats** (lancés sur la version des tâches T1 et T2 présente dans le répertoire de travail, 2026-11-24) :
+- `cd backend; npx jest --passWithNoTests` → 4 fichiers · **23 réussis / 0 en échec / 0 ignoré**
+- Rework 1 (constat bloquant §8, casse de l'UUID) : `cd backend; npx jest --passWithNoTests` → 4 fichiers · **24 réussis / 0 en échec / 0 ignoré**, lancé sur l'arbre de travail qui contient déjà le correctif dev-back (`users.service.ts:121`, garde relancée sur `user.id` après `findOne`). `npx eslint src/users/users.service.spec.ts` → 0 erreur.
+- `cd front; npx ng test --watch=false` → 1 fichier · **7 réussis / 0 en échec / 0 ignoré** (premier fichier de test front : l'erreur « No tests found » ne se produit plus)
+- `npx eslint` sur les 4 fichiers de test back → 0 erreur.
+
+**Correspondance scénarios → tests**
+| Scénario §2 | Test(s) |
+|---|---|
+| Renouvellement refusé à un compte désactivé | `auth.service.spec` › refresh › rejects an inactive account (401 `'Refresh session expired or invalid.'`, `clearRefreshTokenSession('user-1')`, aucun `setRefreshTokenSession`, aucun `sign`) |
+| Requête authentifiée refusée après désactivation | `jwt.strategy.spec` › returns null for an inactive user ; returns null when the user no longer exists |
+| La désactivation met fin à la session | `users.service.spec` › deactivating another account › a non-admin user (`active:false` + 3 champs de session `null`, un seul `save`) |
+| Compte réactivé doit se reconnecter | `auth.service.spec` › rejects the old refresh token of a reactivated account (401 `'Refresh session not found.'`) ; login › lets a reactivated account log in again |
+| Réactivation rapide : jeton d'accès de nouveau accepté | `jwt.strategy.spec` › accepts the same access token again once reactivated |
+| Le serveur refuse l'auto-désactivation (400) | `users.service.spec` › rejects with 400 and the exact message (`findOne`/`save`/`update` non appelés) ; returns the documented 400 response body ; `users.controller.spec` › forwards req.user.id as actorId (×2) |
+| Le serveur refuse l'auto-désactivation — contournement par la casse (§8) | `users.service.spec` › rejects with 400 when the URL id differs only by case from the actor id (`updateUser('ADMIN-1', { active:false }, 'admin-1')`, `findOne` → `id:'admin-1'` ; `BadRequestException` 400, message exact, `save`/`update` non appelés) |
+| Le refus d'auto-désactivation n'enregistre rien d'autre | `users.service.spec` › rejects the whole record when other fields are changed |
+| Interrupteur verrouillé sur sa propre fiche | `user-edit.component.spec` › own record › checked and disabled ; cannot be toggled by clicking ; help text + `aria-describedby="active-self-locked-help"` sur `#active` |
+| Interrupteur modifiable sur la fiche d'un autre | `user-edit.component.spec` › another user's record › enabled, no help text, no `aria-describedby` ; toggle off → envoie `active:false` |
+| Modifier sa propre fiche sans se désactiver | `users.service.spec` › own record › active stays true / active absent (`save`, session intacte) ; `user-edit.component.spec` › still sends `active: true` on submit |
+| Désactiver le compte d'un autre administrateur | `users.service.spec` › deactivating another account › another administrator ; `users.controller.spec` |
+| Utilisateur désactivé renvoyé vers la connexion | Aucun nouveau test (comportement front existant inchangé, conformément à la stratégie de test §5) |
+| Connexion d'un compte désactivé refusée | `auth.service.spec` › login › rejects an inactive account (401 `'Invalid credentials.'`, aucune session) |
+| Désactiver un compte sans session | `users.service.spec` › deactivates an account that has no open session without error |
+| Modifier un compte actif sans le désactiver conserve la session | `users.service.spec` › keeps the refresh session fields intact ; `auth.service.spec` › issues new tokens for an active account |
+| Utilisateur actif non impacté | `jwt.strategy.spec` › returns the user when active ; `auth.service.spec` › refresh active ; logout › clears session / no-op without token |
+| C3 — protection contre l'écriture concurrente (refresh / désactivation) | `users.service.spec` › setRefreshTokenSession › `update({ id, active: true }, …)` |
+| F4 — création (non-régression) | `user-edit.component.spec` › creation › switch enabled, no help text |
+
+**Couverture** : avant cette US, aucun test unitaire (`TESTING.md`) ; la mesure de couverture (`npm run test:cov`) n'a pas été lancée.
+
+**Limites** : le passage `validate → null → 401` par `JwtAuthGuard` et le code HTTP 400 de bout en bout ne sont pas testés en intégration (risque R3, base de données requise). La présence de la clé `USERS.EDIT.ACTIVE_SELF_LOCKED` dans `fr.json` a été vérifiée dans le diff, pas par un test (le front n'a pas `resolveJsonModule`). Le spec front vérifie qu'un texte d'aide est présent, pas son texte exact.
 
 ## 8. Review Findings
-_(pending)_
+
+Revue bernadette — 2026-11-24 — diff `origin/restart-project...HEAD` + arbre de travail (hors `.gitignore` racine). Secrets : aucun dans les lignes ajoutées. Dépendances : aucun changement de manifest ni de lockfile. `SECURITY-DEBT.md` : vide, aucune dette existante à citer.
+
+- 🔴 BLOCKING — Access control / Gherkin mismatch (« Le serveur refuse qu'un administrateur désactive son propre compte ») : la garde d'auto-désactivation compare des chaînes exactes (`userId === actorId`), mais la ligne est ensuite chargée avec `where: { id: userId }` sur `users.id varchar(36)` sans collation explicite (`1781011294781-CreateInitialSchema.ts:21`, `app.module.ts:18-27`), donc avec la collation par défaut de MySQL, insensible à la casse (`utf8mb4_0900_ai_ci`). Aucun `ParseUUIDPipe` ni normalisation sur `@Param('userId')` (`users.controller.ts:78`). `PATCH /api/users/<son UUID en MAJUSCULES>` avec `{"active":false}` passe la garde, `findOne` retrouve sa propre ligne et `save` enregistre `active=false` puis purge sa session.
+  File: backend/src/users/users.service.ts:108 (garde), :115 (lecture), :128/:150 (écriture) · Impact: la garantie serveur (D4/D8 : « le blocage serveur reste la garantie ») se contourne avec un simple appel API modifié. Un administrateur peut se désactiver et se couper l'accès, ce qui peut laisser l'application sans administrateur actif. · Fix: garder la garde actuelle et ajouter la même vérification sur l'identifiant canonique chargé (`if (user.id === actorId && payload.active === false) throw new BadRequestException(...)`) juste après `findOne`, avant d'appliquer le payload : rien n'est écrit, donc le refus en bloc (D7) est conservé. La vérification exacte en tête reste le chemin normal (« aucun findOne »). · Owner: dev-back (correctif) + tester (cas `updateUser('ADMIN-1'…, { active: false }, 'admin-1')` avec `findOne` qui renvoie `id: 'admin-1'` → 400, `save` non appelé)
+    **✅ Résolu (REWORK 1, revue bernadette 2026-11-24)** : `assertNotSelfDeactivation` est appelé en tête avec l'id de l'URL (`users.service.ts:108`), puis sur l'id canonique chargé juste après le 404 (`users.service.ts:121`), avant toute application du payload et avant `save` (`:150`). L'`actorId` vient de `req.user.id`, chargé en base par la stratégie JWT, donc sous sa forme canonique. Le refus en bloc (D7) est conservé. Le test `users.service.spec.ts:131-147` (`'ADMIN-1'` → 400 avec le message exact, `save`/`update` non appelés) couvre ce cas. Aucune régression : les cas « propre fiche sans désactivation » et « désactiver un autre compte » passent toujours (jest 24 ✅).
+
+Aucun autre point :
+- **Sécurité** : C1 renvoie `null` et `passport-jwt` appelle alors `fail` : `JwtAuthGuard` (`jwt-auth.guard.ts:5`, sans `handleRequest` surchargé) répond 401 avant `PermissionsGuard` et le handler. C2 utilise le message neutre existant, sans oracle sur l'état du compte, et rejette avant `issueTokens` et le cookie. C3 filtre l'écriture de session sur `active: true` : la course refresh/désactivation est fermée. La révocation C4 passe par le même `save`, et `toResponseDto` n'expose aucun champ de session (testé). `active` non booléen est rejeté par le `ValidationPipe` global (`main.ts:19-25`, `@IsBoolean` `user-payload.dto.ts:47-49`). Côté front, le verrouillage n'est qu'un confort d'interface et ne sert pas de contrôle de sécurité.
+- **Performance** : aucune requête ajoutée sur le chemin JWT ni dans `updateUser`. Le seul ajout est un `UPDATE` quand un compte inactif tente un refresh, ce qui est borné.
+- **Pré-PR** : conventions respectées (`@Request() req: { user: User }` suit `activities.controller.ts:39`, `@ApiBadRequestResponse`, `protected readonly` + `computed`, `TranslatePipe` et clé i18n). Le code correspond à C1–C5. Pas de travail hors périmètre, et la taille reste facile à relire.
 
 ## 9. Decisions
 - D1 · 2026-11-24 · Branche de base — chosen: restart-project (base + cible de PR ; WORKFLOW.md inchangé) · options: restart-project / develop / main · asked by: factory · decided by: user
@@ -465,3 +562,11 @@ _(pending)_
 - 2026-11-24 — architect: §5 Tech Design rédigé (contrats C1–C5, 3 tâches parallèles, aucun ADR)
 - 2026-11-24 — factory: designed → arch
 - 2026-11-24 — factory: plan gate approuvé (D9) — track full, team confirmée
+- 2026-11-24 — dev-back: T1 (C1–C4) livré · dev-front: T2 (C5) livré · tester: T3, 30 tests
+- 2026-11-24 — factory: intégration OK (back build/lint/jest 23 ✅ · front build/ng test 7 ✅) — arch → dev
+- 2026-11-24 — security-perf-reviewer: REWORK — contournement de l'auto-désactivation par casse de l'UUID (rework 1/3 → dev-back + tester)
+- 2026-11-24 — tester: rework 1 — test du contournement par la casse ajouté ; back jest 24 ✅
+- 2026-11-24 — factory: rework 1 intégré (dev-back : 2e contrôle après findOne) — back build/lint/jest 24 ✅ ; re-review
+- 2026-11-24 — security-perf-reviewer: DONE (finding 🔴 résolu, 0 risque) — dev → reviewed
+- 2026-11-24 — finalizer: BLOCKED → architect (TESTING.md / WORKFLOW.md obsolètes) · architect: docs corrigés (back-route 1/1)
+- 2026-11-24 — finalizer: INDEX.md rafraîchi, README §4.3 mis à jour — reviewed → done (PR)

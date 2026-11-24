@@ -43,6 +43,8 @@ Il n'y a pas d'auto-inscription : **seul un admin (CA) crée les comptes**.
 ### 4.3 Gestion des membres (CA)
 - Créer, consulter, modifier, supprimer un membre ou un candidat.
 - Attribuer le rôle (candidat, membre, CA, président) et l'année d'entrée.
+- Désactiver un compte : la personne perd l'accès immédiatement, même si elle était connectée, et est renvoyée vers la page de connexion.
+- Un admin ne peut pas désactiver son propre compte : l'interrupteur est verrouillé sur son propre profil.
 
 ### 4.4 Activités (CA)
 - Créer, consulter, modifier, supprimer une activité.
