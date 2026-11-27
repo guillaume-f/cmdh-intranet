@@ -24,10 +24,11 @@ Two independent npm projects; run each command in both folders.
 | install | `cd backend; npm ci` · `cd front; npm ci` |
 | build   | `cd backend; npm run build` · `cd front; npm run build` |
 | lint    | `cd backend; npx eslint "{src,apps,libs,test}/**/*.ts"` (check only; `npm run lint` applies `--fix`) · front: none |
-| test    | `cd backend; npx jest --passWithNoTests` · `cd front; npx ng test --watch=false` (fails with "No tests found" until the first front spec exists) |
+| test    | `cd backend; npx jest --passWithNoTests` · `cd front; npx ng test --watch=false` |
 
 ## Gates & limits (overrides of factory.agent.md — empty = defaults)
 - max-files: 30
 
 ## History
 - 2026-11-23 — onboard
+- 2026-11-24 — US-001: removed the "No tests found" note from the front test command (first front spec exists)

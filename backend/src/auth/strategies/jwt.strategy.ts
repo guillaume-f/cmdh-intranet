@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { User } from '../../users/entities/user.entity';
 import { UsersService } from '../../users/users.service';
 
 export interface JwtPayload {
@@ -22,8 +23,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<User | null> {
     const user = await this.usersService.findById(payload.sub);
+    // Missing or inactive account → null → JwtAuthGuard answers 401.
+    if (!user || !user.active) return null;
     return user;
   }
 }

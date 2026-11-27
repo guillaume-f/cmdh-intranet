@@ -101,6 +101,11 @@ export class AuthService {
       throw new UnauthorizedException('Refresh session not found.');
     }
 
+    if (!user.active) {
+      await this.usersService.clearRefreshTokenSession(user.id);
+      throw new UnauthorizedException('Refresh session expired or invalid.');
+    }
+
     const isExpired = user.refreshTokenExpiresAt.getTime() <= Date.now();
     const isHashMismatch =
       user.refreshTokenHash !== this.hashToken(refreshToken);
@@ -112,12 +117,16 @@ export class AuthService {
     }
 
     const nextTokens = this.issueTokens(user);
-    await this.usersService.setRefreshTokenSession(
+    const rotated = await this.usersService.setRefreshTokenSession(
       user.id,
       this.hashToken(nextTokens.refreshToken),
       nextTokens.refreshTokenId,
       nextTokens.refreshExpiresAt,
+      user.refreshTokenId,
     );
+    if (!rotated) {
+      throw new UnauthorizedException('Refresh session expired or invalid.');
+    }
 
     return {
       token: nextTokens.token,
