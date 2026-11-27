@@ -54,7 +54,9 @@ export class UserEditComponent implements OnInit {
   private readonly userId = signal(this.activatedRoute.snapshot.paramMap.get('userId') ?? '');
   private readonly isEditMode = computed(() => !!this.userId());
   protected readonly isOwnRecord = computed(
-    () => this.isEditMode() && this.userId() === this.authService.currentUser()?.id,
+    () =>
+      this.isEditMode() &&
+      this.userId().toLowerCase() === this.authService.currentUser()?.id.toLowerCase(),
   );
   protected readonly activeSwitchPt = computed(() =>
     this.isOwnRecord() ? { input: { 'aria-describedby': 'active-self-locked-help' } } : undefined,
