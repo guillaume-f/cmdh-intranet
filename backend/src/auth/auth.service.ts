@@ -117,12 +117,16 @@ export class AuthService {
     }
 
     const nextTokens = this.issueTokens(user);
-    await this.usersService.setRefreshTokenSession(
+    const rotated = await this.usersService.setRefreshTokenSession(
       user.id,
       this.hashToken(nextTokens.refreshToken),
       nextTokens.refreshTokenId,
       nextTokens.refreshExpiresAt,
+      user.refreshTokenId,
     );
+    if (!rotated) {
+      throw new UnauthorizedException('Refresh session expired or invalid.');
+    }
 
     return {
       token: nextTokens.token,

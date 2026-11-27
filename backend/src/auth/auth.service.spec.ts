@@ -47,7 +47,7 @@ describe('AuthService (US-001 C2)', () => {
     usersService = {
       findById: jest.fn(),
       findByEmail: jest.fn(),
-      setRefreshTokenSession: jest.fn().mockResolvedValue(undefined),
+      setRefreshTokenSession: jest.fn().mockResolvedValue(true),
       clearRefreshTokenSession: jest.fn().mockResolvedValue(undefined),
     };
 
@@ -137,8 +137,18 @@ describe('AuthService (US-001 C2)', () => {
         sha256(result.refreshToken),
         expect.any(String),
         result.refreshExpiresAt,
+        OLD_TOKEN_ID,
       );
       expect(usersService.clearRefreshTokenSession).not.toHaveBeenCalled();
+    });
+
+    it('rejects with 401 when the session was revoked during the rotation', async () => {
+      usersService.findById.mockResolvedValue(buildUser({ active: true }));
+      usersService.setRefreshTokenSession.mockResolvedValue(false);
+
+      await expect(service.refresh(OLD_REFRESH_TOKEN)).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
     });
   });
 

@@ -37,13 +37,22 @@ export class UsersService {
     refreshTokenHash: string,
     refreshTokenId: string,
     refreshTokenExpiresAt: Date,
-  ): Promise<void> {
-    // Filtering on `active` prevents a concurrent refresh from rewriting a
-    // session that a deactivation has just purged.
-    await this.usersRepository.update(
-      { id: userId, active: true },
+    expectedRefreshTokenId?: string,
+  ): Promise<boolean> {
+    // Filtering on `active` (and on the previously validated session id for a
+    // rotation) prevents a concurrent refresh from rewriting a session that a
+    // deactivation has just purged, even after a reactivation.
+    const result = await this.usersRepository.update(
+      {
+        id: userId,
+        active: true,
+        ...(expectedRefreshTokenId
+          ? { refreshTokenId: expectedRefreshTokenId }
+          : {}),
+      },
       { refreshTokenHash, refreshTokenId, refreshTokenExpiresAt },
     );
+    return (result?.affected ?? 0) > 0;
   }
 
   async clearRefreshTokenSession(userId: string): Promise<void> {

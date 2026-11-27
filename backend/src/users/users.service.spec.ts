@@ -286,5 +286,28 @@ describe('UsersService (US-001 C3/C4)', () => {
         },
       );
     });
+
+    it('also filters on the previous session id when rotating', async () => {
+      const result = await service.setRefreshTokenSession(
+        'user-1',
+        'new-hash',
+        'new-token-id',
+        SESSION_EXPIRES_AT,
+        'old-token-id',
+      );
+
+      expect(result).toBe(true);
+      expect(usersRepository.update).toHaveBeenCalledWith(
+        { id: 'user-1', active: true, refreshTokenId: 'old-token-id' },
+        expect.any(Object),
+      );
+    });
+
+    it('returns false when no row was updated', async () => {
+      usersRepository.update.mockResolvedValue({ affected: 0 });
+      await expect(
+        service.setRefreshTokenSession('user-1', 'h', 'i', SESSION_EXPIRES_AT),
+      ).resolves.toBe(false);
+    });
   });
 });
